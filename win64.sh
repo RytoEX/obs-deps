@@ -388,6 +388,7 @@ git checkout f9f95ceebfbd7b7f43c1b7ad34e25d366e6e2d2b
 
 # patch FFmpeg
 git apply ../patch/ffmpeg/ffmpeg_flvdec.patch
+git add .
 git commit -m "Fix decoding of certain malformed FLV files"
 
 # apply cherry-picked commits
