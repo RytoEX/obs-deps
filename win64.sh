@@ -308,6 +308,7 @@ mv vorbis-83a82dd9296400d811b78c06e9ca429e24dd1e5c libvorbis
 # build libvorbis
 cd libvorbis
 make clean
+./autogen.sh
 PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig" LDFLAGS="-L$PREFIX/lib -static-libgcc" CPPFLAGS="-I$PREFIX/include" ./configure --host=x86_64-w64-mingw32 --prefix="$PREFIX" --enable-shared --with-ogg="$PREFIX"
 make -j$PARALLELISM
 make install
