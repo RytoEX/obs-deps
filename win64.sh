@@ -364,16 +364,19 @@ cd ..
 
 # AMF
 # download/prep AMF
-#git clone https://github.com/obsproject/obs-amd-encoder.git
+# git >= 2.25
+#git clone --filter=blob:none --no-checkout https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git
+#cd AMF
+#git sparse-checkout set amf/public/include
+#git checkout 802f92ee52b9efa77bf0d3ea8bfaed6040cdd35e
 #mkdir -p $PREFIX/include/AMF
-#cp -a obs-amd-encoder/AMF/amf/public/include/* $PREFIX/include/AMF
-git clone --filter=blob:none --no-checkout https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git
-cd AMF
-git sparse-checkout set amf/public/include
-git checkout 802f92ee52b9efa77bf0d3ea8bfaed6040cdd35e
+#cp -a amf/public/include/* $PREFIX/include/AMF
+#cd ..
+
+# git < 2.25
+git clone https://github.com/obsproject/obs-amd-encoder.git
 mkdir -p $PREFIX/include/AMF
-cp -a amf/public/include/* $PREFIX/include/AMF
-cd ..
+cp -a obs-amd-encoder/AMF/amf/public/include/* $PREFIX/include/AMF
 
 # download FFmpeg
 #curl -L -o FFmpeg-n4.2.2.zip https://github.com/FFmpeg/FFmpeg/archive/n4.2.2.zip
