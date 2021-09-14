@@ -29,9 +29,9 @@ if [ "$SKIP_PROMPTS" != true ]; then
 fi
 
 # download mbedTLS
-curl --retry 5 -L -o mbedtls-2.23.0.tar.gz https://github.com/ARMmbed/mbedtls/archive/v2.23.0.tar.gz
-tar -xf mbedtls-2.23.0.tar.gz
-mv mbedtls-2.23.0 mbedtls
+curl --retry 5 -L -o mbedtls-2.24.0.tar.gz https://github.com/ARMmbed/mbedtls/archive/v2.24.0.tar.gz
+tar -xf mbedtls-2.24.0.tar.gz
+mv mbedtls-2.24.0 mbedtls
 
 # build mbedTLS
 # Enable the threading abstraction layer and use an alternate implementation
@@ -141,9 +141,9 @@ if [ "$SKIP_PROMPTS" != true ]; then
 fi
 
 # download libsrt
-curl --retry 5 -L -o srt-v1.4.1.tar.gz https://github.com/Haivision/srt/archive/v1.4.1.tar.gz
-tar -xf srt-v1.4.1.tar.gz
-mv srt-1.4.1 srt
+curl --retry 5 -L -o srt-v1.4.2.tar.gz https://github.com/Haivision/srt/archive/v1.4.2.tar.gz
+tar -xf srt-v1.4.2.tar.gz
+mv srt-1.4.2 srt
 
 # build libsrt
 mkdir -p srtbuild/win64
@@ -167,7 +167,7 @@ fi
 # download and prep x264
 git clone https://code.videolan.org/videolan/x264.git
 cd x264
-git checkout 72db437770fd1ce3961f624dd57a8e75ff65ae0b
+git checkout d198931a63049db1f2c92d96c34904c69fde8117
 
 # build x264
 x264_api="$(grep '#define X264_BUILD' < x264.h | sed 's/^.* \([1-9][0-9]*\).*$/\1/')"
@@ -272,9 +272,9 @@ if [ "$SKIP_PROMPTS" != true ]; then
 fi
 
 # download libogg
-curl --retry 5 -L -o ogg-68ca3841567247ac1f7850801a164f58738d8df9.tar.gz https://gitlab.xiph.org/xiph/ogg/-/archive/68ca3841567247ac1f7850801a164f58738d8df9/ogg-68ca3841567247ac1f7850801a164f58738d8df9.tar.gz
-tar -xf ogg-68ca3841567247ac1f7850801a164f58738d8df9.tar.gz
-mv ogg-68ca3841567247ac1f7850801a164f58738d8df9 libogg
+curl --retry 5 -L -o ogg-31bd3f2707fb7dbae539a7093ba1fc4b2b37d84e.tar.gz https://gitlab.xiph.org/xiph/ogg/-/archive/31bd3f2707fb7dbae539a7093ba1fc4b2b37d84e/ogg-31bd3f2707fb7dbae539a7093ba1fc4b2b37d84e.tar.gz
+tar -xf ogg-31bd3f2707fb7dbae539a7093ba1fc4b2b37d84e.tar.gz
+mv ogg-31bd3f2707fb7dbae539a7093ba1fc4b2b37d84e libogg
 
 # build libogg
 cd libogg
@@ -297,9 +297,9 @@ if [ "$SKIP_PROMPTS" != true ]; then
 fi
 
 # download libvorbis
-curl --retry 5 -L -O https://ftp.osuosl.org/pub/xiph/releases/vorbis/libvorbis-1.3.6.tar.gz
-tar -xf libvorbis-1.3.6.tar.gz
-mv libvorbis-1.3.6 libvorbis
+curl --retry 5 -L -o vorbis-83a82dd9296400d811b78c06e9ca429e24dd1e5c.tar.gz https://gitlab.xiph.org/xiph/vorbis/-/archive/83a82dd9296400d811b78c06e9ca429e24dd1e5c/vorbis-83a82dd9296400d811b78c06e9ca429e24dd1e5c.tar.gz
+tar -xf vorbis-83a82dd9296400d811b78c06e9ca429e24dd1e5c.tar.gz
+mv vorbis-83a82dd9296400d811b78c06e9ca429e24dd1e5c libvorbis
 
 # build libvorbis
 cd libvorbis
@@ -319,9 +319,9 @@ if [ "$SKIP_PROMPTS" != true ]; then
 fi
 
 # download libvpx
-curl --retry 5 -L -o libvpx-v1.8.1.tar.gz https://chromium.googlesource.com/webm/libvpx/+archive/v1.8.1.tar.gz
+curl --retry 5 -L -o libvpx-git.tar.gz https://chromium.googlesource.com/webm/libvpx/+archive/e56e8dcd6fc9e2b04316be5144c18ca6772f6263.tar.gz
 mkdir -p libvpx
-tar -xf libvpx-v1.8.1.tar.gz -C $PWD/libvpx
+tar -xf libvpx-git.tar.gz -C $PWD/libvpx
 
 # build libvpx
 cd libvpx
@@ -351,6 +351,7 @@ fi
 # download nv-codec-headers
 git clone https://git.videolan.org/git/ffmpeg/nv-codec-headers.git
 cd nv-codec-headers
+git checkout 96a6db017b096ad48612890083464a7214902afa
 
 # build nv-codec-headers
 make PREFIX=$PREFIX
@@ -359,18 +360,54 @@ cd ..
 
 # AMF
 # download/prep AMF
-git clone https://github.com/obsproject/obs-amd-encoder.git
+#git clone https://github.com/obsproject/obs-amd-encoder.git
+#mkdir -p $PREFIX/include/AMF
+#cp -a obs-amd-encoder/AMF/amf/public/include/* $PREFIX/include/AMF
+git clone --filter=blob:none --no-checkout https://github.com/GPUOpen-LibrariesAndSDKs/AMF.git
+cd AMF
+git sparse-checkout set amf/public/include
+git checkout 802f92ee52b9efa77bf0d3ea8bfaed6040cdd35e
 mkdir -p $PREFIX/include/AMF
-cp -a obs-amd-encoder/AMF/amf/public/include/* $PREFIX/include/AMF
+cp -a amf/public/include/* $PREFIX/include/AMF
+cd ..
 
 # download FFmpeg
-curl -L -o FFmpeg-n4.2.2.zip https://github.com/FFmpeg/FFmpeg/archive/n4.2.2.zip
-unzip FFmpeg-n4.2.2.zip
-mv FFmpeg-n4.2.2 ffmpeg
+#curl -L -o FFmpeg-n4.2.2.zip https://github.com/FFmpeg/FFmpeg/archive/n4.2.2.zip
+#unzip FFmpeg-n4.2.2.zip
+#mv FFmpeg-n4.2.2 ffmpeg
+git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg
+cd ffmpeg
+git checkout f9f95ceebfbd7b7f43c1b7ad34e25d366e6e2d2b
+
+# patch FFmpeg
+git apply ../patch/ffmpeg/ffmpeg_flvdec.patch
+git commit -m "Fix decoding of certain malformed FLV files"
+
+# apply cherry-picked commits
+git cherry-pick 1f7b527194a2a10c334b0ff66ec0a72f4fe65e08 \
+	f9d6addd60b3f9ac87388fe4ae0dc217235af81d \
+	79d907774d59119dcfd1c04dae97b52890aec3ec \
+	8d823e6005febef23ca10ccd9d8725e708167aeb \
+	952fd0c768747a0f910ce8b689fd23d7c67a51f8 \
+	d7e2a2bb35e394287b3e3dc27744830bf0b7ca99 \
+	3def315c5c3baa26c4f6b7ac4622aa8a3bfb46f8 \
+	f8990c5f414d4575415e2a3981c3b142222ca3d4 \
+	fee4cafbf52f81ffd6ad7ed4fd0a8096f8791886 \
+	b96bc946f219fbd28cffc1efea78fd42f34148ec \
+	006744bdbd83d98bc71cb041d9551bf6a64b45a2 \
+	aab9133d919bec4af54a06216d8629ebe4fb8f74 \
+	c112fae6603f8be33cf1ee2ae390ec939812f473 \
+	86a7b77b60488758e0c080882899c32c4a5ee017 \
+	7cc7680a802c1eee9e334a0653f2347e9c0922a4 \
+	449e984192d94ac40713e9217871c884657dc79d \
+	290a35aefed250a797449c34d2f9e5af0c4e006a \
+	6e95ce8cc9ae30e0e617e96e8d7e46a696b8965e \
+	e9b35a249d224b2a93ffe45a1ffb7448972b83f3 \
+	7c59e1b0f285cd7c7b35fcd71f49c5fd52cf9315 \
+	86f5fd471d35423e3bd5c9d2bd0076b14124faee \
+	fb0304fcc9f79a4c9cbdf347f20f484529f169ba
 
 # build FFmpeg
-cd ffmpeg
-patch -p1 < ../patch/ffmpeg/ffmpeg_flvdec.patch
 make clean
 PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig" LDFLAGS="-L$PREFIX/lib" CPPFLAGS="-I$PREFIX/include -I$WORKDIR/pthread-win32" ./configure --enable-gpl --disable-doc --arch=x86_64 --enable-shared --enable-nvenc --enable-amf --enable-libx264 --enable-libopus --enable-libvorbis --enable-libvpx --enable-libsrt --disable-debug --cross-prefix=x86_64-w64-mingw32- --target-os=mingw32 --pkg-config=pkg-config --prefix="$PREFIX" --disable-postproc
 if [ "$SKIP_PROMPTS" != true ]; then
