@@ -17,6 +17,7 @@ export PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig"
 
 # set variables
 SKIP_PROMPTS=true
+PARALLELISM=$(nproc)
 
 
 #---------------------------------
@@ -43,7 +44,7 @@ mkdir -p mbedtlsbuild/win64
 cd mbedtlsbuild/win64
 rm -rf *
 cmake ../../mbedtls -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres -DCMAKE_SHARED_LINKER_FLAGS="-static-libgcc -Wl,--strip-debug" -DUSE_SHARED_MBEDTLS_LIBRARY=ON -DUSE_STATIC_MBEDTLS_LIBRARY=OFF -DENABLE_PROGRAMS=OFF -DENABLE_TESTING=OFF
-make -j$(nproc)
+make -j$PARALLELISM
 x86_64-w64-mingw32-dlltool -z mbedtls.orig.def --export-all-symbols library/libmbedtls.dll
 x86_64-w64-mingw32-dlltool -z mbedcrypto.orig.def --export-all-symbols library/libmbedcrypto.dll
 x86_64-w64-mingw32-dlltool -z mbedx509.orig.def --export-all-symbols library/libmbedx509.dll
@@ -149,7 +150,7 @@ mkdir -p srtbuild/win64
 cd srtbuild/win64
 rm -rf *
 cmake ../../srt -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_CXX_COMPILER=x86_64-w64-mingw32-g++ -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres -DUSE_ENCLIB=mbedtls -DENABLE_APPS=OFF -DENABLE_STATIC=OFF -DENABLE_SHARED=ON -DCMAKE_C_FLAGS="-I$WORKDIR/pthread-win32" -DCMAKE_CXX_FLAGS="-I$WORKDIR/pthread-win32" -DCMAKE_SHARED_LINKER_FLAGS="-static-libgcc -Wl,--strip-debug" -DPTHREAD_LIBRARY="$PREFIX/lib/libpthreadGC2.a" -DPTHREAD_INCLUDE_DIR="$WORKDIR/pthread-win32" -DUSE_OPENSSL_PC=OFF -DCMAKE_BUILD_TYPE=MinSizeRel
-make -j$(nproc)
+make -j$PARALLELISM
 x86_64-w64-mingw32-strip -w --keep-symbol=srt* libsrt.dll
 make install
 cd ../..
@@ -172,7 +173,7 @@ git checkout 72db437770fd1ce3961f624dd57a8e75ff65ae0b
 x264_api="$(grep '#define X264_BUILD' < x264.h | sed 's/^.* \([1-9][0-9]*\).*$/\1/')"
 make clean
 LDFLAGS="-static-libgcc" ./configure --enable-shared --disable-avs --disable-ffms --disable-gpac --disable-interlaced --disable-lavf --cross-prefix=x86_64-w64-mingw32- --host=x86_64-pc-mingw32 --prefix="$PREFIX"
-make -j$(nproc)
+make -j$PARALLELISM
 make install
 x86_64-w64-mingw32-dlltool -z $PREFIX/bin/x264.orig.def --export-all-symbols $PREFIX/bin/libx264-$x264_api.dll
 grep "EXPORTS\|x264" $PREFIX/bin/x264.orig.def > $PREFIX/bin/x264.def
@@ -199,7 +200,7 @@ mv opus-1.3.1 opus
 cd opus
 make clean
 LDFLAGS="-static-libgcc" ./configure --host=x86_64-w64-mingw32 --prefix="$PREFIX" --enable-shared
-make -j$(nproc)
+make -j$PARALLELISM
 make install
 cd ..
 
@@ -226,7 +227,7 @@ mkdir build64
 cd build64
 make clean
 cmake .. -DCMAKE_SYSTEM_NAME=Windows -DCMAKE_C_COMPILER=x86_64-w64-mingw32-gcc -DCMAKE_INSTALL_PREFIX=$PREFIX -DCMAKE_RC_COMPILER=x86_64-w64-mingw32-windres -DCMAKE_SHARED_LINKER_FLAGS="-static-libgcc -Wl,--strip-debug"
-make -j$(nproc)
+make -j$PARALLELISM
 make install
 mv $PREFIX/lib/libzlib.dll.a $PREFIX/lib/libz.dll.a
 mv $PREFIX/lib/libzlibstatic.a $PREFIX/lib/libz.a
@@ -257,7 +258,7 @@ mv libpng-1.6.37 libpng
 cd libpng
 make clean
 PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig" LDFLAGS="-L$PREFIX/lib" CPPFLAGS="-I$PREFIX/include" ./configure --host=x86_64-w64-mingw32 --prefix="$PREFIX" --enable-shared
-make -j$(nproc)
+make -j$PARALLELISM
 make install
 cd ..
 
@@ -282,7 +283,7 @@ mkdir build64
 cd build64
 make clean
 PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig" LDFLAGS="-L$PREFIX/lib -static-libgcc" CPPFLAGS="-I$PREFIX/include" ../configure --host=x86_64-w64-mingw32 --prefix="$PREFIX" --enable-shared
-make -j$(nproc)
+make -j$PARALLELISM
 make install
 cd ../..
 
@@ -304,7 +305,7 @@ mv libvorbis-1.3.6 libvorbis
 cd libvorbis
 make clean
 PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig" LDFLAGS="-L$PREFIX/lib -static-libgcc" CPPFLAGS="-I$PREFIX/include" ./configure --host=x86_64-w64-mingw32 --prefix="$PREFIX" --enable-shared --with-ogg="$PREFIX"
-make -j$(nproc)
+make -j$PARALLELISM
 make install
 cd ..
 
@@ -330,7 +331,7 @@ mkdir -p libvpxbuild
 cd libvpxbuild
 make clean
 PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig" CROSS=x86_64-w64-mingw32- LDFLAGS="-static-libgcc" ../libvpx/configure --prefix=$PREFIX --enable-vp8 --enable-vp9 --disable-docs --disable-examples --enable-shared --disable-static --enable-runtime-cpu-detect --enable-realtime-only --disable-install-bins --disable-install-docs --disable-unit-tests --target=x86_64-win64-gcc
-make -j$(nproc)
+make -j$PARALLELISM
 make install
 x86_64-w64-mingw32-dlltool -m i386:x86-64 -d libvpx.def -l $PREFIX/bin/vpx.lib -D $PREFIX/bin/libvpx-1.dll
 cd ..
@@ -375,6 +376,6 @@ PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig" LDFLAGS="-L$PREFIX/lib" CPPFLAGS="-I$PRE
 if [ "$SKIP_PROMPTS" != true ]; then
 	read -n1 -r -p "Press any key to continue building FFmpeg..." key
 fi
-make -j$(nproc)
+make -j$PARALLELISM
 make install
 cd ..
