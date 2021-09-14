@@ -198,7 +198,7 @@ mv opus-1.3.1 opus
 # build opus
 cd opus
 make clean
-LDFLAGS="-static-libgcc" ./configure --host=x86_64-w64-mingw32 --prefix="$PREFIX" --enable-shared
+PKG_CONFIG_PATH="$PREFIX/lib/pkgconfig" LDFLAGS="-L$PREFIX/lib -static-libgcc" ./configure --host=x86_64-w64-mingw32 --prefix="$PREFIX" --enable-shared --enable-stack-protector=yes
 make -j$PARALLELISM
 make install
 cd ..
