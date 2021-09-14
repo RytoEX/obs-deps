@@ -387,6 +387,19 @@ git clone https://github.com/FFmpeg/FFmpeg.git ffmpeg
 cd ffmpeg
 git checkout f9f95ceebfbd7b7f43c1b7ad34e25d366e6e2d2b
 
+# verify git is configured
+# git needs to be configured with user.email and user.name to be able to commit
+# the patch below
+# should make this a helper function
+git_user_email=$(git config --get user.email)
+if [ -z "$git_user_email" ]; then
+	git config user.email "contact@obsproject.com"
+fi
+git_user_name=$(git config --get user.name)
+if [ -z "$git_user_name" ]; then
+	git config user.name "OBS Project"
+fi
+
 # patch FFmpeg
 git apply ../patch/ffmpeg/ffmpeg_flvdec.patch
 git add .
