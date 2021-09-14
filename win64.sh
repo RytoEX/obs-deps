@@ -144,6 +144,11 @@ curl --retry 5 -L -o srt-v1.4.2.tar.gz https://github.com/Haivision/srt/archive/
 tar -xf srt-v1.4.2.tar.gz
 mv srt-1.4.2 srt
 
+# patch libsrt
+cd srt
+patch -p1 < ../patch/libsrt/libsrt-minsizerel.patch
+cd ..
+
 # build libsrt
 mkdir -p srtbuild/win64
 cd srtbuild/win64
