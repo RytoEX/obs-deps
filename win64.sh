@@ -38,6 +38,7 @@ mv mbedtls-2.24.0 mbedtls
 sed -i -e "s/\/\/#define MBEDTLS_THREADING_C/#define MBEDTLS_THREADING_C/" \
 -e "s/\/\/#define MBEDTLS_THREADING_ALT/#define MBEDTLS_THREADING_ALT/" mbedtls/include/mbedtls/config.h
 cp -p patch/mbedtls/threading_alt.h mbedtls/include/mbedtls/threading_alt.h
+#cp -p patch/mbedtls/config.h mbedtls/include/mbedtls/config.h
 
 
 mkdir -p mbedtlsbuild/win64
@@ -401,11 +402,13 @@ if [ -z "$git_user_name" ]; then
 fi
 
 # patch FFmpeg
+# does not apply on current FFmpeg git master
 git apply ../patch/ffmpeg/ffmpeg_flvdec.patch
 git add .
 git commit -m "Fix decoding of certain malformed FLV files"
 
 # apply cherry-picked commits
+# cherry-picks obviously fail on current FFmpeg git master
 git cherry-pick 1f7b527194a2a10c334b0ff66ec0a72f4fe65e08 \
 	f9d6addd60b3f9ac87388fe4ae0dc217235af81d \
 	79d907774d59119dcfd1c04dae97b52890aec3ec \
