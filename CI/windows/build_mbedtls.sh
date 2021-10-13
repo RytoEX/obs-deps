@@ -59,7 +59,7 @@ _install_product() {
     step "Install (${ARCH})..."
     #cmake --install build_${ARCH} --config "Release"
     make install
-    mv ${BUILD_DIR}/lib/*.dll ${BUILD_DIR}/bin
+    mv "${BUILD_DIR}"/lib/*.dll "${BUILD_DIR}"/bin
     _install_pkgconfig
 }
 
