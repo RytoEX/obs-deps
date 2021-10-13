@@ -22,7 +22,6 @@ set -eE
 _RUN_OBS_BUILD_SCRIPT=TRUE
 PRODUCT_NAME="obs-deps"
 REQUIRED_DEPS=(
-    "cache  "
     "mbedtls 2.24.0 d436ae4892bd80329ca18a3960052fbb42d3f1f46c7519711d6763621ca6cfa0"
 )
 

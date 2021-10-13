@@ -28,7 +28,7 @@ fi
 
 ## DEFINE UTILITIES ##
 install_tools() {
-    sudo apt install ${QUIET:+--quiet} automake cmake curl git libtool mingw-w64 mingw-w64-tools pkg-config wget
+    sudo apt ${QUIET:+--quiet} -y install automake cmake curl git libtool mingw-w64 mingw-w64-tools pkg-config wget
 }
 
 check_curl() {
