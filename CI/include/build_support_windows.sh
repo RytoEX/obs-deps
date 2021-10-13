@@ -65,11 +65,8 @@ check_archs() {
         CMAKE_ARCHS="x86"
     elif [ "${ARCH}" = "x86_64" ]; then
         CMAKE_ARCHS="x86_64"
-    elif
-    elif [ "${ARCH}" != "x86_64" -a "${ARCH}" != "arm64" ]; then
-        caught_error "Unsupported architecture '${ARCH}' provided"
     else
-        CMAKE_ARCHS="${ARCH}"
+        caught_error "Unsupported architecture '${ARCH}' provided"
     fi
 }
 

@@ -1,12 +1,12 @@
 #!/bin/bash
 
-##############################################################################
+################################################################################
 # Windows mbedtls build script
-##############################################################################
+################################################################################
 #
 # This script file can be included in build scripts for Windows or run directly
 #
-##############################################################################
+################################################################################
 
 # Halt on errors
 set -eE
@@ -24,9 +24,9 @@ _build_product() {
     step "Configure (${ARCH})..."
     cmake -S . -B build_${ARCH} ${CMAKE_CCACHE_OPTIONS} \
         -DCMAKE_SYSTEM_NAME=Windows \
-        -DCMAKE_C_COMPILER=$toolprefix-w64-mingw32-gcc \
+        -DCMAKE_C_COMPILER=$WIN_CROSS_TOOL_PREFIX-w64-mingw32-gcc \
         -DCMAKE_INSTALL_PREFIX="${BUILD_DIR}" \
-        -DCMAKE_RC_COMPILER=$toolprefix-w64-mingw32-windres \
+        -DCMAKE_RC_COMPILER=$WIN_CROSS_TOOL_PREFIX-w64-mingw32-windres \
         -DCMAKE_SHARED_LINKER_FLAGS="-static-libgcc -Wl,--strip-debug" \
         -DUSE_SHARED_MBEDTLS_LIBRARY=ON \
         -DUSE_STATIC_MBEDTLS_LIBRARY=OFF \
@@ -35,14 +35,31 @@ _build_product() {
         ${QUIET:+-Wno-deprecated -Wno-dev --log-level=ERROR}
 
     step "Build (${ARCH})..."
-    cmake --build build_${ARCH} --config "Release"
+    #cmake --build build_${ARCH} --config "Release"
+    cd "${BUILD_DIR}"
+    make -j$PARALLELISM
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z mbedtls.orig.def --export-all-symbols library/libmbedtls.dll
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z mbedcrypto.orig.def --export-all-symbols library/libmbedcrypto.dll
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z mbedx509.orig.def --export-all-symbols library/libmbedx509.dll
+    grep "EXPORTS\|mbedtls" mbedtls.orig.def > mbedtls.def
+    grep "EXPORTS\|mbedtls" mbedcrypto.orig.def > mbedcrypto.def
+    grep "EXPORTS\|mbedtls" mbedx509.orig.def > mbedx509.def
+    sed -i -e "/\\t.*DATA/d" -e "/\\t\".*/d" -e "s/\s@.*//" mbedtls.def
+    sed -i -e "/\\t.*DATA/d" -e "/\\t\".*/d" -e "s/\s@.*//" mbedcrypto.def
+    sed -i -e "/\\t.*DATA/d" -e "/\\t\".*/d" -e "s/\s@.*//" mbedx509.def
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedtls.def -l $outdir/bin/mbedtls.lib -D library/libmbedtls.dll
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedcrypto.def -l $outdir/bin/mbedcrypto.lib -D library/libmbedcrypto.dll
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedx509.def -l $outdir/bin/mbedx509.lib -D library/libmbedx509.dll
+
 }
 
 _install_product() {
     cd "${PRODUCT_FOLDER}"
 
     step "Install (${ARCH})..."
-    cmake --install build_${ARCH} --config "Release"
+    #cmake --install build_${ARCH} --config "Release"
+    make install
+    #mv $archdir/lib/*.dll $archdir/bin
     _install_pkgconfig
 }
 
@@ -101,7 +118,7 @@ build-mbedtls-main() {
     if [ -z "${_RUN_OBS_BUILD_SCRIPT}" ]; then
         CHECKOUT_DIR="$(/usr/bin/git rev-parse --show-toplevel)"
         source "${CHECKOUT_DIR}/CI/include/build_support.sh"
-        source "${CHECKOUT_DIR}/CI/include/build_support_windows.sh"
+        source "${CHECKOUT_DIR}/CI/include/build_support_windows_cross.sh"
 
         _check_parameters $*
         _build_checks

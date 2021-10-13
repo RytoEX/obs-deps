@@ -10,13 +10,7 @@
 
 # Setup build environment
 
-# Ensure using the most recent macOS SDK
-export SDKROOT=$(xcrun --sdk macosx --show-sdk-path)
 PARALLELISM="$(nproc)"
-
-MACOS_VERSION="$(/usr/bin/sw_vers -productVersion)"
-MACOS_MAJOR="$(echo ${MACOS_VERSION} | /usr/bin/cut -d '.' -f 1)"
-MACOS_MINOR="$(echo ${MACOS_VERSION} | /usr/bin/cut -d '.' -f 2)"
 
 if [ "${TERM-}" -a -z "${CI}" ]; then
     COLOR_RED=$(/usr/bin/tput setaf 1)
@@ -33,19 +27,8 @@ else
 fi
 
 ## DEFINE UTILITIES ##
-check_windows_version() {
-    step "Check Windows version..."
-    MIN_VERSION=${MACOSX_DEPLOYMENT_TARGET}
-    MIN_MAJOR=$(echo ${MIN_VERSION} | /usr/bin/cut -d '.' -f 1)
-    MIN_MINOR=$(echo ${MIN_VERSION} | /usr/bin/cut -d '.' -f 2)
-
-    if [ "${MACOS_MAJOR}" -lt "11" -a "${MACOS_MINOR}" -lt "${MIN_MINOR}" ]; then
-        error "ERROR: Minimum required macOS version is ${MIN_VERSION}, but running on ${MACOS_VERSION}"
-    fi
-}
-
 install_tools() {
-    sudo apt install ${QUIET:+-quiet} automake cmake curl git libtool mingw-w64 mingw-w64-tools pkg-config wget
+    sudo apt install ${QUIET:+--quiet} automake cmake curl git libtool mingw-w64 mingw-w64-tools pkg-config wget
 }
 
 check_curl() {
@@ -63,43 +46,29 @@ check_archs() {
     ARCH="${ARCH:-${CURRENT_ARCH}}"
     if [ "${ARCH}" = "x86" ]; then
         CMAKE_ARCHS="x86"
+        WIN_CROSS_BUILD_DIR="build32"
+        WIN_CROSS_ARCH_DIR="win32"
+        WIN_CROSS_TOOL_PREFIX="i686"
+        WIN_CROSS_MVAL="i386"
+        WIN_CROSS_TARGET="x86"
+        WIN_CROSS_GCC_TARGET="x86-win32-gcc"
     elif [ "${ARCH}" = "x86_64" ]; then
         CMAKE_ARCHS="x86_64"
-    elif
-    elif [ "${ARCH}" != "x86_64" -a "${ARCH}" != "arm64" ]; then
-        caught_error "Unsupported architecture '${ARCH}' provided"
+        WIN_CROSS_BUILD_DIR="build64"
+        WIN_CROSS_ARCH_DIR="win64"
+        WIN_CROSS_TOOL_PREFIX="x86_64"
+        WIN_CROSS_MVAL="i386:x86-64"
+        WIN_CROSS_TARGET="x86_64"
+        WIN_CROSS_GCC_TARGET="x86_64-win64-gcc"
     else
-        CMAKE_ARCHS="${ARCH}"
+        caught_error "Unsupported architecture '${ARCH}' provided"
     fi
 }
 
 cleanup() {
-    if [ -d /usr/local/opt/xz -a ! -f /usr/local/lib/liblzma.dylib ]; then
-        brew link xz
-    fi
-
-    if [ -d /usr/local/opt/sdl2 -a ! -f /usr/local/lib/libSDL2.dylib ]; then
-        brew link sdl2
-    fi
-
-    if [ -d /usr/local/opt/zstd -a ! -f /usr/local/lib/libzstd.dylib ]; then
-        brew link zstd
-    fi
-
-    if [ -d /usr/local/opt/libtiff -a ! -f /usr/local/lib/libtiff.dylib ]; then
-        brew link libtiff
-    fi
-
-    if [ -d /usr/local/opt/webp -a ! -f /usr/local/lib/libwebp.dylib ]; then
-        brew link webp
-    fi
-
-    unset MACOSX_DEPLOYMENT_TARGET
     unset LDFLAGS
     unset CFLAGS
     unset LD_LIBRARY_PATH
-    unset CODESIGN_LINKER
-    unset SDKROOT
 }
 
 ## DEFINE TEMPLATES ##
@@ -109,8 +78,8 @@ _print_usage() {
             "-h, --help                     : Print this help\n" \
             "-q, --quiet                    : Suppress most build process output\n" \
             "-v, --verbose                  : Enable more verbose build process output\n" \
-            "-a, --architecture             : Specify build architecture (default: host arch, alternatives: universal,x86_64, arm64)\n" \
-            "-s, --skip-dependency-checks   : Skip Homebrew dependency checks (default: off)\n" \
+            "-a, --architecture             : Specify build architecture (default: host arch, alternatives: x86, x86_64)\n" \
+            "-s, --skip-dependency-checks   : Skip dependency checks (default: off)\n" \
             "-i, --install                  : Run installation (default: off)\n"
 }
 
@@ -134,7 +103,6 @@ _build_checks() {
     CI_PRODUCT_VERSION=$(/bin/cat "${CI_WORKFLOW}" | /usr/bin/sed -En "s/[ ]+${PRODUCT_NAME_U}_VERSION: '(.+)'/\1/p")
     CI_PRODUCT_HASH=$(/bin/cat "${CI_WORKFLOW}" | /usr/bin/sed -En "s/[ ]+${PRODUCT_NAME_U}_HASH: '([0-9a-f]+)'/\1/p")
 
-    check_macos_version
     check_archs
 
     if [ -z "${INSTALL}" ]; then
@@ -142,21 +110,21 @@ _build_checks() {
         check_curl
 
         if [ -z "${SKIP_DEP_CHECKS}" ]; then
-            status "Installation of Homebrew dependencies"
+            status "Installation of build dependencies"
             trap "caught_error 'install_dependencies'" ERR
-            install_homebrew_deps
+            install_tools
         fi
     else
-        ensure_dir "${CHECKOUT_DIR}/macos_build_temp"
+        ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
     fi
 
-    BUILD_DIR="${CHECKOUT_DIR}/macos/obs-dependencies-${ARCH}"
+    BUILD_DIR="${CHECKOUT_DIR}/windows/obs-dependencies-${ARCH}"
 }
 
 _build_setup() {
     trap "caught_error 'build-${PRODUCT_NAME}'" ERR
 
-    ensure_dir "${CHECKOUT_DIR}/macos_build_temp"
+    ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
 
     step "Download..."
     check_and_fetch "${PRODUCT_URL}" "${PRODUCT_HASH:-${CI_PRODUCT_HASH}}"
@@ -172,7 +140,7 @@ _build_setup() {
 _build_setup_git() {
     trap "caught_error 'build-${PRODUCT_NAME}'" ERR
 
-    ensure_dir "${CHECKOUT_DIR}/macos_build_temp"
+    ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
 
     step "Git checkout..."
     mkdir -p "${PRODUCT_REPO}-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
@@ -184,17 +152,17 @@ _build() {
     status "Build ${PRODUCT_NAME} v${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
 
     if declare -f _patch_product $1 > /dev/null; then
-        ensure_dir "${CHECKOUT_DIR}/macos_build_temp"
+        ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
         _patch_product
     fi
 
     if declare -f _build_product $1 > /dev/null; then
-        ensure_dir "${CHECKOUT_DIR}/macos_build_temp"
+        ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
         _build_product
     fi
 
     if declare -f _install_product $1 > /dev/null; then
-        ensure_dir "${CHECKOUT_DIR}/macos_build_temp"
+        ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
         _install_product
     fi
 }
