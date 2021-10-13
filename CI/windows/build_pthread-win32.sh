@@ -38,8 +38,8 @@ build-pthread-win32-main() {
         _build_checks
     fi
 
-    PRODUCT_REPO="GerHobbelt"
-    PRODUCT_PROJECT="pthread-win32"
+    PRODUCT_PROJECT="GerHobbelt"
+    PRODUCT_REPO="pthread-win32"
     PRODUCT_FOLDER="${PRODUCT_REPO}-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
 
     if [ -z "${INSTALL}" ]; then
