@@ -46,7 +46,6 @@ check_archs() {
     ARCH="${ARCH:-${CURRENT_ARCH}}"
     if [ "${ARCH}" = "x86" ]; then
         CMAKE_ARCHS="x86"
-        WIN_CROSS_BUILD_DIR="build32"
         WIN_CROSS_ARCH_DIR="win32"
         WIN_CROSS_TOOL_PREFIX="i686"
         WIN_CROSS_MVAL="i386"
@@ -54,7 +53,6 @@ check_archs() {
         WIN_CROSS_GCC_TARGET="x86-win32-gcc"
     elif [ "${ARCH}" = "x86_64" ]; then
         CMAKE_ARCHS="x86_64"
-        WIN_CROSS_BUILD_DIR="build64"
         WIN_CROSS_ARCH_DIR="win64"
         WIN_CROSS_TOOL_PREFIX="x86_64"
         WIN_CROSS_MVAL="i386:x86-64"
@@ -119,6 +117,11 @@ _build_checks() {
     fi
 
     BUILD_DIR="${CHECKOUT_DIR}/windows/obs-dependencies-${ARCH}"
+    ensure_dir "${BUILD_DIR}"
+    ensure_dir "${BUILD_DIR}/bin"
+    ensure_dir "${BUILD_DIR}/include"
+    ensure_dir "${BUILD_DIR}/lib"
+    ensure_dir "${BUILD_DIR}/share"
 }
 
 _build_setup() {

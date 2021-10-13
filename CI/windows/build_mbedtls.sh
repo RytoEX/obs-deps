@@ -19,10 +19,11 @@ _patch_product() {
 }
 
 _build_product() {
-    cd "${PRODUCT_FOLDER}"
+    mkdir -p "${PRODUCT_FOLDER}/build_${ARCH}"
+    cd "${PRODUCT_FOLDER}/build_${ARCH}"
 
     step "Configure (${ARCH})..."
-    cmake -S . -B build_${ARCH} ${CMAKE_CCACHE_OPTIONS} \
+    cmake .. ${CMAKE_CCACHE_OPTIONS} \
         -DCMAKE_SYSTEM_NAME=Windows \
         -DCMAKE_C_COMPILER=$WIN_CROSS_TOOL_PREFIX-w64-mingw32-gcc \
         -DCMAKE_INSTALL_PREFIX="${BUILD_DIR}" \
@@ -36,7 +37,6 @@ _build_product() {
 
     step "Build (${ARCH})..."
     #cmake --build build_${ARCH} --config "Release"
-    cd "${BUILD_DIR}"
     make -j$PARALLELISM
     $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z mbedtls.orig.def --export-all-symbols library/libmbedtls.dll
     $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z mbedcrypto.orig.def --export-all-symbols library/libmbedcrypto.dll
@@ -47,19 +47,19 @@ _build_product() {
     sed -i -e "/\\t.*DATA/d" -e "/\\t\".*/d" -e "s/\s@.*//" mbedtls.def
     sed -i -e "/\\t.*DATA/d" -e "/\\t\".*/d" -e "s/\s@.*//" mbedcrypto.def
     sed -i -e "/\\t.*DATA/d" -e "/\\t\".*/d" -e "s/\s@.*//" mbedx509.def
-    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedtls.def -l $outdir/bin/mbedtls.lib -D library/libmbedtls.dll
-    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedcrypto.def -l $outdir/bin/mbedcrypto.lib -D library/libmbedcrypto.dll
-    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedx509.def -l $outdir/bin/mbedx509.lib -D library/libmbedx509.dll
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedtls.def -l ${BUILD_DIR}/bin/mbedtls.lib -D library/libmbedtls.dll
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedcrypto.def -l ${BUILD_DIR}/bin/mbedcrypto.lib -D library/libmbedcrypto.dll
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedx509.def -l ${BUILD_DIR}/bin/mbedx509.lib -D library/libmbedx509.dll
 
 }
 
 _install_product() {
-    cd "${PRODUCT_FOLDER}"
+    cd "${PRODUCT_FOLDER}/build_${ARCH}"
 
     step "Install (${ARCH})..."
     #cmake --install build_${ARCH} --config "Release"
     make install
-    #mv $archdir/lib/*.dll $archdir/bin
+    mv ${BUILD_DIR}/lib/*.dll ${BUILD_DIR}/bin
     _install_pkgconfig
 }
 
