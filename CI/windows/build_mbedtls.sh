@@ -15,7 +15,7 @@ _patch_product() {
     cd "${PRODUCT_FOLDER}"
 
     step "Apply patches..."
-    apply_patch "${CHECKOUT_DIR}/CI/windows/patches/mbedtls-enable-alt-threading.patch" "6100d0dad3f1ba12d74a2833b60d52921bc0794e1361b92560387310883d45d8"
+    apply_patch "${CHECKOUT_DIR}/CI/windows/patches/mbedtls/mbedtls-enable-alt-threading.patch" "6100d0dad3f1ba12d74a2833b60d52921bc0794e1361b92560387310883d45d8"
 }
 
 _build_product() {
@@ -125,9 +125,9 @@ build-mbedtls-main() {
     fi
 
     NOCONTINUE=TRUE
-    PRODUCT_URL="https://github.com/ARMmbed/mbedtls/archive/refs/tags/mbedtls-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}.tar.gz"
+    PRODUCT_URL="https://github.com/ARMmbed/mbedtls/archive/refs/tags/v${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}.tar.gz"
     PRODUCT_FILENAME="$(basename "${PRODUCT_URL}")"
-    PRODUCT_FOLDER="mbedtls-mbedtls-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+    PRODUCT_FOLDER="mbedtls-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
 
     if [ -z "${INSTALL}" ]; then
         _build_setup
