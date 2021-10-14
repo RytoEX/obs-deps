@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ################################################################################
-# Windows pthread-win32 build script
+# Windows pthread-win32 cross-compile build script
 ################################################################################
 #
 # This script file can be included in build scripts for Windows or run directly

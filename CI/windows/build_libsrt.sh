@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ##############################################################################
-# macOS libsrt build script
+# Windows libsrt cross-compile build script
 ##############################################################################
 #
 # This script file can be included in build scripts for macOS or run directly

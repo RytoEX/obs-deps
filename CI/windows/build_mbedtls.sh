@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ################################################################################
-# Windows mbedtls build script
+# Windows mbedtls cross-compile build script
 ################################################################################
 #
 # This script file can be included in build scripts for Windows or run directly
