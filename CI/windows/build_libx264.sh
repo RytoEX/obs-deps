@@ -12,8 +12,8 @@
 set -eE
 
 _fixup_libs() {
-    x264name=$(find "${BUILD_DIR}/bin" -type f -iname "libx264*.dll")
-    x264name="${x264name:2}"
+    x264name=$(find "${PRODUCT_FOLDER}" -type f -iname "libx264*.dll")
+    x264name="$(basename "${x264name}")"
     $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z "${BUILD_DIR}"/bin/x264.orig.def --export-all-symbols "${BUILD_DIR}"/bin/$x264name
     grep "EXPORTS\|x264" "${BUILD_DIR}"/bin/x264.orig.def > "${BUILD_DIR}"/bin/x264.def
     rm -f "${BUILD_DIR}"/bin/x264.orig.def
