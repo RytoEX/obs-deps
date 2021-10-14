@@ -38,7 +38,7 @@ _build_product() {
 }
 
 _install_product() {
-    cd "${PRODUCT_FOLDER}/build_${ARCH}"
+    cd "${PRODUCT_FOLDER}"
 
     step "Install (${ARCH})..."
     make install
