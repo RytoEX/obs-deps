@@ -66,12 +66,12 @@ build-libsrt-main() {
     fi
 
     NOCONTINUE=TRUE
-    PRODUCT_URL="https://github.com/Haivision/srt/archive/v${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}.tar.gz"
-    PRODUCT_FILENAME="$(basename "${PRODUCT_URL}")"
-    PRODUCT_FOLDER="srt-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+    PRODUCT_PROJECT="Haivision"
+    PRODUCT_REPO="srt"
+    PRODUCT_FOLDER="${PRODUCT_REPO}"
 
     if [ -z "${INSTALL}" ]; then
-        _build_setup
+        _build_setup_git
         _build
     else
         _install_product
