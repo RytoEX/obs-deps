@@ -124,12 +124,12 @@ build-mbedtls-main() {
     fi
 
     NOCONTINUE=TRUE
-    PRODUCT_URL="https://github.com/ARMmbed/mbedtls/archive/refs/tags/v${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}.tar.gz"
-    PRODUCT_FILENAME="$(basename "${PRODUCT_URL}")"
-    PRODUCT_FOLDER="mbedtls"
+    PRODUCT_PROJECT="ARMmbed"
+    PRODUCT_REPO="mbedtls"
+    PRODUCT_FOLDER="${PRODUCT_REPO}"
 
     if [ -z "${INSTALL}" ]; then
-        _build_setup
+        _build_setup_git
         _build
     else
         _install_product

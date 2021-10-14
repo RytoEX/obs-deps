@@ -22,7 +22,7 @@ set -eE
 _RUN_OBS_BUILD_SCRIPT=TRUE
 PRODUCT_NAME="obs-deps"
 REQUIRED_DEPS=(
-    "mbedtls 2.24.0 d436ae4892bd80329ca18a3960052fbb42d3f1f46c7519711d6763621ca6cfa0"
+    "mbedtls 2.24.0 523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8"
     "pthread-win32 2.10.0.0 19fd5054b29af1b4e3b3278bfffbb6274c6c89f5"
     "libsrt 1.4.2 50b7af06f3a0a456c172b4cb3aceafa8a5cc0036"
 )
