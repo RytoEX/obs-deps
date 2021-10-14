@@ -40,7 +40,7 @@ build-pthread-win32-main() {
 
     PRODUCT_PROJECT="GerHobbelt"
     PRODUCT_REPO="pthread-win32"
-    PRODUCT_FOLDER="${PRODUCT_REPO}-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+    PRODUCT_FOLDER="${PRODUCT_REPO}"
 
     if [ -z "${INSTALL}" ]; then
         _build_setup_git
