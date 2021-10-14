@@ -19,8 +19,7 @@ _patch_product() {
 }
 
 _build_product() {
-    mkdir -p "${PRODUCT_FOLDER}/build_${ARCH}"
-    cd "${PRODUCT_FOLDER}/build_${ARCH}"
+    ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
 
     step "Configure (${ARCH})..."
     cmake .. ${CMAKE_CCACHE_OPTIONS} \
