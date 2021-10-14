@@ -22,7 +22,7 @@ _fixup_libs() {
 }
 
 _build_product() {
-    ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
+    cd "${PRODUCT_FOLDER}"
 
     LDFLAGS="-static-libgcc" ./configure --enable-shared \
         --disable-avs \
