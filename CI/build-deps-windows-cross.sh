@@ -25,6 +25,7 @@ REQUIRED_DEPS=(
     "mbedtls 2.24.0 523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8"
     "pthread-win32 2.10.0.0 19fd5054b29af1b4e3b3278bfffbb6274c6c89f5"
     "libsrt 1.4.2 50b7af06f3a0a456c172b4cb3aceafa8a5cc0036"
+    "libx264 r3020 d198931a63049db1f2c92d96c34904c69fde8117"
 )
 
 ## MAIN SCRIPT FUNCTIONS ##

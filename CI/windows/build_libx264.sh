@@ -1,70 +1,40 @@
 #!/bin/bash
 
-##############################################################################
-# macOS libx264 build script
-##############################################################################
+################################################################################
+# Windows libx264 cross-compile build script
+################################################################################
 #
-# This script file can be included in build scripts for macOS or run directly
+# This script file can be included in build scripts for Windows or run directly
 #
-##############################################################################
+################################################################################
 
 # Halt on errors
 set -eE
 
 _fixup_libs() {
-    LIBS=$(find "${BUILD_DIR}/lib" -type f -name "libx264*.dylib")
-
-    for LIB in ${LIBS}; do
-        LIB_BASENAME="$(basename ${LIB})"
-        LIB_NAME=${LIB_BASENAME%%.*}
-        for LINKED_LIB in $(otool -L ${LIB} | grep "obs-dependencies-${ARCH}" | grep -v ${LIB_NAME} | cut -d " " -f 1 | sed -e 's/^[[:space:]]*//'); do
-            info "Fix library path ${LINKED_LIB} in ${LIB}"
-            install_name_tool -change "${LINKED_LIB}" "@rpath/$(basename "${LINKED_LIB}")" "${LIB}"
-        done
-
-        info "Fix id of ${LIB}"
-        install_name_tool -id "@rpath/${LIB_BASENAME}" "${LIB}"
-    done
+    x264name=$(find "${BUILD_DIR}/bin" -type f -iname "libx264*.dll")
+    x264name="${x264name:2}"
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z "${BUILD_DIR}"/bin/x264.orig.def --export-all-symbols "${BUILD_DIR}"/bin/$x264name
+    grep "EXPORTS\|x264" "${BUILD_DIR}"/bin/x264.orig.def > "${BUILD_DIR}"/bin/x264.def
+    rm -f "${BUILD_DIR}"/bin/x264.orig.def
+    sed -i -e "/\\t.*DATA/d" -e "/\\t\".*/d" -e "s/\s@.*//" "${BUILD_DIR}"/bin/x264.def
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d "${BUILD_DIR}"/bin/x264.def -l "${BUILD_DIR}"/bin/x264.lib -D "${BUILD_DIR}"/bin/$x264name
 }
 
 _build_product() {
-    cd "${PRODUCT_FOLDER}"
-    BASE_DIR="$(pwd)"
+    ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
 
-    if [ "${ARCH}" = "x86_64" -o "${ARCH}" = "universal" ]; then
-        mkdir -p "${BASE_DIR}/build_x86_64"
-        cd "${BASE_DIR}/build_x86_64"
+    LDFLAGS="-static-libgcc" ./configure --enable-shared \
+        --disable-avs \
+        --disable-ffms \
+        --disable-gpac \
+        --disable-interlaced \
+        --disable-lavf \
+        --cross-prefix=$WIN_CROSS_TOOL_PREFIX-w64-mingw32- \
+        --host=$WIN_CROSS_TOOL_PREFIX-pc-mingw32 \
+        --prefix="${BUILD_DIR}"
 
-        step "Configure (x86_64)..."
-        ../configure --extra-ldflags="-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET:-${CI_MACOSX_DEPLOYMENT_TARGET}}" \
-            --enable-shared --enable-static --enable-strip --enable-pic \
-            --disable-lsmash --disable-swscale --disable-ffms \
-            --prefix="${BUILD_DIR}" --host="x86_64-apple-darwin${DARWIN_TARGET}"
-        step "Compile (x86_64)..."
-        make -j${PARALLELISM}
-    fi
-
-    if [ "${ARCH}" = "arm64" -o "${ARCH}" = "universal" ]; then
-        mkdir -p "${BASE_DIR}/build_arm64"
-        cd "${BASE_DIR}/build_arm64"
-
-        step "Configure (arm64)..."
-        ../configure --enable-shared --enable-static --enable-strip --enable-pic --disable-lsmash --disable-swscale --disable-ffms \
-            --prefix="${BUILD_DIR}" --host="aarch64-apple-darwin20"
-        step "Compile (arm64)..."
-        make -j${PARALLELISM}
-    fi
-
-    if [ "${ARCH}" = "universal" ]; then
-        step "Create universal binaries..."
-        cp -cpR "${BASE_DIR}/build_x86_64" "${BASE_DIR}/build_universal"
-        cd "${BASE_DIR}/build_universal"
-        lipo -create ../build_x86_64/libx264.a ../build_arm64/libx264.a -output ./libx264.a
-        lipo -create ../build_x86_64/x264 ../build_arm64/x264 -output ./x264
-        DYLIB_NAME=$(basename $(find . -maxdepth 1 -type f -name "*.dylib"))
-        lipo -create ../build_x86_64/${DYLIB_NAME} ../build_arm64/${DYLIB_NAME} -output ./${DYLIB_NAME}
-        unset DYLIB_NAME
-    fi
+    make -j$PARALLELISM
 }
 
 _install_product() {
@@ -82,15 +52,15 @@ build-libx264-main() {
     if [ -z "${_RUN_OBS_BUILD_SCRIPT}" ]; then
         CHECKOUT_DIR="$(/usr/bin/git rev-parse --show-toplevel)"
         source "${CHECKOUT_DIR}/CI/include/build_support.sh"
-        source "${CHECKOUT_DIR}/CI/include/build_support_macos.sh"
+        source "${CHECKOUT_DIR}/CI/include/build_support_windows_cross.sh"
 
         _check_parameters $*
         _build_checks
     fi
 
-    PRODUCT_REPO="x264"
     PRODUCT_PROJECT="mirror"
-    PRODUCT_FOLDER="${PRODUCT_REPO}-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+    PRODUCT_REPO="x264"
+    PRODUCT_FOLDER="${PRODUCT_REPO}"
 
     if [ -z "${INSTALL}" ]; then
         _add_ccache_to_path
