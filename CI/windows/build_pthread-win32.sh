@@ -12,15 +12,15 @@
 set -eE
 
 _build_product() {
-    mkdir -p "${PRODUCT_FOLDER}/build_${ARCH}"
-    cd "${PRODUCT_FOLDER}/build_${ARCH}"
+    mkdir -p "${PRODUCT_FOLDER}"
+    cd "${PRODUCT_FOLDER}"
 
     step "Build (${ARCH})..."
     make DESTROOT="${BUILD_DIR}" CROSS=$WIN_CROSS_TOOL_PREFIX-w64-mingw32- realclean GC-small-static
 }
 
 _install_product() {
-    cd "${PRODUCT_FOLDER}/build_${ARCH}"
+    cd "${PRODUCT_FOLDER}"
 
     step "Install (${ARCH})..."
     cp libpthreadGC2.a "${BUILD_DIR}"/lib
