@@ -146,8 +146,10 @@ _build_setup_git() {
     ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
 
     step "Git checkout..."
-    mkdir -p "${PRODUCT_REPO}-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
-    cd "${PRODUCT_REPO}-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+    #mkdir -p "${PRODUCT_REPO}-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+    #cd "${PRODUCT_REPO}-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+    mkdir -p "${PRODUCT_REPO}"
+    cd "${PRODUCT_REPO}"
     github_fetch ${PRODUCT_PROJECT} ${PRODUCT_REPO} ${PRODUCT_HASH:-${CI_PRODUCT_HASH}}""
 }
 
