@@ -78,4 +78,4 @@ build-zlib-main() {
     fi
 }
 
-build-libx264-main $*
+build-zlib-main $*
