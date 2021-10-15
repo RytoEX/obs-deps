@@ -17,7 +17,7 @@ _patch_product() {
     step "Apply patches..."
     apply_patch "${CHECKOUT_DIR}/CI/windows/patches/mbedtls/mbedtls-enable-alt-threading-01.patch" "306b8aaee8f291cc0dbd4cbee12ea185e722469eb06b8b7113f0a60feca6bbe6"
 
-    if [ ! -f "threading_alt.h" ]; then
+    if [ ! -f "include/mbedtls/threading_alt.h" ]; then
         apply_patch "${CHECKOUT_DIR}/CI/windows/patches/mbedtls/mbedtls-enable-alt-threading-02.patch" "d0dde0836dc6b100edf218207feffbbf808d04b1d0065082cdc5c838f8a4a7c7"
     fi
 }
