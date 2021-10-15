@@ -21,19 +21,14 @@ _fixup_libs() {
     apply_patch "${CHECKOUT_DIR}/CI/windows/patches/zlib/zlib-include-zconf.patch" "e7534bbf425d4670757b329eebb7c997e4ab928030c7479bdd8fc872e3c6e728"
 }
 
-_patch_product() {
-    cd "${PRODUCT_FOLDER}"
-
-    step "Apply patches..."
-    apply_patch "${CHECKOUT_DIR}/CI/windows/patches/zlib/zlib-disable-shared-lib-prefix.patch" "ed1e5f301827046e13071d836beb8e701de1fdbfdde5ba58c70fd779b81713c8"
-}
-
 _build_product() {
     ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
 
     cmake .. \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_SYSTEM_NAME=Windows \
+        -DCMAKE_SHARED_LIBRARY_PREFIX="" \
+        -DCMAKE_SHARED_LIBRARY_PREFIX_C="" \
         -DCMAKE_C_COMPILER=$WIN_CROSS_TOOL_PREFIX-w64-mingw32-gcc \
         -DCMAKE_INSTALL_PREFIX="${BUILD_DIR}" \
         -DINSTALL_PKGCONFIG_DIR="${BUILD_DIR}"/lib/pkgconfig \
