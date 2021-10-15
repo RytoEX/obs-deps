@@ -15,23 +15,25 @@ _build_product() {
     cd "${PRODUCT_FOLDER}"
 
     step "Configure ("${ARCH}")..."
-    cmake -S . -B build_${ARCH} -G Ninja ${CMAKE_CCACHE_OPTIONS} \
-        -DCMAKE_INSTALL_PREFIX="${BUILD_DIR}" \
-        -DCMAKE_OSX_ARCHITECTURES="${CMAKE_ARCHS}" \
-        -DBUILD_SHARED_LIBS=OFF \
-        -DBUILD_TESTING=OFF \
-        -DOPUS_BUILD_PROGRAMS=OFF \
-        ${QUIET:+-Wno-deprecated -Wno-dev --log-level=ERROR}
+    ./autogen.sh
+    PKG_CONFIG_PATH="${BUILD_DIR}/lib/pkgconfig" \
+        LDFLAGS="-L${BUILD_DIR}/lib -static-libgcc" \
+        CPPFLAGS="-I${BUILD_DIR}/include" \
+        ./configure \
+        --host=$WIN_CROSS_TOOL_PREFIX-w64-mingw32 \
+        --prefix="${BUILD_DIR}" \
+        --enable-shared \
+        --enable-stack-protector=yes
 
     step "Build ("${ARCH}")..."
-    cmake --build build_${ARCH} --config "Release"
+    make -j$PARALLELISM
 }
 
 _install_product() {
     cd "${PRODUCT_FOLDER}"
 
     step "Install ("${ARCH}")..."
-    cmake --install build_${ARCH} --config "Release"
+    make install
 }
 
 build-libopus-main() {
