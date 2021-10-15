@@ -1,12 +1,12 @@
 #!/bin/bash
 
-##############################################################################
-# macOS libopus build script
-##############################################################################
+################################################################################
+# Windows libopus cross-compile build script
+################################################################################
 #
-# This script file can be included in build scripts for macOS or run directly
+# This script file can be included in build scripts for Windows or run directly
 #
-##############################################################################
+################################################################################
 
 # Halt on errors
 set -eE
@@ -40,15 +40,15 @@ build-libopus-main() {
     if [ -z "${_RUN_OBS_BUILD_SCRIPT}" ]; then
         CHECKOUT_DIR="$(/usr/bin/git rev-parse --show-toplevel)"
         source "${CHECKOUT_DIR}/CI/include/build_support.sh"
-        source "${CHECKOUT_DIR}/CI/include/build_support_macos.sh"
+        source "${CHECKOUT_DIR}/CI/include/build_support_windows_cross.sh"
 
         _check_parameters $*
         _build_checks
     fi
 
-    PRODUCT_REPO="opus"
     PRODUCT_PROJECT="xiph"
-    PRODUCT_FOLDER="${PRODUCT_REPO}-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+    PRODUCT_REPO="opus"
+    PRODUCT_FOLDER="${PRODUCT_REPO}"
 
     if [ -z "${INSTALL}" ]; then
         _build_setup_git
