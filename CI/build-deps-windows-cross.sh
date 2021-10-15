@@ -72,8 +72,8 @@ obs-deps-build-main() {
 
     step "Cleanup unnecessary files..."
     find . \( -type f -or -type l \) \( -name "*.la" -or -name "*.a" \) | xargs rm
-    rm -rf ./lib
-    rm -rf ./share
+    #rm -rf ./lib
+    #rm -rf ./share
     cp -R "${CHECKOUT_DIR}/licenses" .
 
     step "Create archive ${FILE_NAME}"
