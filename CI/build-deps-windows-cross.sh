@@ -30,6 +30,7 @@ REQUIRED_DEPS=(
     "zlib 1.2.11 cacf7f1d4e3d44d871b605da3b647f07d718623f"
     "libpng 1.6.37 505e70834d35383537b6491e7ae8641f1a4bed1876dbfe361201fc80868d88ca"
     "libogg 1.3.4 31bd3f2707fb7dbae539a7093ba1fc4b2b37d84e"
+    "libvorbis 1.3.7 83a82dd9296400d811b78c06e9ca429e24dd1e5c"
 )
 
 ## MAIN SCRIPT FUNCTIONS ##
