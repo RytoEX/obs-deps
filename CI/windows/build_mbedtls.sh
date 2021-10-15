@@ -15,7 +15,11 @@ _patch_product() {
     cd "${PRODUCT_FOLDER}"
 
     step "Apply patches..."
-    apply_patch "${CHECKOUT_DIR}/CI/windows/patches/mbedtls/mbedtls-enable-alt-threading.patch" "6100d0dad3f1ba12d74a2833b60d52921bc0794e1361b92560387310883d45d8"
+    apply_patch "${CHECKOUT_DIR}/CI/windows/patches/mbedtls/mbedtls-enable-alt-threading-01.patch" "306b8aaee8f291cc0dbd4cbee12ea185e722469eb06b8b7113f0a60feca6bbe6"
+
+    if [ ! -f "threading_alt.h" ]; then
+        apply_patch "${CHECKOUT_DIR}/CI/windows/patches/mbedtls/mbedtls-enable-alt-threading-02.patch" "d0dde0836dc6b100edf218207feffbbf808d04b1d0065082cdc5c838f8a4a7c7"
+    fi
 }
 
 _build_product() {

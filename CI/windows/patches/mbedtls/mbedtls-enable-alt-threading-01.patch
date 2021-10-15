@@ -20,12 +20,3 @@ index 1e6e05275..98b5be699 100644
  
  /**
   * \def MBEDTLS_TIMING_C
-diff --git a/include/mbedtls/threading_alt.h b/include/mbedtls/threading_alt.h
-new file mode 100644
-index 000000000..6e6565f23
---- /dev/null
-+++ b/include/mbedtls/threading_alt.h
-@@ -0,0 +1,3 @@
-+#pragma once
-+
-+typedef void *mbedtls_threading_mutex_t;
