@@ -71,7 +71,7 @@ obs-deps-build-main() {
     cd "${CHECKOUT_DIR}/windows/obs-dependencies-${ARCH}"
 
     step "Cleanup unnecessary files..."
-    find . \( -type f -or -type l \) \( -name "*.la" -or -name "*.a" \) | xargs rm
+    #find . \( -type f -or -type l \) \( -name "*.la" -or -name "*.a" \) | xargs rm
     #rm -rf ./lib
     #rm -rf ./share
     cp -R "${CHECKOUT_DIR}/licenses" .
