@@ -89,6 +89,46 @@ check_ccache() {
     fi
 }
 
+check_git() {
+    step "Check git..."
+    if git --version >/dev/null 2>&1; then
+        info "Git available"
+
+        info "Check git config for user..."
+        set +e
+
+        git_user_email=$(git config --get user.email)
+        if [ -z "$git_user_email" ]; then
+            info "Set git user.email globally..."
+            git config --global user.email "commits@obsproject.com"
+        else
+            info "Git user.email already set"
+        fi
+
+        git_user_name=$(git config --get user.name)
+        if [ -z "$git_user_name" ]; then
+            info "Set git user.name globally..."
+            git config --global user.name "OBS Project"
+        else
+            info "Git user.name already set"
+        fi
+        set -e
+    else
+        error "Git not available"
+    fi
+}
+
+_add_ccache_to_path() {
+    if [ "${CMAKE_CCACHE_OPTIONS}" ]; then
+        PATH="/usr/local/opt/ccache/libexec:${PATH}"
+        status "Compiler Info:"
+        local IFS=$'\n'
+        for COMPILER_INFO in $(type cc c++ gcc g++ clang clang++ || true); do
+            info "${COMPILER_INFO}"
+        done
+    fi
+}
+
 safe_fetch() {
     if [ $# -lt 2 ]; then
         error "Usage: safe_fetch URL HASH"
