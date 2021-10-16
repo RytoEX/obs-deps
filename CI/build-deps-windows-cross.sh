@@ -31,7 +31,7 @@ REQUIRED_DEPS=(
     "libpng 1.6.37 505e70834d35383537b6491e7ae8641f1a4bed1876dbfe361201fc80868d88ca"
     "libogg 1.3.4 31bd3f2707fb7dbae539a7093ba1fc4b2b37d84e"
     "libvorbis 1.3.7 83a82dd9296400d811b78c06e9ca429e24dd1e5c"
-    "libvpx 1.9.0 e56e8dcd6fc9e2b04316be5144c18ca6772f6263"
+    "libvpx 1.8.1 8ae686757b708cd8df1d10c71586aff5355cfe1e"
     "nv-codec-headers 9.0.18.2 96a6db017b096ad48612890083464a7214902afa"
     "amf 1.4.16.1 802f92ee52b9efa77bf0d3ea8bfaed6040cdd35e"
     "ffmpeg 4.2.4 f9f95ceebfbd7b7f43c1b7ad34e25d366e6e2d2b"
