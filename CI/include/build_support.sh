@@ -95,24 +95,21 @@ check_git() {
         info "Git available"
 
         info "Check git config for user..."
-        set +e
-
         git_user_email=$(git config --get user.email)
         if [ -z "$git_user_email" ]; then
-            info "Set git user.email globally..."
-            git config --global user.email "commits@obsproject.com"
+            info "Set git user.email..."
+            git config user.email "commits@obsproject.com"
         else
             info "Git user.email already set"
         fi
 
         git_user_name=$(git config --get user.name)
         if [ -z "$git_user_name" ]; then
-            info "Set git user.name globally..."
-            git config --global user.name "OBS Project"
+            info "Set git user.name..."
+            git config user.name "OBS Project"
         else
             info "Git user.name already set"
         fi
-        set -e
     else
         error "Git not available"
     fi
