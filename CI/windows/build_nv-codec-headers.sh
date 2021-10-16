@@ -14,7 +14,7 @@ set -eE
 _build_product() {
     cd "${PRODUCT_FOLDER}"
 
-    step "Compile (${ARCH})..."
+    step "Build (${ARCH})..."
     make PREFIX="$outdir"
 }
 
