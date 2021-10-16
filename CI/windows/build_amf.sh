@@ -16,7 +16,7 @@ _install_product() {
     mkdir -p "${BUILD_DIR}"/include/AMF
 
     step "Install (${ARCH})..."
-    cp -a AMF/amf/public/include/* "${BUILD_DIR}"/include/AMF
+    cp -a amf/public/include/* "${BUILD_DIR}"/include/AMF
 }
 
 build-amf-main() {
@@ -37,6 +37,7 @@ build-amf-main() {
 
     if [ -z "${INSTALL}" ]; then
         _build_setup_git
+        _build
     else
         _install_product
     fi
