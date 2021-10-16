@@ -96,7 +96,7 @@ build-ffmpeg-main() {
 
     PRODUCT_PROJECT="FFmpeg"
     PRODUCT_REPO="FFmpeg"
-    PRODUCT_FOLDER="${PRODUCT_REPO}"
+    PRODUCT_FOLDER="ffmpeg"
 
     if [ -z "${INSTALL}" ]; then
         _add_ccache_to_path
