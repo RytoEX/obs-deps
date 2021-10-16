@@ -14,6 +14,10 @@ set -eE
 _patch_product() {
     cd "${PRODUCT_FOLDER}"
 
+    set +eE
+    check_git
+    set -eE
+
     step "Apply patches..."
     apply_patch "${CHECKOUT_DIR}/CI/windows/patches/ffmpeg/ffmpeg_flvdec.patch" "2e73d9296c3190a9e395c1e0dfe98e9b12df40e5960dc27d5cd19c7e8d8695ab"
     git add .
