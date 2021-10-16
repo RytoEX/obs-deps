@@ -11,6 +11,16 @@
 # Halt on errors
 set -eE
 
+_fixup_libs() {
+    vpxname=`find . -type f -iname libvpx*.dll`
+    vpxname="$(basename "${vpxname}")"
+    $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool \
+        -m $WIN_CROSS_MVAL \
+        -d libvpx.def \
+        -l "${BUILD_DIR}"/bin/vpx.lib \
+        -D "${BUILD_DIR}"/bin/$vpxname
+}
+
 _patch_product() {
     cd "${PRODUCT_FOLDER}"
 
@@ -42,6 +52,8 @@ _build_product() {
 
     step "Build (${ARCH})..."
     make -j$PARALLELISM
+
+    _fixup_libs
 }
 
 _install_product() {
