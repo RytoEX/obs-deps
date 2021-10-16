@@ -52,8 +52,6 @@ _build_product() {
 
     step "Build (${ARCH})..."
     make -j$PARALLELISM
-
-    _fixup_libs
 }
 
 _install_product() {
@@ -61,6 +59,8 @@ _install_product() {
 
     step "Install (${ARCH})..."
     make install
+
+    _fixup_libs
 }
 
 build-libvpx-main() {
