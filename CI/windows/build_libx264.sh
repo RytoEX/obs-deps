@@ -24,6 +24,7 @@ _fixup_libs() {
 _build_product() {
     cd "${PRODUCT_FOLDER}"
 
+    step "Configure (${ARCH})..."
     LDFLAGS="-static-libgcc" ./configure --enable-shared \
         --disable-avs \
         --disable-ffms \
@@ -34,6 +35,7 @@ _build_product() {
         --host=$WIN_CROSS_TOOL_PREFIX-pc-mingw32 \
         --prefix="${BUILD_DIR}"
 
+    step "Build (${ARCH})..."
     make -j$PARALLELISM
 }
 

@@ -24,6 +24,7 @@ _fixup_libs() {
 _build_product() {
     ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
 
+    step "Configure (${ARCH})..."
     cmake .. \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_SYSTEM_NAME=Windows \
@@ -35,6 +36,7 @@ _build_product() {
         -DCMAKE_RC_COMPILER=$WIN_CROSS_TOOL_PREFIX-w64-mingw32-windres \
         -DCMAKE_SHARED_LINKER_FLAGS="-static-libgcc -Wl,--strip-debug"
 
+    step "Build (${ARCH})..."
     make -j$PARALLELISM
 }
 
