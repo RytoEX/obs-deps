@@ -50,6 +50,8 @@ build-libpng-main() {
     PRODUCT_FOLDER="${PRODUCT_FILENAME%.*.*}"
 
     if [ -z "${INSTALL}" ]; then
+        _add_ccache_to_path
+
         _build_setup
         _build
     else

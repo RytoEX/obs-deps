@@ -25,7 +25,7 @@ _build_product() {
     ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
 
     step "Configure (${ARCH})..."
-    cmake .. \
+    cmake .. ${CMAKE_CCACHE_OPTIONS} \
         -DCMAKE_BUILD_TYPE=Release \
         -DCMAKE_SYSTEM_NAME=Windows \
         -DCMAKE_SHARED_LIBRARY_PREFIX="" \
@@ -66,8 +66,6 @@ build-zlib-main() {
     PRODUCT_FOLDER="${PRODUCT_REPO}"
 
     if [ -z "${INSTALL}" ]; then
-        _add_ccache_to_path
-
         _build_setup_git
         _build
     else
