@@ -16,6 +16,8 @@ _patch_product() {
 
     step "Apply patches..."
     apply_patch "${CHECKOUT_DIR}/CI/windows/patches/ffmpeg/ffmpeg_flvdec.patch" "2e73d9296c3190a9e395c1e0dfe98e9b12df40e5960dc27d5cd19c7e8d8695ab"
+    git add .
+    git commit -m "Fix decoding of certain malformed FLV files"
 
     git cherry-pick 1f7b527194a2a10c334b0ff66ec0a72f4fe65e08 \
         f9d6addd60b3f9ac87388fe4ae0dc217235af81d \
