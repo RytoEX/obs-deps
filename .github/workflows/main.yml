@@ -619,9 +619,199 @@ jobs:
       AMF_HASH: '802f92ee52b9efa77bf0d3ea8bfaed6040cdd35e'
       FFMPEG_VERSION: '4.2.4'
       FFMPEG_HASH: 'f9f95ceebfbd7b7f43c1b7ad34e25d366e6e2d2b'
+    defaults:
+      run:
+        shell: bash
     steps:
-      - name: 'Install Tools'
-        run: ./win-install-tools.sh
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: 'Check for Github Labels'
+        if: github.event_name == 'pull_request'
+        run: |
+          if test -n "$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -s "${{ github.event.pull_request.url }}" | jq -e '.labels[] | select(.name == "Seeking Testers")')"; then
+            echo "SEEKING_TESTERS=1" >> $GITHUB_ENV
+          else
+            echo "SEEKING_TESTERS=0" >> $GITHUB_ENV
+          fi
+
+          echo "CACHE_DATE=$(date +"%Y-%m-%d")" >> $GITHUB_ENV
+
+      - name: 'Restore ccache from cache'
+        id: ccache-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'ccache-cache'
+        with:
+          path: ${{ github.workspace }}/.ccache
+          key: ${{ runner.os }}-pr-${{ env.CACHE_NAME }}-${{ matrix.arch }}-${{ env.CACHE_DATE }}
+
+      - name: 'Setup build environment'
+        run: |
+          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/bin
+          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/include
+          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/lib
+          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/share
+
+          ./win-install-tools.sh
+
+          FFMPEG_DEP_HASH="$(echo "${{ env.LIBPNG_VERSION }}-${{ env.LIBOGG_VERSION }}-${{ env.LIBVORBIS_VERSION }}-${{ env.LIBVPX_VERSION }}-${{ env.LIBOPUS_VERSION }}-${{ env.LIBX264_VERSION }}-${{ env.LIBSRT_VERSION }}-${{ env.LIBMBEDTLS_VERSION }}" | sha256sum | cut -d " " -f 1)"
+          echo "FFMPEG_DEP_HASH=$FFMPEG_DEP_HASH" >> $GITHUB_ENV
+
+      - name: 'Restore ffmpeg dependencies from cache'
+        id: ffmpeg-deps-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'ffmpeg-deps-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
+        with:
+          path: |
+            ${{ github.workspace }}/windows_build_temp/AMF
+            ${{ github.workspace }}/windows_build_temp/libpng-${{ env.LIBPNG_VERSION }}
+            ${{ github.workspace }}/windows_build_temp/libvpx
+            ${{ github.workspace }}/windows_build_temp/mbedtls
+            ${{ github.workspace }}/windows_build_temp/nv-codec-headers
+            ${{ github.workspace }}/windows_build_temp/ogg
+            ${{ github.workspace }}/windows_build_temp/opus
+            ${{ github.workspace }}/windows_build_temp/pthread-win32
+            ${{ github.workspace }}/windows_build_temp/srt
+            ${{ github.workspace }}/windows_build_temp/vorbis
+            ${{ github.workspace }}/windows_build_temp/x264
+            ${{ github.workspace }}/windows_build_temp/zlib
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.FFMPEG_DEP_HASH }}
+
+      - name: 'Build dependency mbedtls'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_mbedtls.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency mbedtls'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_mbedtls.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency pthread-win32'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_pthread-win32.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency pthread-win32'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_pthread-win32.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency libsrt'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_libsrt.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency libsrt'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_libsrt.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency libx264'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_libx264.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency libx264'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_libx264.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency libopus'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_libopus.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency libopus'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_libopus.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency zlib'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_zlib.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency zlib'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_zlib.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency libpng'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_libpng.sh -a ${{ matrix.arch }}
+
+      - name: 'Install dependency libpng'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_libpng.sh -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency libogg'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_libogg.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency libogg'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_libogg.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency libvorbis'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_libvorbis.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency libvorbis'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_libvorbis.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency libvpx'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_libvpx.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency libvpx'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_libvpx.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency nv-codec-headers'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_nv-codec-headers.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency nv-codec-headers'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_nv-codec-headers.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency amf'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_amf.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency amf'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_amf.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Restore ffmpeg from cache'
+        id: ffmpeg-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'ffmpeg-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
+        with:
+          path: ${{ github.workspace }}/windows_build_temp/ffmpeg
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.FFMPEG_VERSION }}-${{ env.FFMPEG_DEP_HASH }}
+
+      - name: 'Build dependency ffmpeg'
+        if: steps.ffmpeg-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_ffmpeg.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency ffmpeg'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_ffmpeg.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Package dependencies'
+        if: success()
+        working-directory: ${{ github.workspace }}/windows/obs-dependencies-${{ matrix.arch }}
+        run: |
+          CURRENT_DATE=$(date +"%Y-%m-%d")
+          FILE_NAME="windows-deps-${CURRENT_DATE}-${{ matrix.arch }}.tar.xz"
+          echo "FILE_NAME=${FILE_NAME}" >> $GITHUB_ENV
+
+          cp -R ${{ github.workspace }}/licenses .
+
+          XZ_OPT=-T0 tar -cJf "${FILE_NAME}" *
+
+          mv ${FILE_NAME} ..
+
+      - name: 'Publish Build Artifacts'
+        if: ${{ success() && (github.event_name != 'pull_request' || env.SEEKING_TESTERS == '1') }}
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: ${{ env.FILE_NAME }}
+          path: ${{ github.workspace }}/windows/${{ env.FILE_NAME }}
 
   make-release:
     name: 'Create and upload release'
