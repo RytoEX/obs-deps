@@ -44,7 +44,7 @@ _patch_product() {
 }
 
 _build_product() {
-    ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
+    ensure_dir "${PRODUCT_FOLDER}"
 
     step "Configure (${ARCH})..."
 
@@ -78,7 +78,7 @@ _build_product() {
 }
 
 _install_product() {
-    cd "${PRODUCT_FOLDER}/build_${ARCH}"
+    cd "${PRODUCT_FOLDER}"
 
     step "Install..."
     make install
