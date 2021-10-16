@@ -95,7 +95,7 @@ build-ffmpeg-main() {
     fi
 
     PRODUCT_PROJECT="FFmpeg"
-    PRODUCT_REPO="FFmpeg"
+    PRODUCT_REPO="ffmpeg"
     PRODUCT_FOLDER="ffmpeg"
 
     if [ -z "${INSTALL}" ]; then
