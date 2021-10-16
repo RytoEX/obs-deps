@@ -1,51 +1,47 @@
 #!/bin/bash
 
-##############################################################################
-# macOS libvpx build script
-##############################################################################
+################################################################################
+# Windows libvpx cross-compile build script
+################################################################################
 #
-# This script file can be included in build scripts for macOS or run directly
+# This script file can be included in build scripts for Windows or run directly
 #
-##############################################################################
+################################################################################
 
 # Halt on errors
 set -eE
 
-_build_product() {
+_patch_product() {
     cd "${PRODUCT_FOLDER}"
-    BASE_DIR="$(pwd)"
 
-    if [ "${ARCH}" = "x86_64" -o "${ARCH}" = "universal" ]; then
-        mkdir -p "${BASE_DIR}/build_x86_64"
-        cd "${BASE_DIR}/build_x86_64"
+    step "Apply patches..."
+    apply_patch "${CHECKOUT_DIR}/CI/windows/patches/libvpx/libvpx-crosscompile-win-dll.patch" "9553b8186feac616d4421188d7c6ca75fbce900265e688cafdf1ed3333ad376a"
+}
 
-        step "Configure (x86_64)..."
-        ../configure --target="x86_64-darwin${DARWIN_TARGET}-gcc" --disable-shared --disable-examples --disable-unit-tests --enable-pic --enable-vp9-highbitdepth --prefix="${BUILD_DIR}"
+_build_product() {
+    ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
 
-        step "Compile (x86_64)..."
-        make -j${PARALLELISM}
-    fi
+    step "Configure (${ARCH})..."
+    PKG_CONFIG_PATH="$${BUILD_DIR}/lib/pkgconfig" \
+        CROSS=$WIN_CROSS_TOOL_PREFIX-w64-mingw32- \
+        LDFLAGS="-static-libgcc" \
+        ../configure \
+        --prefix="${BUILD_DIR}" \
+        --enable-vp8 \
+        --enable-vp9 \
+        --disable-docs \
+        --disable-examples \
+        --enable-shared \
+        --disable-static \
+        --enable-runtime-cpu-detect \
+        --enable-realtime-only \
+        --disable-install-bins \
+        --disable-install-docs \
+        --disable-unit-tests \
+        --target=$WIN_CROSS_GCC_TARGET
 
-    if [ "${ARCH}" = "arm64" -o "${ARCH}" = "universal" ]; then
-        mkdir -p "${BASE_DIR}/build_arm64"
-        cd "${BASE_DIR}/build_arm64"
-
-        step "Configure (arm64)..."
-        ../configure --target="arm64-darwin20-gcc" --disable-shared --disable-examples --disable-unit-tests --enable-pic --enable-vp9-highbitdepth --prefix="${BUILD_DIR}"
-
-        step "Compile (arm64)..."
-        make -j${PARALLELISM}
-    fi
-
-    if [ ${ARCH} = "universal" ]; then
-        step "Create universal binaries..."
-        cp -cpR "${BASE_DIR}/build_x86_64" "${BASE_DIR}/build_universal"
-        cd "${BASE_DIR}/build_universal"
-        lipo -create ../build_x86_64/libvpx.a ../build_arm64/libvpx.a -output ./libvpx.a
-        lipo -create ../build_x86_64/libvpx_g.a ../build_arm64/libvpx_g.a -output ./libvpx_g.a
-        lipo -create ../build_x86_64/libvp9rc.a ../build_arm64/libvp9rc.a -output ./libvp9rc.a
-        lipo -create ../build_x86_64/libvp9rc_g.a ../build_arm64/libvp9rc_g.a -output ./libvp9rc_g.a
-    fi
+    step "Build (${ARCH})..."
+    make -j$PARALLELISM
 }
 
 _install_product() {
@@ -61,20 +57,20 @@ build-libvpx-main() {
     if [ -z "${_RUN_OBS_BUILD_SCRIPT}" ]; then
         CHECKOUT_DIR="$(/usr/bin/git rev-parse --show-toplevel)"
         source "${CHECKOUT_DIR}/CI/include/build_support.sh"
-        source "${CHECKOUT_DIR}/CI/include/build_support_macos.sh"
+        source "${CHECKOUT_DIR}/CI/include/build_support_windows_cross.sh"
 
         _check_parameters $*
         _build_checks
     fi
 
 
-    PRODUCT_URL="https://github.com/webmproject/libvpx/archive/v${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}.tar.gz"
-    PRODUCT_FILENAME="$(basename "${PRODUCT_URL}")"
-    PRODUCT_FOLDER="${PRODUCT_NAME}-${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+    PRODUCT_PROJECT="webmproject"
+    PRODUCT_REPO="libvpx"
+    PRODUCT_FOLDER="${PRODUCT_REPO}"
 
     if [ -z "${INSTALL}" ]; then
         _add_ccache_to_path
-       _build_setup
+       _build_setup_git
        _build
     else
         _install_product
