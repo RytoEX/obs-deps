@@ -77,6 +77,16 @@ cleanup() {
 }
 
 ## DEFINE TEMPLATES ##
+_add_ccache_to_path() {
+    if [ "${CMAKE_CCACHE_OPTIONS}" ]; then
+        PATH="/usr/bin/ccache:${PATH}"
+        status "Compiler Info:"
+        local IFS=$'\n'
+        for COMPILER_INFO in $(type cc c++ gcc g++ clang clang++ || true); do
+            info "${COMPILER_INFO}"
+        done
+    fi
+}
 
 _print_usage() {
     echo -e "Usage: ${0}\n" \
@@ -84,8 +94,11 @@ _print_usage() {
             "-q, --quiet                    : Suppress most build process output\n" \
             "-v, --verbose                  : Enable more verbose build process output\n" \
             "-a, --architecture             : Specify build architecture (default: host arch, alternatives: x86, x86_64)\n" \
-            "-s, --skip-dependency-checks   : Skip dependency checks (default: off)\n" \
-            "-i, --install                  : Run installation (default: off)\n"
+            "-s, --skip-dependency-checks   : Skip dependency checks (default: off)\n"
+
+    if [ -z _RUN_OBS_BUILD_SCRIPT ]; then
+        echo -e "-i, --install                  : Run installation (default: off)\n"
+    fi
 }
 
 _check_parameters() {
