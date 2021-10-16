@@ -15,14 +15,14 @@ _build_product() {
     cd "${PRODUCT_FOLDER}"
 
     step "Build (${ARCH})..."
-    make PREFIX="$outdir"
+    make PREFIX="${BUILD_DIR}"
 }
 
 _install_product() {
     cd "${PRODUCT_FOLDER}"
 
     step "Install (${ARCH})..."
-    make PREFIX="$outdir" install
+    make PREFIX="${BUILD_DIR}" install
 }
 
 build-nv-codec-headers-main() {
