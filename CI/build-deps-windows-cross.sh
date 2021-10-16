@@ -34,6 +34,7 @@ REQUIRED_DEPS=(
     "libvpx 1.9.0 e56e8dcd6fc9e2b04316be5144c18ca6772f6263"
     "nv-codec-headers 9.0.18.2 96a6db017b096ad48612890083464a7214902afa"
     "amf 1.4.16.1 802f92ee52b9efa77bf0d3ea8bfaed6040cdd35e"
+    "ffmpeg 4.2.4 f9f95ceebfbd7b7f43c1b7ad34e25d366e6e2d2b"
 )
 
 ## MAIN SCRIPT FUNCTIONS ##
