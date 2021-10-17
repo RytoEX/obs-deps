@@ -63,11 +63,6 @@ obs-deps-build-main() {
         set -- ${DEPENDENCY}
         trap "caught_error ${DEPENDENCY}" ERR
 
-        if [ "${1}" = "swig" ]; then
-            PCRE_VERSION="8.44"
-            PCRE_HASH="19108658b23b3ec5058edc9f66ac545ea19f9537234be1ec62b714c84399366d"
-        fi
-
         PRODUCT_NAME="${1}"
         PRODUCT_VERSION="${2}"
         PRODUCT_HASH="${3}"
