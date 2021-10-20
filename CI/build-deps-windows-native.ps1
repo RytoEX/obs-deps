@@ -104,11 +104,12 @@ function Build-OBS-Deps-Main {
             $DepName = $Dependency[0]
             $DepVersion = $Dependency[1]
         }
+        Remove-Item -Path Function:Build-Product,
+            Function:Patch-Product,
+            Function:Install-Product
 
-        if(!(Test-CommandExists "${Command}")) {
-            Write-Step "Build dependency ${DepName}..."
-            . ${CheckoutDir}/CI/windows/build_${DepName}.ps1
-        }
+        Write-Step "Build dependency ${DepName}..."
+        . ${CheckoutDir}/CI/windows/build_${DepName}.ps1
     }
 
     if ($Package.isPresent) {

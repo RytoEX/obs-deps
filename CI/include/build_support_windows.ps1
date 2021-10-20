@@ -276,3 +276,49 @@ function Build-Checks {
     Ensure-Directory "${BuildDirectory}\win64\cmake"
     Ensure-Directory "${BuildDirectory}\win64\include"
 }
+
+function Build-Setup() {
+    trap "caught_error 'build-${PRODUCT_NAME}'" ERR
+
+    ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
+
+    step "Download..."
+    check_and_fetch "${PRODUCT_URL}" "${PRODUCT_HASH:-${CI_PRODUCT_HASH}}"
+
+    if [ -z "${SKIP_UNPACK}" ]; then
+        step "Unpack..."
+        tar -xf ${PRODUCT_FILENAME}
+    fi
+
+    cd "${PRODUCT_FOLDER}"
+}
+
+function Build-Setup-Git() {
+    trap "caught_error 'build-${PRODUCT_NAME}'" ERR
+
+    ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
+
+    step "Git checkout..."
+    mkdir -p "${PRODUCT_REPO}"
+    cd "${PRODUCT_REPO}"
+    github_fetch ${PRODUCT_PROJECT} ${PRODUCT_REPO} ${PRODUCT_HASH:-${CI_PRODUCT_HASH}}""
+}
+
+function Build() {
+    Write-Status "Build ${PRODUCT_NAME} v${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+
+    if (Test-CommandExists 'Patch-Product') {
+        Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
+        Patch-Product
+    }
+
+    if (Test-CommandExists 'Build-Product') {
+        Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
+        Build-Product
+    }
+
+    if (Test-CommandExists 'Install-Product') {
+        Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
+        Install-Product
+    }
+}
