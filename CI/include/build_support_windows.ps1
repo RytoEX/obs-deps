@@ -22,7 +22,7 @@ function Write-Status {
         [String] $output
     )
 
-    if (!($Quiet.isPresent)) {
+    if (!$Quiet) {
         if (Test-Path Env:CI) {
             Write-Host "[${ProductName}] ${output}"
         } else {
@@ -37,7 +37,7 @@ function Write-Info {
         [String] $output
     )
 
-    if (!($Quiet.isPresent)) {
+    if (!$Quiet) {
         if (Test-Path Env:CI) {
             Write-Host " + ${output}"
         } else {
@@ -52,7 +52,7 @@ function Write-Step {
         [String] $output
     )
 
-    if (!($Quiet.isPresent)) {
+    if (!$Quiet) {
         if (Test-Path Env:CI) {
             Write-Host " + ${output}"
         } else {
@@ -110,6 +110,15 @@ function Ensure-Directory {
     Set-Location -Path $Directory
 }
 
+function Cleanup {
+}
+
+function Caught-Error {
+    Write-Error "ERROR during build step: $args[1]"
+    Cleanup
+    exit 1
+}
+
 $BuildDirectory = "$(if (Test-Path Env:BuildDirectory) { $env:BuildDirectory } else { $BuildDirectory })"
 $BuildConfiguration = "$(if (Test-Path Env:BuildConfiguration) { $env:BuildConfiguration } else { $BuildConfiguration })"
 $BuildArch = "$(if (Test-Path Env:BuildArch) { $env:BuildArch } else { $BuildArch })"
@@ -121,7 +130,9 @@ function Install-Windows-Build-Tools {
 
     $ObsBuildDependencies = @(
         @("7z", "7zip"),
-        @("cmake", "cmake --install-arguments 'ADD_CMAKE_TO_PATH=System'")
+        @("cmake", "cmake --install-arguments 'ADD_CMAKE_TO_PATH=System'"),
+        @("curl", "curl"),
+        @("patch", "patch")
     )
 
     if (!(Test-CommandExists "choco")) {
@@ -148,12 +159,86 @@ function Install-Windows-Build-Tools {
 }
 
 function Install-Dependencies {
-    if (!($NoChoco.isPresent)) {
-        Install-Windows-Dependencies
+    if (!$NoChoco) {
+        Install-Windows-Build-Tools
     }
 }
 
-function Git-Fetch() {
+function Get-Basename {
+    Param(
+        [Parameter(Mandatory=$true)]
+        [String] $Path
+    )
+
+    $Separators = "\/"
+    $SepArray = $Separators.ToCharArray()
+    return ${Path}.Substring(${Path}.LastIndexOfAny($SepArray) + 1)
+}
+
+function Safe-Fetch {
+    Param(
+        [switch]$NoContinue,
+        [Parameter(Mandatory=$true)]
+        [String] $DOWNLOAD_URL,
+        [Parameter(Mandatory=$true)]
+        [String] $DOWNLOAD_HASH
+    )
+    if ($($args.Count) -lt 2) {
+        Caught-Error "Usage: Safe-Fetch URL HASH"
+    }
+
+    $DOWNLOAD_FILE = Get-Basename "${DOWNLOAD_URL}"
+    $CURLCMD = $script:CURLCMD
+
+    if ($NoContinue) {
+        $CURLCMD = $CURLCMD.Replace("--continue-at -", "") + " ${DOWNLOAD_URL}"
+    } else {
+        $CURLCMD = ${CURLCMD} + " ${DOWNLOAD_URL}"
+    }
+
+    Invoke-Expression "${CURLCMD}"
+
+    if ("${DOWNLOAD_HASH}" -eq $(Get-FileHash ${DOWNLOAD_FILE}).Hash) {
+        Write-Info "${DOWNLOAD_FILE} downloaded successfully and passed hash check"
+        return 0
+    } else {
+        Write-Error "${DOWNLOAD_FILE} downloaded successfully and failed hash check"
+        return 1
+    }
+}
+
+function Check-And-Fetch {
+    Param(
+        [switch]$NoContinue,
+        [Parameter(Mandatory=$true)]
+        [String] $DOWNLOAD_URL,
+        [Parameter(Mandatory=$true)]
+        [String] $DOWNLOAD_HASH
+    )
+    if ($($args.Count) -lt 2) {
+        Caught-Error "Usage: Check-And-Fetch URL HASH"
+    }
+
+    if ($NoContinue) {
+        $NoContinueValue = $true
+    } else {
+        $NoContinueValue = $false
+    }
+    $params = @{
+        NoContinue = $NoContinueResult
+    }
+
+    $DOWNLOAD_FILE = Get-Basename "${DOWNLOAD_URL}"
+
+    if (Test-Path "${DOWNLOAD_FILE}" -and "${DOWNLOAD_HASH}" -eq $(Get-FileHash ${DOWNLOAD_FILE}).Hash) {
+        Write-Info "${DOWNLOAD_FILE} exists and passed hash check"
+        return 0
+    } else {
+        Safe-Fetch $SafeFetchArgs "${DOWNLOAD_URL}" "${DOWNLOAD_HASH}" @params
+    }
+}
+
+function Git-Fetch {
     if ($($args.Count) -ne 4) {
         Write-Error "Usage: Git-Fetch GIT_HOST GIT_USER GIT_REPOSITORY GIT_REF"
         exit 1
@@ -172,13 +257,13 @@ function Git-Fetch() {
     $GIT_HOST = $GIT_HOST.TrimEnd("/")
 
     if (Test-Path "./.git") {
-        info "Repository ${GIT_USER}/${GIT_REPO} already exists, updating..."
+        Write-Info "Repository ${GIT_USER}/${GIT_REPO} already exists, updating..."
         git config advice.detachedHead false
         git config remote.origin.url "${GIT_HOST}/${GIT_USER}/${GIT_REPO}.git"
         git config remote.origin.fetch "+refs/heads/master:refs/remotes/origin/master"
         git config remote.origin.tapOpt --no-tags
 
-        if (! git rev-parse -q --verify "${GH_COMMIT}^{commit}") {
+        if (!(git rev-parse -q --verify "${GH_COMMIT}^{commit}")) {
             git fetch origin
         }
 
@@ -191,7 +276,7 @@ function Git-Fetch() {
     } else {
         git clone "${GIT_HOST}/${GIT_USER}/${GIT_REPO}.git" "$(pwd)"
         git config advice.detachedHead false
-        info "Checking out commit ${GH_REF}..."
+        Write-Info "Checking out commit ${GH_REF}..."
         git checkout -f "${GH_REF}" --
 
         if (Test-Path "./.gitmodules") {
@@ -201,7 +286,7 @@ function Git-Fetch() {
     }
 }
 
-function GitHub-Fetch() {
+function GitHub-Fetch {
     if ($($args.Count) -ne 3) {
         Write-Error "Usage: GitHub-Fetch GITHUB_USER GITHUB_REPOSITORY GITHUB_REF"
         return 1
@@ -218,7 +303,7 @@ function GitHub-Fetch() {
     Git-Fetch "https://github.com" "${GH_USER}" "${GH_REPO}" "${GH_REF}"
 }
 
-function GitLab-Fetch() {
+function GitLab-Fetch {
     if ($($args.Count) -ne 3) {
         Write-Error "Usage: GitLab-Fetch GITLAB_USER GITLAB_REPOSITORY GITLAB_REF"
         return 1
@@ -235,7 +320,7 @@ function GitLab-Fetch() {
     Git-Fetch "https://gitlab.com" "${GL_USER}" "${GL_REPO}" "${GL_REF}"
 }
 
-function Apply-Patch() {
+function Apply-Patch {
     Param(
         [Parameter(Mandatory=$true)]
         [String] $COMMIT_URL,
@@ -262,8 +347,23 @@ function Apply-Patch() {
     patch -g 0 -f -p1 -i "${PATCH_FILE}"
 }
 
+function Check-Curl {
+    if (!(Test-CommandExists "curl")) {
+        Write-Step "Install curl from chocolatey..."
+        Invoke-Expression "choco install -y curl"
+    }
+
+    $CURLCMD = "C:\ProgramData\chocolatey\bin\curl.exe"
+
+    if ("${CI}" -or "${QUIET}") {
+        $script:CURLCMD = "${CURLCMD} --silent --show-error --location -O"
+    } else {
+        $script:CURLCMD = "${CURLCMD} --progress-bar --location --continue-at - -O"
+    }
+}
+
 function Build-Checks {
-    if(!($NoChoco.isPresent)) {
+    if(!$NoChoco) {
         Install-Windows-Dependencies
     }
 
@@ -277,35 +377,60 @@ function Build-Checks {
     Ensure-Directory "${BuildDirectory}\win64\include"
 }
 
-function Build-Setup() {
-    trap "caught_error 'build-${PRODUCT_NAME}'" ERR
+function Build-Setup {
+    Trap { Caught-Error "build-${PRODUCT_NAME}" }
 
-    ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
+    Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
 
-    step "Download..."
-    check_and_fetch "${PRODUCT_URL}" "${PRODUCT_HASH:-${CI_PRODUCT_HASH}}"
+    if (!$PRODUCT_HASH) {
+        $PRODUCT_HASH = $CI_PRODUCT_HASH
+    }
 
-    if [ -z "${SKIP_UNPACK}" ]; then
-        step "Unpack..."
+    Write-Step "Download..."
+    Check-And-Fetch "${PRODUCT_URL}" "${PRODUCT_HASH}"
+
+    if (!"${SKIP_UNPACK}") {
+        Write-Step "Unpack..."
         tar -xf ${PRODUCT_FILENAME}
-    fi
+    }
 
     cd "${PRODUCT_FOLDER}"
 }
 
-function Build-Setup-Git() {
-    trap "caught_error 'build-${PRODUCT_NAME}'" ERR
+function Build-Setup-GitHub {
+    Trap { Caught-Error "build-${PRODUCT_NAME}" }
 
-    ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
+    Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
 
-    step "Git checkout..."
-    mkdir -p "${PRODUCT_REPO}"
-    cd "${PRODUCT_REPO}"
-    github_fetch ${PRODUCT_PROJECT} ${PRODUCT_REPO} ${PRODUCT_HASH:-${CI_PRODUCT_HASH}}""
+    if (!$PRODUCT_HASH) {
+        $PRODUCT_HASH = $CI_PRODUCT_HASH
+    }
+
+    Write-Step "Git checkout..."
+    Ensure-Directory "${PRODUCT_REPO}"
+    GitHub-Fetch ${PRODUCT_PROJECT} ${PRODUCT_REPO} ${PRODUCT_HASH}
 }
 
-function Build() {
-    Write-Status "Build ${PRODUCT_NAME} v${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
+function Build-Setup-GitLab {
+    Trap { Caught-Error "build-${PRODUCT_NAME}" }
+
+    Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
+
+    if (!$PRODUCT_HASH) {
+        $PRODUCT_HASH = $CI_PRODUCT_HASH
+    }
+
+    Write-Step "Git checkout..."
+    Ensure-Directory "${PRODUCT_REPO}"
+    GitLab-Fetch ${PRODUCT_PROJECT} ${PRODUCT_REPO} ${PRODUCT_HASH}
+}
+
+function Build {
+    if (!$PRODUCT_VERSION) {
+        $PRODUCT_VERSION = $CI_PRODUCT_VERSION
+    }
+
+    Write-Status "Build ${PRODUCT_NAME} v${PRODUCT_VERSION}"
 
     if (Test-CommandExists 'Patch-Product') {
         Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"

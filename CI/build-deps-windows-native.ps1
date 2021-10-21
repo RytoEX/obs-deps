@@ -48,19 +48,13 @@ $ProductName = "obs-deps"
 $CheckoutDir = git rev-parse --show-toplevel
 $DepsBuildDir = "${CheckoutDir}/../obs-build-dependencies"
 
+Write-Output "CheckoutDir: ${CheckoutDir}"
+Write-Output "DepsBuildDir: ${DepsBuildDir}"
+
 . ${CheckoutDir}/CI/include/build_support_windows.ps1
 
 $ObsBuildDependencies = @(
-    @('mbedtls', '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8'),
-    @('cmocka', '5a4b15870efa2225e6586fbb4c3af05ff0659434'),
-    @('detours', '4.0.1'),
-    @('freetype', '6a2b3e4007e794bfc6c91030d0ed987f925164a8'),
-    @('libcurl', '315ee3fe75dade912b48a21ceec9ccda0230d937'),
-    @('python', '3.6.2'),
-    @('luajit', 'v2.0.5'),
-    @('rnnoise', 'e9f457a356221fe3e3297c75444a568d44324bbd'),
-    @('speexdsp', '20ed3452074664ad07e380e51321b148acebdf20'),
-    @('vulkan', '1.2.131.2')
+    @('mbedtls', '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8')
 )
 
 function Build-OBS-Deps-Main {
@@ -81,19 +75,19 @@ function Build-OBS-Deps-Main {
 
     $FileName = "${ProductName}-${VersionString}"
 
-    if ($CombinedArchs.isPresent) {
+    if ($CombinedArchs) {
         if (!(Test-Path env:obsInstallerTempDir)) {
             $Env:obsInstallerTempDir = "${CheckoutDir}/install_temp"
         }
 
-        if (!($SkipDependencyChecks.isPresent)) {
-            Install-Dependencies -NoChoco:${NoChoco}
+        if (!$SkipDependencyChecks) {
+            Install-Dependencies -NoChoco
         }
 
         Build-OBS -BuildArch 64-bit
     } else {
-        if (!($SkipDependencyChecks.isPresent)) {
-            Install-Dependencies -NoChoco:${NoChoco}
+        if (!$SkipDependencyChecks) {
+            Install-Dependencies -NoChoco
         }
 
         Build-OBS
@@ -108,11 +102,13 @@ function Build-OBS-Deps-Main {
             Function:Patch-Product,
             Function:Install-Product
 
+        Trap { Caught-Error "${DepName}" }
+
         Write-Step "Build dependency ${DepName}..."
         . ${CheckoutDir}/CI/windows/build_${DepName}.ps1
     }
 
-    if ($Package.isPresent) {
+    if ($Package) {
         Package-OBS -CombinedArchs:$CombinedArchs
     }
 
@@ -138,7 +134,7 @@ function Print-Usage {
     $Lines | Write-Host
 }
 
-if($Help.isPresent) {
+if($Help) {
     Print-Usage
     exit 0
 }
