@@ -48,9 +48,6 @@ $ProductName = "obs-deps"
 $CheckoutDir = git rev-parse --show-toplevel
 $DepsBuildDir = "${CheckoutDir}/../obs-build-dependencies"
 
-Write-Output "CheckoutDir: ${CheckoutDir}"
-Write-Output "DepsBuildDir: ${DepsBuildDir}"
-
 . ${CheckoutDir}/CI/include/build_support_windows.ps1
 
 $ObsBuildDependencies = @(
@@ -83,14 +80,10 @@ function Build-OBS-Deps-Main {
         if (!$SkipDependencyChecks) {
             Install-Dependencies -NoChoco
         }
-
-        Build-OBS -BuildArch 64-bit
     } else {
         if (!$SkipDependencyChecks) {
             Install-Dependencies -NoChoco
         }
-
-        Build-OBS
     }
 
     Foreach ($Dependency in $ObsBuildDependencies) {
