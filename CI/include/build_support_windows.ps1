@@ -304,10 +304,10 @@ function GitHub-Fetch {
         Write-Error "Usage: GitHub-Fetch GITHUB_USER GITHUB_REPOSITORY GITHUB_REF"
         return 1
     }
-    Write-Status "GH_USER: ${GH_USER}"
-    Write-Status "GH_REPO: ${GH_REPO}"
-    Write-Status "GH_REF: ${GH_REF}"
-    Write-Status "GitHub-Fetch"
+    #Write-Status "GH_USER: ${GH_USER}"
+    #Write-Status "GH_REPO: ${GH_REPO}"
+    #Write-Status "GH_REF: ${GH_REF}"
+    #Write-Status "GitHub-Fetch"
 
     Git-Fetch "https://github.com" "${GH_USER}" "${GH_REPO}" "${GH_REF}"
 }
@@ -394,7 +394,6 @@ function Check-Curl {
 }
 
 function Build-Checks {
-    Write-Status "Build-Checks"
     if(!$NoChoco) {
         Install-Windows-Build-Tools
     }
@@ -402,15 +401,15 @@ function Build-Checks {
     $script:CI_PRODUCT_VERSION = ${CIWorkflowJobString} | Select-String "[ ]+${PRODUCT_NAME_U}_VERSION: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
     $script:CI_PRODUCT_HASH = ${CIWorkflowJobString} | Select-String "[ ]+${PRODUCT_NAME_U}_HASH: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
 
-    Write-Status "CheckoutDir: ${CheckoutDir}"
-    Write-Status "ProductProject: ${ProductProject}"
-    Write-Status "ProductRepo: ${ProductRepo}"
-    Write-Status "ProductHash: ${ProductHash}"
-    Write-Status "ProductName: ${ProductName}"
-    Write-Status "ProductVersion: ${ProductVersion}"
-    Write-Status "PRODUCT_NAME_U: ${PRODUCT_NAME_U}"
-    Write-Status "CI_PRODUCT_VERSION: ${CI_PRODUCT_VERSION}"
-    Write-Status "CI_PRODUCT_HASH: ${CI_PRODUCT_HASH}"
+    #Write-Status "CheckoutDir: ${CheckoutDir}"
+    #Write-Status "ProductProject: ${ProductProject}"
+    #Write-Status "ProductRepo: ${ProductRepo}"
+    #Write-Status "ProductHash: ${ProductHash}"
+    #Write-Status "ProductName: ${ProductName}"
+    #Write-Status "ProductVersion: ${ProductVersion}"
+    #Write-Status "PRODUCT_NAME_U: ${PRODUCT_NAME_U}"
+    #Write-Status "CI_PRODUCT_VERSION: ${CI_PRODUCT_VERSION}"
+    #Write-Status "CI_PRODUCT_HASH: ${CI_PRODUCT_HASH}"
 
     Check-Archs
     #Check-Curl
@@ -451,15 +450,13 @@ function Build-Setup-GitHub {
     Ensure-Directory "${CheckoutDir}/windows_build_temp"
 
     if (!$ProductHash) {
-        Write-Status "ProductHash is empty"
-        Write-Status "CI_PRODUCT_HASH: ${CI_PRODUCT_HASH}"
         $ProductHash = $CI_PRODUCT_HASH
     }
 
-    Write-Status "CheckoutDir: ${CheckoutDir}"
-    Write-Status "ProductProject: ${ProductProject}"
-    Write-Status "ProductRepo: ${ProductRepo}"
-    Write-Status "ProductHash: ${ProductHash}"
+    #Write-Status "CheckoutDir: ${CheckoutDir}"
+    #Write-Status "ProductProject: ${ProductProject}"
+    #Write-Status "ProductRepo: ${ProductRepo}"
+    #Write-Status "ProductHash: ${ProductHash}"
 
     Write-Step "Git checkout..."
     Ensure-Directory "${ProductRepo}"

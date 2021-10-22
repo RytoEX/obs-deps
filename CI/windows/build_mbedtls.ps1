@@ -20,7 +20,7 @@ Param(
 ################################################################################
 
 function Patch-Product {
-    cd "${PRODUCT_FOLDER}"
+    cd "${ProductFolder}"
 
     Write-Step "Apply patches..."
     Apply-Patch "${CheckoutDir}\CI\windows\patches\mbedtls\mbedtls-enable-alt-threading-01.patch" "306b8aaee8f291cc0dbd4cbee12ea185e722469eb06b8b7113f0a60feca6bbe6"
@@ -63,26 +63,22 @@ function Install-Product {
 function Build-Mbedtls-Main {
     $ProductName = "${ProductName}"
     if (!${ProductName}) {
-        Write-Output "ProductName is empty"
         $ProductName = "mbedtls"
     }
-    Write-Output "ProductName: ${ProductName}"
 
     if (!${_RunObsDepsBuildScript}) {
         $CheckoutDir = "$(git rev-parse --show-toplevel)"
-        Write-Output "ProductName: ${ProductName}"
         . "${CheckoutDir}/CI/include/build_support_windows.ps1"
 
-        Write-Status "_RunObsDepsBuildScript is false"
         #_check_parameters $*
         Build-Checks -NoChoco:${NoChoco}
     }
 
-    Write-Status "ProductName: ${ProductName}"
-    Write-Status "CheckoutDir: ${CheckoutDir}"
-    Write-Status "ProductProject: ${ProductProject}"
-    Write-Status "ProductRepo: ${ProductRepo}"
-    Write-Status "ProductHash: ${ProductHash}"
+    #Write-Status "ProductName: ${ProductName}"
+    #Write-Status "CheckoutDir: ${CheckoutDir}"
+    #Write-Status "ProductProject: ${ProductProject}"
+    #Write-Status "ProductRepo: ${ProductRepo}"
+    #Write-Status "ProductHash: ${ProductHash}"
     $NOCONTINUE = $true
     $ProductProject = "ARMmbed"
     $ProductRepo = "mbedtls"
