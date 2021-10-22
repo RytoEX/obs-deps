@@ -398,14 +398,16 @@ function Build-Checks {
     if(!$NoChoco) {
         Install-Windows-Build-Tools
     }
-    $PRODUCT_NAME_U = "${PRODUCT_NAME}".ToUpper()
+    $PRODUCT_NAME_U = "${ProductName}".ToUpper()
     $script:CI_PRODUCT_VERSION = ${CIWorkflowJobString} | Select-String "[ ]+${PRODUCT_NAME_U}_VERSION: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
     $script:CI_PRODUCT_HASH = ${CIWorkflowJobString} | Select-String "[ ]+${PRODUCT_NAME_U}_HASH: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
 
     Write-Status "CheckoutDir: ${CheckoutDir}"
-    Write-Status "PRODUCT_PROJECT: ${PRODUCT_PROJECT}"
-    Write-Status "PRODUCT_REPO: ${PRODUCT_REPO}"
-    Write-Status "PRODUCT_HASH: ${PRODUCT_HASH}"
+    Write-Status "ProductProject: ${ProductProject}"
+    Write-Status "ProductRepo: ${ProductRepo}"
+    Write-Status "ProductHash: ${ProductHash}"
+    Write-Status "ProductName: ${ProductName}"
+    Write-Status "ProductVersion: ${ProductVersion}"
     Write-Status "PRODUCT_NAME_U: ${PRODUCT_NAME_U}"
     Write-Status "CI_PRODUCT_VERSION: ${CI_PRODUCT_VERSION}"
     Write-Status "CI_PRODUCT_HASH: ${CI_PRODUCT_HASH}"
@@ -424,66 +426,66 @@ function Build-Checks {
 }
 
 function Build-Setup {
-    Trap { Caught-Error "build-${PRODUCT_NAME}" }
+    Trap { Caught-Error "build-${ProductName}" }
 
     Ensure-Directory "${CheckoutDir}/windows_build_temp"
 
-    if (!$PRODUCT_HASH) {
-        $PRODUCT_HASH = $CI_PRODUCT_HASH
+    if (!$ProductHash) {
+        $ProductHash = $CI_PRODUCT_HASH
     }
 
     Write-Step "Download..."
-    Check-And-Fetch "${PRODUCT_URL}" "${PRODUCT_HASH}"
+    Check-And-Fetch "${ProductUrl}" "${ProductHash}"
 
     if (!"${SKIP_UNPACK}") {
         Write-Step "Unpack..."
-        tar -xf ${PRODUCT_FILENAME}
+        tar -xf ${ProductFilename}
     }
 
-    cd "${PRODUCT_FOLDER}"
+    cd "${ProductFolder}"
 }
 
 function Build-Setup-GitHub {
-    Trap { Caught-Error "build-${PRODUCT_NAME}" }
+    Trap { Caught-Error "build-${ProductName}" }
 
     Ensure-Directory "${CheckoutDir}/windows_build_temp"
 
-    if (!$PRODUCT_HASH) {
-        Write-Status "PRODUCT_HASH is empty"
+    if (!$ProductHash) {
+        Write-Status "ProductHash is empty"
         Write-Status "CI_PRODUCT_HASH: ${CI_PRODUCT_HASH}"
-        $PRODUCT_HASH = $CI_PRODUCT_HASH
+        $ProductHash = $CI_PRODUCT_HASH
     }
 
     Write-Status "CheckoutDir: ${CheckoutDir}"
-    Write-Status "PRODUCT_PROJECT: ${PRODUCT_PROJECT}"
-    Write-Status "PRODUCT_REPO: ${PRODUCT_REPO}"
-    Write-Status "PRODUCT_HASH: ${PRODUCT_HASH}"
+    Write-Status "ProductProject: ${ProductProject}"
+    Write-Status "ProductRepo: ${ProductRepo}"
+    Write-Status "ProductHash: ${ProductHash}"
 
     Write-Step "Git checkout..."
-    Ensure-Directory "${PRODUCT_REPO}"
-    GitHub-Fetch ${PRODUCT_PROJECT} ${PRODUCT_REPO} ${PRODUCT_HASH}
+    Ensure-Directory "${ProductRepo}"
+    GitHub-Fetch ${ProductProject} ${ProductRepo} ${ProductHash}
 }
 
 function Build-Setup-GitLab {
-    Trap { Caught-Error "build-${PRODUCT_NAME}" }
+    Trap { Caught-Error "build-${ProductName}" }
 
     Ensure-Directory "${CheckoutDir}/windows_build_temp"
 
-    if (!$PRODUCT_HASH) {
-        $PRODUCT_HASH = $CI_PRODUCT_HASH
+    if (!$ProductHash) {
+        $ProductHash = $CI_PRODUCT_HASH
     }
 
     Write-Step "Git checkout..."
-    Ensure-Directory "${PRODUCT_REPO}"
-    GitLab-Fetch ${PRODUCT_PROJECT} ${PRODUCT_REPO} ${PRODUCT_HASH}
+    Ensure-Directory "${ProductRepo}"
+    GitLab-Fetch ${ProductProject} ${ProductRepo} ${ProductHash}
 }
 
 function Build {
-    if (!$PRODUCT_VERSION) {
-        $PRODUCT_VERSION = $CI_PRODUCT_VERSION
+    if (!$ProductVersion) {
+        $ProductVersion = $CI_PRODUCT_VERSION
     }
 
-    Write-Status "Build ${PRODUCT_NAME} ${PRODUCT_VERSION}"
+    Write-Status "Build ${ProductName} ${ProductVersion}"
 
     if (Test-CommandExists 'Patch-Product') {
         Ensure-Directory "${CheckoutDir}/windows_build_temp"

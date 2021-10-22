@@ -99,9 +99,9 @@ function Build-OBS-Deps-Main {
         Trap { Caught-Error "${DepName}" }
 
         Write-Step "Build dependency ${DepName}..."
-        $PRODUCT_NAME = "${DepName}"
-        $PRODUCT_VERSION = "${DepVersion}"
-        $PRODUCT_HASH = "${DepVersion}"
+        $ProductName = "${DepName}"
+        $ProductVersion = "${DepVersion}"
+        $ProductHash = "${DepVersion}"
         . ${CheckoutDir}/CI/windows/build_${DepName}.ps1
     }
 

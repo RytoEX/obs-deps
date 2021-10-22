@@ -61,16 +61,16 @@ function Install-Product {
 }
 
 function Build-Mbedtls-Main {
-    $PRODUCT_NAME = "${PRODUCT_NAME}"
-    if (!${PRODUCT_NAME}) {
-        Write-Output "PRODUCT_NAME is empty"
-        $PRODUCT_NAME = "mbedtls"
+    $ProductName = "${ProductName}"
+    if (!${ProductName}) {
+        Write-Output "ProductName is empty"
+        $ProductName = "mbedtls"
     }
-    Write-Output "PRODUCT_NAME: ${PRODUCT_NAME}"
+    Write-Output "ProductName: ${ProductName}"
 
     if (!${_RunObsDepsBuildScript}) {
         $CheckoutDir = "$(git rev-parse --show-toplevel)"
-        Write-Output "PRODUCT_NAME: ${PRODUCT_NAME}"
+        Write-Output "ProductName: ${ProductName}"
         . "${CheckoutDir}/CI/include/build_support_windows.ps1"
 
         Write-Status "_RunObsDepsBuildScript is false"
@@ -78,15 +78,15 @@ function Build-Mbedtls-Main {
         Build-Checks -NoChoco:${NoChoco}
     }
 
-    Write-Status "PRODUCT_NAME: ${PRODUCT_NAME}"
+    Write-Status "ProductName: ${ProductName}"
     Write-Status "CheckoutDir: ${CheckoutDir}"
-    Write-Status "PRODUCT_PROJECT: ${PRODUCT_PROJECT}"
-    Write-Status "PRODUCT_REPO: ${PRODUCT_REPO}"
-    Write-Status "PRODUCT_HASH: ${PRODUCT_HASH}"
+    Write-Status "ProductProject: ${ProductProject}"
+    Write-Status "ProductRepo: ${ProductRepo}"
+    Write-Status "ProductHash: ${ProductHash}"
     $NOCONTINUE = $true
-    $PRODUCT_PROJECT = "ARMmbed"
-    $PRODUCT_REPO = "mbedtls"
-    $PRODUCT_FOLDER = "${PRODUCT_REPO}"
+    $ProductProject = "ARMmbed"
+    $ProductRepo = "mbedtls"
+    $ProductFolder = "${ProductRepo}"
 
     if (!$Install) {
         Build-Setup-GitHub
