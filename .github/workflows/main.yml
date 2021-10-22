@@ -813,6 +813,123 @@ jobs:
           name: ${{ env.FILE_NAME }}
           path: ${{ github.workspace }}/windows/${{ env.FILE_NAME }}
 
+  windows-deps-build-native:
+    name: '01 - Build Windows dependencies (native)'
+    runs-on: [windows-2019]
+    strategy:
+      matrix:
+        arch: ['32-bit', '64-bit']
+    env:
+      CACHE_REVISION: '01'
+      MBEDTLS_VERSION: '2.24.0'
+      MBEDTLS_HASH: '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8'
+      CMOCKA_VERSION: '1.1.5-git'
+      CMOCKA_HASH: '5a4b15870efa2225e6586fbb4c3af05ff0659434'
+      DETOURS_VERSION: '4.0.1'
+      DETOURS_HASH: 'e4bfd6b03e50de46b47abfbd1e46b384f0c5f833'
+      FREETYPE_VERSION: '2.10.4'
+      FREETYPE_HASH: '6a2b3e4007e794bfc6c91030d0ed987f925164a8'
+      LIBCURL_VERSION: '7.73.0'
+      LIBCURL_HASH: '315ee3fe75dade912b48a21ceec9ccda0230d937'
+      PYTHON_VERSION: '3.6.2'
+      PYTHON_HASH: ''
+      LUAJIT_VERSION: 'v2.0.5'
+      LUAJIT_HASH: ''
+      RNNOISE_VERSION: ''
+      RNNOISE_HASH: 'e9f457a356221fe3e3297c75444a568d44324bbd'
+      SPEEXDSP_VERSION: ''
+      SPEEXDSP_HASH: '20ed3452074664ad07e380e51321b148acebdf20'
+      VULKAN_VERSION: '1.2.131.2'
+      VULKAN_HASH: ''
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+
+      - name: 'Check for Github Labels'
+        if: github.event_name == 'pull_request'
+        run: |
+          if test -n "$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -s "${{ github.event.pull_request.url }}" | jq -e '.labels[] | select(.name == "Seeking Testers")')"; then
+            echo "SEEKING_TESTERS=1" >> $GITHUB_ENV
+          else
+            echo "SEEKING_TESTERS=0" >> $GITHUB_ENV
+          fi
+
+          echo "CACHE_DATE=$(date +"%Y-%m-%d")" >> $GITHUB_ENV
+
+      - name: 'Setup build environment'
+        run: |
+          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/bin
+          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/include
+          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/lib
+          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/share
+
+      - name: 'Restore mbedtls from cache'
+        id: mbedtls-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'mbedtls-${{ matrix.arch }}-${{ env.MBEDTLS_REVISION }}'
+        with:
+          path: ${{ github.workspace }}/windows_build_temp/mbedtls
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.MBEDTLS_VERSION }}
+
+      - name: 'Build dependency mbedtls'
+        if: steps.mbedtls-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_mbedtls.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}
+
+      - name: 'Install dependency mbedtls'
+        if: steps.mbedtls-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_mbedtls.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }} -Install
+
+      - name: 'Restore cmocka from cache'
+        id: cmocka-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'cmocka-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
+        with:
+          path: ${{ github.workspace }}/windows_build_temp/cmocka
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.CMOCKA_VERSION }}
+
+      - name: 'Build dependency cmocka'
+        if: steps.cmocka-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_cmocka.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency cmocka'
+        if: steps.cmocka-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_cmocka.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Build dependency cmocka'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_pthread-win32.sh -s -a ${{ matrix.arch }}
+
+      - name: 'Install dependency cmocka'
+        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_pthread-win32.sh -s -a ${{ matrix.arch }} --install
+
+      - name: 'Package dependencies'
+        if: success()
+        working-directory: ${{ github.workspace }}/windows/obs-dependencies-${{ matrix.arch }}
+        run: |
+          CURRENT_DATE=$(date +"%Y-%m-%d")
+          FILE_NAME="windows-deps-${CURRENT_DATE}-${{ matrix.arch }}.tar.xz"
+          echo "FILE_NAME=${FILE_NAME}" >> $GITHUB_ENV
+
+          cp -R ${{ github.workspace }}/licenses .
+
+          XZ_OPT=-T0 tar -cJf "${FILE_NAME}" *
+
+          mv ${FILE_NAME} ..
+
+      - name: 'Publish Build Artifacts'
+        if: ${{ success() && (github.event_name != 'pull_request' || env.SEEKING_TESTERS == '1') }}
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: ${{ env.FILE_NAME }}
+          path: ${{ github.workspace }}/windows/${{ env.FILE_NAME }}
+
+
   make-release:
     name: 'Create and upload release'
     runs-on: [ubuntu-latest]
