@@ -10,15 +10,15 @@ function Patch-Product {
     cd "${PRODUCT_FOLDER}"
 
     Write-Step "Apply patches..."
-    Apply-Patch "${CHECKOUT_DIR}\CI\windows\patches\mbedtls\mbedtls-enable-alt-threading-01.patch" "306b8aaee8f291cc0dbd4cbee12ea185e722469eb06b8b7113f0a60feca6bbe6"
+    Apply-Patch "${CheckoutDir}\CI\windows\patches\mbedtls\mbedtls-enable-alt-threading-01.patch" "306b8aaee8f291cc0dbd4cbee12ea185e722469eb06b8b7113f0a60feca6bbe6"
 
-    if (!Test-Path "include\mbedtls\threading_alt.h") {
-        Apply-Patch "${CHECKOUT_DIR}\CI\windows\patches\mbedtls\mbedtls-enable-alt-threading-02.patch" "d0dde0836dc6b100edf218207feffbbf808d04b1d0065082cdc5c838f8a4a7c7"
+    if (!(Test-Path "include\mbedtls\threading_alt.h")) {
+        Apply-Patch "${CheckoutDir}\CI\windows\patches\mbedtls\mbedtls-enable-alt-threading-02.patch" "d0dde0836dc6b100edf218207feffbbf808d04b1d0065082cdc5c838f8a4a7c7"
     }
 }
 
 function Build-Product {
-    Ensure-Directory "${PRODUCT_FOLDER}\build_${ARCH}"
+    cd "${DepsBuildDir}"
 
     if ("${QUIET}") {
         $CMAKE_OPTS = "-Wno-deprecated -Wno-dev --log-level=ERROR"
@@ -34,25 +34,29 @@ function Build-Product {
         -DENABLE_PROGRAMS=OFF `
         "${CMAKE_OPTS}" `
         -S "mbedtls" `
-        -B "mbedtls_build\64"
+        -B "mbedtls_build\${CMAKE_BITNESS}"
 
     Write-Step "Build (${ARCH})..."
-    cmake --build "build_${ARCH}" --config "RelWithDebInfo"
+    cmake --build "mbedtls_build\${CMAKE_BITNESS}" --config "RelWithDebInfo"
 }
 
 function Install-Product {
-    cd "${PRODUCT_FOLDER}/build_${ARCH}"
+    cd "${DepsBuildDir}"
 
     Write-Step "Install (${ARCH})..."
-    cmake --install "build_${ARCH}" --config "RelWithDebInfo" --prefix "${BUILD_DIR}"
+    cmake --install "mbedtls_build\${CMAKE_BITNESS}" --config "RelWithDebInfo" --prefix "${DepsBuildDir}\${CMAKE_INSTALL_DIR}"
 }
 
 function Build-Mbedtls-Main {
-    $PRODUCT_NAME = "${PRODUCT_NAME:-mbedtls}"
+    $PRODUCT_NAME = "${PRODUCT_NAME}"
+    if (!${PRODUCT_NAME}) {
+        $PRODUCT_NAME = "mbedtls"
+    }
 
-    if (!"${_RUN_OBS_BUILD_SCRIPT}") {
-        $CHECKOUT_DIR = "$(/usr/bin/git rev-parse --show-toplevel)"
-        . "${CHECKOUT_DIR}/CI/include/build_support_windows.ps1"
+    if (!${_RunObsDepsBuildScript}) {
+        Write-Status "_RunObsDepsBuildScript is false"
+        $CheckoutDir = "$(/usr/bin/git rev-parse --show-toplevel)"
+        . "${CheckoutDir}/CI/include/build_support_windows.ps1"
 
         #_check_parameters $*
         Build-Checks
@@ -71,4 +75,4 @@ function Build-Mbedtls-Main {
     }
 }
 
-Build-Mbedtls-Main $*
+Build-Mbedtls-Main

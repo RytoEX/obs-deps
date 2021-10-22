@@ -42,16 +42,18 @@ Param(
 
 $ErrorActionPreference = "Stop"
 
-$_RunObsBuildScript = $true
+$_RunObsDepsBuildScript = $true
 $ProductName = "obs-deps"
 
 $CheckoutDir = git rev-parse --show-toplevel
-$DepsBuildDir = "${CheckoutDir}/../obs-build-dependencies"
+#$DepsBuildDir = "${CheckoutDir}/../obs-build-dependencies"
+$DepsBuildDir = "${CheckoutDir}/windows_build_temp"
 
 . ${CheckoutDir}/CI/include/build_support_windows.ps1
 
 $ObsBuildDependencies = @(
-    @('mbedtls', '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8')
+    @('mbedtls', '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8'),
+    @('cmocka', '5a4b15870efa2225e6586fbb4c3af05ff0659434')
 )
 
 function Build-OBS-Deps-Main {
@@ -63,6 +65,9 @@ function Build-OBS-Deps-Main {
     $ErrorActionPreference = "SilentlyContinue"
     $GitTag = git describe --tags --abbrev=0
     $ErrorActionPreference = "Stop"
+
+    #Check-Parameters
+    Build-Checks
 
     if (Test-Path variable:BUILD_FOR_DISTRIBUTION) {
         $VersionString = "${GitTag}"
@@ -78,11 +83,11 @@ function Build-OBS-Deps-Main {
         }
 
         if (!$SkipDependencyChecks) {
-            Install-Dependencies -NoChoco
+            Install-Dependencies -NoChoco:${NoChoco}
         }
     } else {
         if (!$SkipDependencyChecks) {
-            Install-Dependencies -NoChoco
+            Install-Dependencies -NoChoco:${NoChoco}
         }
     }
 
@@ -90,14 +95,28 @@ function Build-OBS-Deps-Main {
         if ($Dependency -is [system.array]) {
             $DepName = $Dependency[0]
             $DepVersion = $Dependency[1]
+        } else {
+            Write-Error "ObsBuildDependencies is not array"
         }
-        Remove-Item -Path Function:Build-Product,
-            Function:Patch-Product,
-            Function:Install-Product
+        if (Test-CommandExists Build-Product) {
+            #Write-Status "Build-Product previously defined"
+            Remove-Item -Path Function:Build-Product
+        }
+        if (Test-CommandExists Patch-Product) {
+            #Write-Status "Patch-Product previously defined"
+            Remove-Item -Path Function:Patch-Product
+        }
+        if (Test-CommandExists Install-Product) {
+            #Write-Status "Install-Product previously defined"
+            Remove-Item -Path Function:Install-Product
+        }
 
         Trap { Caught-Error "${DepName}" }
 
         Write-Step "Build dependency ${DepName}..."
+        $PRODUCT_NAME = "${DepName}"
+        $PRODUCT_VERSION = "${DepVersion}"
+        $PRODUCT_HASH = "${DepVersion}"
         . ${CheckoutDir}/CI/windows/build_${DepName}.ps1
     }
 
@@ -110,7 +129,7 @@ function Build-OBS-Deps-Main {
 
 ## MAIN SCRIPT FUNCTIONS ##
 function Print-Usage {
-    Write-Host "build-windows.ps1 - Build script for ${ProductName}"
+    Write-Host "build-deps-windows-native.ps1 - Build script for ${ProductName}"
     $Lines = @(
         "Usage: ${MyInvocation.MyCommand.Name}",
         "-Help                    : Print this help",

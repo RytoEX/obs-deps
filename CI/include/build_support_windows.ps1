@@ -12,9 +12,12 @@
 $CIWorkflow = "${CheckoutDir}/.github/workflows/main.yml"
 
 $CIDepsVersion = Get-Content ${CIWorkflow} | Select-String "[ ]+DEPS_VERSION_WIN: '([0-9\-]+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
-$CIQtVersion = Get-Content ${CIWorkflow} | Select-String "[ ]+QT_VERSION_WIN: '([0-9\.]+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
-$CIVlcVersion = Get-Content ${CIWorkflow} | Select-String "[ ]+VLC_VERSION_WIN: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
-$CICefVersion = Get-Content ${CIWorkflow} | Select-String "[ ]+CEF_BUILD_VERSION_WIN: '([0-9\.]+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
+
+$BuildDirectory = "$(if (Test-Path Env:BuildDirectory) { $env:BuildDirectory } else { $BuildDirectory })"
+$BuildConfiguration = "$(if (Test-Path Env:BuildConfiguration) { $env:BuildConfiguration } else { $BuildConfiguration })"
+$BuildArch = "$(if (Test-Path Env:BuildArch) { $env:BuildArch } else { $BuildArch })"
+$WindowsDepsVersion = "$(if (Test-Path Env:WindowsDepsVersion ) { $env:WindowsDepsVersion } else { $CIDepsVersion })"
+$CmakeSystemVersion = "$(if (Test-Path Env:CMAKE_SYSTEM_VERSION) { $Env:CMAKE_SYSTEM_VERSION } else { "10.0.18363.657" })"
 
 function Write-Status {
     Param(
@@ -114,16 +117,10 @@ function Cleanup {
 }
 
 function Caught-Error {
-    Write-Error "ERROR during build step: $args[1]"
+    Write-Error "ERROR during build step: $($args[0])"
     Cleanup
     exit 1
 }
-
-$BuildDirectory = "$(if (Test-Path Env:BuildDirectory) { $env:BuildDirectory } else { $BuildDirectory })"
-$BuildConfiguration = "$(if (Test-Path Env:BuildConfiguration) { $env:BuildConfiguration } else { $BuildConfiguration })"
-$BuildArch = "$(if (Test-Path Env:BuildArch) { $env:BuildArch } else { $BuildArch })"
-$WindowsDepsVersion = "$(if (Test-Path Env:WindowsDepsVersion ) { $env:WindowsDepsVersion } else { $CIDepsVersion })"
-$CmakeSystemVersion = "$(if (Test-Path Env:CMAKE_SYSTEM_VERSION) { $Env:CMAKE_SYSTEM_VERSION } else { "10.0.18363.657" })"
 
 function Install-Windows-Build-Tools {
     Write-Status "Check Windows build tools"
@@ -132,6 +129,7 @@ function Install-Windows-Build-Tools {
         @("7z", "7zip"),
         @("cmake", "cmake --install-arguments 'ADD_CMAKE_TO_PATH=System'"),
         @("curl", "curl"),
+        @("git", "git"),
         @("patch", "patch")
     )
 
@@ -149,7 +147,9 @@ function Install-Windows-Build-Tools {
             $ChocoName = $Dependency
         }
 
-        if (!(Test-CommandExists "${Command}")) {
+        if ((Test-CommandExists "${Command}")) {
+            Write-Status "Has ${Command}"
+        } else {
             Write-Step "Install dependency ${ChocoName}..."
             Invoke-Expression "choco install -y ${ChocoName}"
         }
@@ -159,6 +159,9 @@ function Install-Windows-Build-Tools {
 }
 
 function Install-Dependencies {
+    Param(
+        [switch]$NoChoco
+    )
     if (!$NoChoco) {
         Install-Windows-Build-Tools
     }
@@ -183,7 +186,7 @@ function Safe-Fetch {
         [Parameter(Mandatory=$true)]
         [String] $DOWNLOAD_HASH
     )
-    if ($($args.Count) -lt 2) {
+    if ($PSBoundParameters.Count -lt 2) {
         Caught-Error "Usage: Safe-Fetch URL HASH"
     }
 
@@ -215,7 +218,7 @@ function Check-And-Fetch {
         [Parameter(Mandatory=$true)]
         [String] $DOWNLOAD_HASH
     )
-    if ($($args.Count) -lt 2) {
+    if ($PSBoundParameters.Count -lt 2) {
         Caught-Error "Usage: Check-And-Fetch URL HASH"
     }
 
@@ -239,10 +242,6 @@ function Check-And-Fetch {
 }
 
 function Git-Fetch {
-    if ($($args.Count) -ne 4) {
-        Write-Error "Usage: Git-Fetch GIT_HOST GIT_USER GIT_REPOSITORY GIT_REF"
-        exit 1
-    }
     Param(
         [Parameter(Mandatory=$true)]
         [String] $GIT_HOST,
@@ -253,6 +252,10 @@ function Git-Fetch {
         [Parameter(Mandatory=$true)]
         [String] $GIT_REF
     )
+    if ($PSBoundParameters.Count -ne 4) {
+        Write-Error "Usage: Git-Fetch GIT_HOST GIT_USER GIT_REPOSITORY GIT_REF"
+        exit 1
+    }
 
     $GIT_HOST = $GIT_HOST.TrimEnd("/")
 
@@ -287,10 +290,6 @@ function Git-Fetch {
 }
 
 function GitHub-Fetch {
-    if ($($args.Count) -ne 3) {
-        Write-Error "Usage: GitHub-Fetch GITHUB_USER GITHUB_REPOSITORY GITHUB_REF"
-        return 1
-    }
     Param(
         [Parameter(Mandatory=$true)]
         [String] $GH_USER,
@@ -299,15 +298,21 @@ function GitHub-Fetch {
         [Parameter(Mandatory=$true)]
         [String] $GH_REF
     )
+    if ($PSBoundParameters.Count -ne 3) {
+        Write-Error "Usage: GitHub-Fetch GITHUB_USER GITHUB_REPOSITORY GITHUB_REF"
+        Write-Error $args.Count
+        Write-Status $PSBoundParameters.Count
+        return 1
+    }
+    Write-Status "GH_USER: ${GH_USER}"
+    Write-Status "GH_REPO: ${GH_REPO}"
+    Write-Status "GH_REF: ${GH_REF}"
+    Write-Status "GitHub-Fetch"
 
     Git-Fetch "https://github.com" "${GH_USER}" "${GH_REPO}" "${GH_REF}"
 }
 
 function GitLab-Fetch {
-    if ($($args.Count) -ne 3) {
-        Write-Error "Usage: GitLab-Fetch GITLAB_USER GITLAB_REPOSITORY GITLAB_REF"
-        return 1
-    }
     Param(
         [Parameter(Mandatory=$true)]
         [String] $GL_USER,
@@ -316,6 +321,10 @@ function GitLab-Fetch {
         [Parameter(Mandatory=$true)]
         [String] $GL_REF
     )
+    if ($PSBoundParameters.Count -ne 3) {
+        Write-Error "Usage: GitLab-Fetch GITLAB_USER GITLAB_REPOSITORY GITLAB_REF"
+        return 1
+    }
 
     Git-Fetch "https://gitlab.com" "${GL_USER}" "${GL_REPO}" "${GL_REF}"
 }
@@ -328,7 +337,7 @@ function Apply-Patch {
         [String] $COMMIT_HASH
     )
 
-    PATCH_FILE = "${COMMIT_URL}.Substring(${COMMIT_URL}.LastIndexOf('/') + 1)"
+    $PATCH_FILE = Get-Basename "${COMMIT_URL}"
 
     if ("${COMMIT_URL}".Substring(0, 5) -eq "https") {
         Invoke-WebRequest "${COMMIT_URL}" -OutFile "${PATCH_FILE}"
@@ -338,13 +347,38 @@ function Apply-Patch {
             Write-Error "${PATCH_FILE} downloaded successfully and failed hash check"
             return 1
         }
-
-        Write-Info "Applying patch ${COMMIT_URL}"
     } else {
-        PATCH_FILE = "${COMMIT_URL}"
+        $PATCH_FILE = "${COMMIT_URL}"
     }
 
-    patch -g 0 -f -p1 -i "${PATCH_FILE}"
+    Write-Info "Applying patch ${PATCH_FILE}"
+
+    if (Test-Path "./.git") {
+        git apply "${PATCH_FILE}"
+    } else {
+        patch -g 0 -f -p1 -i "${PATCH_FILE}"
+    }
+}
+
+function Check-Archs {
+    Write-Step "Check Architecture..."
+    Write-Status "BuildArch: ${BuildArch}"
+    if ("${BuildArch}" -eq "64-bit") {
+        $script:ARCH = "x86_64"
+        $script:CMAKE_ARCH = "x86_64"
+        $script:CMAKE_BITNESS = "64"
+        $script:CMAKE_INSTALL_DIR = "win64"
+    } elseif ("${BuildArch}" -eq "32-bit") {
+        $script:ARCH = "x86"
+        $script:CMAKE_ARCH = "x86"
+        $script:CMAKE_BITNESS = "32"
+        $script:CMAKE_INSTALL_DIR = "win32"
+    } else {
+        Caught-Error "Unsupported architecture '${BuildArch}' provided"
+    }
+
+    Write-Status "CMAKE_ARCH: ${CMAKE_ARCH}"
+    Write-Status "CMAKE_BITNESS: ${CMAKE_BITNESS}"
 }
 
 function Check-Curl {
@@ -363,24 +397,28 @@ function Check-Curl {
 }
 
 function Build-Checks {
+    Write-Status "Build-Checks"
     if(!$NoChoco) {
-        Install-Windows-Dependencies
+        Install-Windows-Build-Tools
     }
 
-    Ensure-Directory "${BuildDirectory}\win32"
-    Ensure-Directory "${BuildDirectory}\win32\bin"
-    Ensure-Directory "${BuildDirectory}\win32\cmake"
-    Ensure-Directory "${BuildDirectory}\win32\include"
-    Ensure-Directory "${BuildDirectory}\win64"
-    Ensure-Directory "${BuildDirectory}\win64\bin"
-    Ensure-Directory "${BuildDirectory}\win64\cmake"
-    Ensure-Directory "${BuildDirectory}\win64\include"
+    Check-Archs
+    #Check-Curl
+
+    #Ensure-Directory "${BuildDirectory}\win32"
+    #Ensure-Directory "${BuildDirectory}\win32\bin"
+    #Ensure-Directory "${BuildDirectory}\win32\cmake"
+    #Ensure-Directory "${BuildDirectory}\win32\include"
+    #Ensure-Directory "${BuildDirectory}\win64"
+    #Ensure-Directory "${BuildDirectory}\win64\bin"
+    #Ensure-Directory "${BuildDirectory}\win64\cmake"
+    #Ensure-Directory "${BuildDirectory}\win64\include"
 }
 
 function Build-Setup {
     Trap { Caught-Error "build-${PRODUCT_NAME}" }
 
-    Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
+    Ensure-Directory "${CheckoutDir}/windows_build_temp"
 
     if (!$PRODUCT_HASH) {
         $PRODUCT_HASH = $CI_PRODUCT_HASH
@@ -400,11 +438,15 @@ function Build-Setup {
 function Build-Setup-GitHub {
     Trap { Caught-Error "build-${PRODUCT_NAME}" }
 
-    Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
+    Ensure-Directory "${CheckoutDir}/windows_build_temp"
 
     if (!$PRODUCT_HASH) {
         $PRODUCT_HASH = $CI_PRODUCT_HASH
     }
+
+    #Write-Status "PRODUCT_PROJECT: ${PRODUCT_PROJECT}"
+    #Write-Status "PRODUCT_REPO: ${PRODUCT_REPO}"
+    #Write-Status "PRODUCT_HASH: ${PRODUCT_HASH}"
 
     Write-Step "Git checkout..."
     Ensure-Directory "${PRODUCT_REPO}"
@@ -414,7 +456,7 @@ function Build-Setup-GitHub {
 function Build-Setup-GitLab {
     Trap { Caught-Error "build-${PRODUCT_NAME}" }
 
-    Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
+    Ensure-Directory "${CheckoutDir}/windows_build_temp"
 
     if (!$PRODUCT_HASH) {
         $PRODUCT_HASH = $CI_PRODUCT_HASH
@@ -433,17 +475,17 @@ function Build {
     Write-Status "Build ${PRODUCT_NAME} v${PRODUCT_VERSION}"
 
     if (Test-CommandExists 'Patch-Product') {
-        Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
+        Ensure-Directory "${CheckoutDir}/windows_build_temp"
         Patch-Product
     }
 
     if (Test-CommandExists 'Build-Product') {
-        Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
+        Ensure-Directory "${CheckoutDir}/windows_build_temp"
         Build-Product
     }
 
     if (Test-CommandExists 'Install-Product') {
-        Ensure-Directory "${CHECKOUT_DIR}/windows_build_temp"
+        Ensure-Directory "${CheckoutDir}/windows_build_temp"
         Install-Product
     }
 }
