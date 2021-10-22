@@ -5,8 +5,6 @@ Param(
     [Switch]$NoChoco,
     [Switch]$Package,
     [Switch]$SkipDependencyChecks,
-    [Switch]$BuildInstaller,
-    [Switch]$CombinedArchs,
     [String]$BuildDirectory = "build",
     [String]$BuildArch = (Get-CimInstance CIM_OperatingSystem).OSArchitecture,
     [String]$BuildConfiguration = "RelWithDebInfo"
@@ -31,11 +29,9 @@ Param(
 #   -BuildDirectory         : Directory to use for builds
 #                             Default: Win64 on 64-bit systems
 #                                      Win32 on 32-bit systems
-#   -BuildArch              : Build architecture to use (32bit or 64bit)
+#   -BuildArch              : Build architecture to use (32-bit or 64-bit)
 #   -BuildConfiguration     : Build configuration to use
 #                             Default: RelWithDebInfo
-#   -CombinedArchs          : Create combined packages and installer
-#                             (64-bit and 32-bit) - Default: off
 #   -Package                : Prepare folder structure for installer creation
 #
 ##############################################################################
@@ -46,7 +42,6 @@ $_RunObsDepsBuildScript = $true
 $ProductName = "obs-deps"
 
 $CheckoutDir = git rev-parse --show-toplevel
-#$DepsBuildDir = "${CheckoutDir}/../obs-build-dependencies"
 $DepsBuildDir = "${CheckoutDir}/windows_build_temp"
 
 . ${CheckoutDir}/CI/include/build_support_windows.ps1
@@ -77,18 +72,8 @@ function Build-OBS-Deps-Main {
 
     $FileName = "${ProductName}-${VersionString}"
 
-    if ($CombinedArchs) {
-        if (!(Test-Path env:obsInstallerTempDir)) {
-            $Env:obsInstallerTempDir = "${CheckoutDir}/install_temp"
-        }
-
-        if (!$SkipDependencyChecks) {
-            Install-Dependencies -NoChoco:${NoChoco}
-        }
-    } else {
-        if (!$SkipDependencyChecks) {
-            Install-Dependencies -NoChoco:${NoChoco}
-        }
+    if (!$SkipDependencyChecks) {
+        Install-Dependencies -NoChoco:${NoChoco}
     }
 
     Foreach ($Dependency in $ObsBuildDependencies) {
@@ -120,9 +105,9 @@ function Build-OBS-Deps-Main {
         . ${CheckoutDir}/CI/windows/build_${DepName}.ps1
     }
 
-    if ($Package) {
-        Package-OBS -CombinedArchs:$CombinedArchs
-    }
+    #if ($Package) {
+    #    Package-OBS -CombinedArchs:$CombinedArchs
+    #}
 
     Write-Info "All done!"
 }
@@ -133,14 +118,13 @@ function Print-Usage {
     $Lines = @(
         "Usage: ${MyInvocation.MyCommand.Name}",
         "-Help                    : Print this help",
-        "-Quiet                   : Suppress most build process output"
-        "-Verbose                 : Enable more verbose build process output"
+        "-Quiet                   : Suppress most build process output",
+        "-Verbose                 : Enable more verbose build process output",
         "-SkipDependencyChecks    : Skip dependency checks - Default: off",
         "-NoChoco                 : Skip automatic dependency installation via Chocolatey - Default: on",
         "-BuildDirectory          : Directory to use for builds - Default: build64 on 64-bit systems, build32 on 32-bit systems",
-        "-BuildArch               : Build architecture to use (32bit or 64bit) - Default: local architecture",
+        "-BuildArch               : Build architecture to use (32-bit or 64-bit) - Default: local architecture",
         "-BuildConfiguration      : Build configuration to use - Default: RelWithDebInfo",
-        "-CombinedArchs           : Create combined packages and installer (64-bit and 32-bit) - Default: off"
         "-Package                 : Prepare folder structure for installer creation"
     )
     $Lines | Write-Host

@@ -1,3 +1,16 @@
+Param(
+    [Switch]$Help,
+    [Switch]$Quiet,
+    [Switch]$Verbose,
+    [Switch]$NoChoco,
+    [Switch]$Package,
+    [Switch]$SkipDependencyChecks,
+    [Switch]$Install,
+    [String]$BuildDirectory = "build",
+    [String]$BuildArch = (Get-CimInstance CIM_OperatingSystem).OSArchitecture,
+    [String]$BuildConfiguration = "RelWithDebInfo"
+)
+
 ################################################################################
 # Windows mbedtls native-compile build script
 ################################################################################
@@ -50,24 +63,32 @@ function Install-Product {
 function Build-Mbedtls-Main {
     $PRODUCT_NAME = "${PRODUCT_NAME}"
     if (!${PRODUCT_NAME}) {
+        Write-Output "PRODUCT_NAME is empty"
         $PRODUCT_NAME = "mbedtls"
     }
+    Write-Output "PRODUCT_NAME: ${PRODUCT_NAME}"
 
     if (!${_RunObsDepsBuildScript}) {
-        Write-Status "_RunObsDepsBuildScript is false"
-        $CheckoutDir = "$(/usr/bin/git rev-parse --show-toplevel)"
+        $CheckoutDir = "$(git rev-parse --show-toplevel)"
+        Write-Output "PRODUCT_NAME: ${PRODUCT_NAME}"
         . "${CheckoutDir}/CI/include/build_support_windows.ps1"
 
+        Write-Status "_RunObsDepsBuildScript is false"
         #_check_parameters $*
-        Build-Checks
+        Build-Checks -NoChoco:${NoChoco}
     }
 
+    Write-Status "PRODUCT_NAME: ${PRODUCT_NAME}"
+    Write-Status "CheckoutDir: ${CheckoutDir}"
+    Write-Status "PRODUCT_PROJECT: ${PRODUCT_PROJECT}"
+    Write-Status "PRODUCT_REPO: ${PRODUCT_REPO}"
+    Write-Status "PRODUCT_HASH: ${PRODUCT_HASH}"
     $NOCONTINUE = $true
     $PRODUCT_PROJECT = "ARMmbed"
     $PRODUCT_REPO = "mbedtls"
     $PRODUCT_FOLDER = "${PRODUCT_REPO}"
 
-    if (!"${INSTALL}") {
+    if (!$Install) {
         Build-Setup-GitHub
         Build
     } else {

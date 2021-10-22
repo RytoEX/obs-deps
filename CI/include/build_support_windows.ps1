@@ -11,6 +11,8 @@
 
 $CIWorkflow = "${CheckoutDir}/.github/workflows/main.yml"
 
+$CIWorkflowJobString = Get-Content ${CIWorkflow} -Raw | Select-String "(?s)(  windows-deps-build-native.+)\n  \w" | ForEach-Object{$_.Matches.Groups[1].Value}
+
 $CIDepsVersion = Get-Content ${CIWorkflow} | Select-String "[ ]+DEPS_VERSION_WIN: '([0-9\-]+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
 
 $BuildDirectory = "$(if (Test-Path Env:BuildDirectory) { $env:BuildDirectory } else { $BuildDirectory })"
@@ -300,8 +302,6 @@ function GitHub-Fetch {
     )
     if ($PSBoundParameters.Count -ne 3) {
         Write-Error "Usage: GitHub-Fetch GITHUB_USER GITHUB_REPOSITORY GITHUB_REF"
-        Write-Error $args.Count
-        Write-Status $PSBoundParameters.Count
         return 1
     }
     Write-Status "GH_USER: ${GH_USER}"
@@ -362,7 +362,7 @@ function Apply-Patch {
 
 function Check-Archs {
     Write-Step "Check Architecture..."
-    Write-Status "BuildArch: ${BuildArch}"
+
     if ("${BuildArch}" -eq "64-bit") {
         $script:ARCH = "x86_64"
         $script:CMAKE_ARCH = "x86_64"
@@ -376,9 +376,6 @@ function Check-Archs {
     } else {
         Caught-Error "Unsupported architecture '${BuildArch}' provided"
     }
-
-    Write-Status "CMAKE_ARCH: ${CMAKE_ARCH}"
-    Write-Status "CMAKE_BITNESS: ${CMAKE_BITNESS}"
 }
 
 function Check-Curl {
@@ -401,6 +398,17 @@ function Build-Checks {
     if(!$NoChoco) {
         Install-Windows-Build-Tools
     }
+    $PRODUCT_NAME_U = "${PRODUCT_NAME}".ToUpper()
+    $script:CI_PRODUCT_VERSION = ${CIWorkflowJobString} | Select-String "[ ]+${PRODUCT_NAME_U}_VERSION: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
+    $script:CI_PRODUCT_HASH = ${CIWorkflowJobString} | Select-String "[ ]+${PRODUCT_NAME_U}_HASH: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
+
+    Write-Status "CheckoutDir: ${CheckoutDir}"
+    Write-Status "PRODUCT_PROJECT: ${PRODUCT_PROJECT}"
+    Write-Status "PRODUCT_REPO: ${PRODUCT_REPO}"
+    Write-Status "PRODUCT_HASH: ${PRODUCT_HASH}"
+    Write-Status "PRODUCT_NAME_U: ${PRODUCT_NAME_U}"
+    Write-Status "CI_PRODUCT_VERSION: ${CI_PRODUCT_VERSION}"
+    Write-Status "CI_PRODUCT_HASH: ${CI_PRODUCT_HASH}"
 
     Check-Archs
     #Check-Curl
@@ -441,12 +449,15 @@ function Build-Setup-GitHub {
     Ensure-Directory "${CheckoutDir}/windows_build_temp"
 
     if (!$PRODUCT_HASH) {
+        Write-Status "PRODUCT_HASH is empty"
+        Write-Status "CI_PRODUCT_HASH: ${CI_PRODUCT_HASH}"
         $PRODUCT_HASH = $CI_PRODUCT_HASH
     }
 
-    #Write-Status "PRODUCT_PROJECT: ${PRODUCT_PROJECT}"
-    #Write-Status "PRODUCT_REPO: ${PRODUCT_REPO}"
-    #Write-Status "PRODUCT_HASH: ${PRODUCT_HASH}"
+    Write-Status "CheckoutDir: ${CheckoutDir}"
+    Write-Status "PRODUCT_PROJECT: ${PRODUCT_PROJECT}"
+    Write-Status "PRODUCT_REPO: ${PRODUCT_REPO}"
+    Write-Status "PRODUCT_HASH: ${PRODUCT_HASH}"
 
     Write-Step "Git checkout..."
     Ensure-Directory "${PRODUCT_REPO}"
@@ -472,7 +483,7 @@ function Build {
         $PRODUCT_VERSION = $CI_PRODUCT_VERSION
     }
 
-    Write-Status "Build ${PRODUCT_NAME} v${PRODUCT_VERSION}"
+    Write-Status "Build ${PRODUCT_NAME} ${PRODUCT_VERSION}"
 
     if (Test-CommandExists 'Patch-Product') {
         Ensure-Directory "${CheckoutDir}/windows_build_temp"
