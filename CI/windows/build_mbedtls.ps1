@@ -20,7 +20,7 @@ function Patch-Product {
 function Build-Product {
     cd "${DepsBuildDir}"
 
-    if ("${QUIET}") {
+    if ($Quiet) {
         $CMAKE_OPTS = "-Wno-deprecated -Wno-dev --log-level=ERROR"
     } else {
         $CMAKE_OPTS = ""
