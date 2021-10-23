@@ -6,7 +6,9 @@ Param(
     [Switch]$Package,
     [Switch]$SkipDependencyChecks,
     [String]$BuildDirectory = "build",
+    [ValidateSet("32-bit", "64-bit")]
     [String]$BuildArch = (Get-CimInstance CIM_OperatingSystem).OSArchitecture,
+    [ValidateSet("Release", "RelWithDebInfo", "MinSizeRel", "Debug")]
     [String]$BuildConfiguration = "RelWithDebInfo"
 )
 
