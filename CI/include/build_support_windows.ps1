@@ -6,9 +6,6 @@
 #
 ##############################################################################
 
-# Setup build environment
-
-
 $CIWorkflow = "${CheckoutDir}/.github/workflows/main.yml"
 
 $CIWorkflowJobString = Get-Content ${CIWorkflow} -Raw | Select-String "(?s)(  windows-deps-build-native.+)\n  \w" | ForEach-Object{$_.Matches.Groups[1].Value}
