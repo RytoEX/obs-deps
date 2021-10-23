@@ -61,7 +61,6 @@ function Build-OBS-Deps-Main {
     $GitTag = git describe --tags --abbrev=0
     $ErrorActionPreference = "Stop"
 
-    #Check-Parameters
     Build-Checks
 
     if (Test-Path variable:BUILD_FOR_DISTRIBUTION) {
