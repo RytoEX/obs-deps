@@ -953,7 +953,7 @@ jobs:
 
       - name: 'Package dependencies'
         if: success()
-        working-directory: ${{ github.workspace }}/windows/obs-dependencies-${{ matrix.arch }}
+        working-directory: ${{ github.workspace }}/windows_build_temp/win${{ matrix.arch }}
         run: |
           CURRENT_DATE=$(date +"%Y-%m-%d")
           FILE_NAME="windows-deps-${CURRENT_DATE}-${{ matrix.arch }}.tar.xz"
