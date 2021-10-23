@@ -187,17 +187,20 @@ function Safe-Fetch {
     }
 
     $DOWNLOAD_FILE = Get-Basename "${DOWNLOAD_URL}"
-    $CURLCMD = $script:CURLCMD
 
-    if ($NoContinue) {
-        Write-Output "NoContinue is true"
-        $CURLCMD = $CURLCMD.Replace("--continue-at -", "") + " ${DOWNLOAD_URL}"
+    if ($UseCurlExe) {
+        $CURLCMD = $script:CURLCMD
+
+        if ($NoContinue) {
+            $CURLCMD = $CURLCMD.Replace(" --continue-at -", "") + " ${DOWNLOAD_URL}"
+        } else {
+            $CURLCMD = "${CURLCMD} ${DOWNLOAD_URL}"
+        }
+
+        Invoke-Expression "${CURLCMD}"
     } else {
-        Write-Output "NoContinue is false"
-        $CURLCMD = ${CURLCMD} + " ${DOWNLOAD_URL}"
+        Invoke-WebRequest -Uri "${DOWNLOAD_URL}" -UseBasicParsing -OutFile "${DOWNLOAD_FILE}"
     }
-
-    Invoke-Expression "${CURLCMD}"
 
     if ("${DOWNLOAD_HASH}" -eq $(Get-FileHash ${DOWNLOAD_FILE}).Hash) {
         Write-Info "${DOWNLOAD_FILE} downloaded successfully and passed hash check"
@@ -227,6 +230,25 @@ function Check-And-Fetch {
     } else {
         Safe-Fetch $SafeFetchArgs "${DOWNLOAD_URL}" "${DOWNLOAD_HASH}"
     }
+}
+
+function Git-Checkout-Pull-Request {
+    Param(
+        [Parameter(Mandatory=$true)]
+        [String] $PR_NUM
+    )
+
+    if (!(Test-Path "./.git")) {
+        Write-Error "There is no git repository in this directory."
+        exit 1
+    }
+
+    if (git show-ref --quiet --verify refs/heads/pr-$PR_NUM) {
+        Write-Info "Local branch pr-$PR_NUM already exists"
+    } else {
+        git fetch origin pull/$PR_NUM/head:pr-$PR_NUM
+    }
+    git checkout pr-$PR_NUM
 }
 
 function Git-Fetch {
@@ -290,10 +312,6 @@ function GitHub-Fetch {
         Write-Error "Usage: GitHub-Fetch GITHUB_USER GITHUB_REPOSITORY GITHUB_REF"
         return 1
     }
-    #Write-Status "GH_USER: ${GH_USER}"
-    #Write-Status "GH_REPO: ${GH_REPO}"
-    #Write-Status "GH_REF: ${GH_REF}"
-    #Write-Status "GitHub-Fetch"
 
     Git-Fetch "https://github.com" "${GH_USER}" "${GH_REPO}" "${GH_REF}"
 }
@@ -366,7 +384,7 @@ function Check-Archs {
 }
 
 function Check-Curl {
-    if (!(Test-CommandExists "curl")) {
+    if (!(Test-CommandExists "curl") -and !$NoChoco) {
         Write-Step "Install curl from chocolatey..."
         Invoke-Expression "choco install -y curl"
     }
@@ -388,27 +406,8 @@ function Build-Checks {
     $script:CI_PRODUCT_VERSION = ${CIWorkflowJobString} | Select-String "[ ]+${PRODUCT_NAME_U}_VERSION: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
     $script:CI_PRODUCT_HASH = ${CIWorkflowJobString} | Select-String "[ ]+${PRODUCT_NAME_U}_HASH: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
 
-    #Write-Status "CheckoutDir: ${CheckoutDir}"
-    #Write-Status "ProductProject: ${ProductProject}"
-    #Write-Status "ProductRepo: ${ProductRepo}"
-    #Write-Status "ProductHash: ${ProductHash}"
-    #Write-Status "ProductName: ${ProductName}"
-    #Write-Status "ProductVersion: ${ProductVersion}"
-    #Write-Status "PRODUCT_NAME_U: ${PRODUCT_NAME_U}"
-    #Write-Status "CI_PRODUCT_VERSION: ${CI_PRODUCT_VERSION}"
-    #Write-Status "CI_PRODUCT_HASH: ${CI_PRODUCT_HASH}"
-
     Check-Archs
-    #Check-Curl
-
-    #Ensure-Directory "${BuildDirectory}\win32"
-    #Ensure-Directory "${BuildDirectory}\win32\bin"
-    #Ensure-Directory "${BuildDirectory}\win32\cmake"
-    #Ensure-Directory "${BuildDirectory}\win32\include"
-    #Ensure-Directory "${BuildDirectory}\win64"
-    #Ensure-Directory "${BuildDirectory}\win64\bin"
-    #Ensure-Directory "${BuildDirectory}\win64\cmake"
-    #Ensure-Directory "${BuildDirectory}\win64\include"
+    Check-Curl
 }
 
 function Build-Setup {
@@ -439,11 +438,6 @@ function Build-Setup-GitHub {
     if (!$ProductHash) {
         $ProductHash = $CI_PRODUCT_HASH
     }
-
-    #Write-Status "CheckoutDir: ${CheckoutDir}"
-    #Write-Status "ProductProject: ${ProductProject}"
-    #Write-Status "ProductRepo: ${ProductRepo}"
-    #Write-Status "ProductHash: ${ProductHash}"
 
     Write-Step "Git checkout..."
     Ensure-Directory "${ProductRepo}"

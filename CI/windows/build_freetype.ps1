@@ -13,23 +13,12 @@ Param(
 )
 
 ################################################################################
-# Windows mbedtls native-compile build script
+# Windows FreeType native-compile build script
 ################################################################################
 #
 # This script file can be included in build scripts for Windows or run directly
 #
 ################################################################################
-
-function Patch-Product {
-    cd "${ProductFolder}"
-
-    Write-Step "Apply patches..."
-    Apply-Patch "${CheckoutDir}\CI\windows\patches\mbedtls\mbedtls-enable-alt-threading-01.patch" "306b8aaee8f291cc0dbd4cbee12ea185e722469eb06b8b7113f0a60feca6bbe6"
-
-    if (!(Test-Path "include\mbedtls\threading_alt.h")) {
-        Apply-Patch "${CheckoutDir}\CI\windows\patches\mbedtls\mbedtls-enable-alt-threading-02.patch" "d0dde0836dc6b100edf218207feffbbf808d04b1d0065082cdc5c838f8a4a7c7"
-    }
-}
 
 function Build-Product {
     cd "${DepsBuildDir}"
@@ -43,28 +32,25 @@ function Build-Product {
     Write-Step "Configure (${ARCH})..."
     cmake -G "Visual Studio 16 2019" `
         -A "${CMAKE_ARCH}" `
-        -DUSE_SHARED_MBEDTLS_LIBRARY=OFF `
-        -DUSE_STATIC_MBEDTLS_LIBRARY=ON `
-        -DENABLE_PROGRAMS=OFF `
         "${CMAKE_OPTS}" `
-        -S "mbedtls" `
-        -B "mbedtls_build\${CMAKE_BITNESS}"
+        -S "freetype" `
+        -B "freetype_build\${CMAKE_BITNESS}"
 
     Write-Step "Build (${ARCH})..."
-    cmake --build "mbedtls_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}"
+    cmake --build "freetype_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}"
 }
 
 function Install-Product {
     cd "${DepsBuildDir}"
 
     Write-Step "Install (${ARCH})..."
-    cmake --install "mbedtls_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}" --prefix "${DepsBuildDir}\${CMAKE_INSTALL_DIR}"
+    cmake --install "freetype_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}" --prefix "${DepsBuildDir}\${CMAKE_INSTALL_DIR}"
 }
 
-function Build-Mbedtls-Main {
+function Build-Freetype-Main {
     $ProductName = "${ProductName}"
     if (!${ProductName}) {
-        $ProductName = "mbedtls"
+        $ProductName = "freetype"
     }
 
     if (!${_RunObsDepsBuildScript}) {
@@ -74,8 +60,8 @@ function Build-Mbedtls-Main {
         Build-Checks
     }
 
-    $ProductProject = "ARMmbed"
-    $ProductRepo = "mbedtls"
+    $ProductProject = "freetype"
+    $ProductRepo = "freetype"
     $ProductFolder = "${ProductRepo}"
 
     if (!$Install) {
@@ -86,4 +72,4 @@ function Build-Mbedtls-Main {
     }
 }
 
-Build-Mbedtls-Main
+Build-Freetype-Main

@@ -13,7 +13,7 @@ Param(
 )
 
 ################################################################################
-# Windows mbedtls native-compile build script
+# Windows RNNoise native-compile build script
 ################################################################################
 #
 # This script file can be included in build scripts for Windows or run directly
@@ -23,12 +23,8 @@ Param(
 function Patch-Product {
     cd "${ProductFolder}"
 
-    Write-Step "Apply patches..."
-    Apply-Patch "${CheckoutDir}\CI\windows\patches\mbedtls\mbedtls-enable-alt-threading-01.patch" "306b8aaee8f291cc0dbd4cbee12ea185e722469eb06b8b7113f0a60feca6bbe6"
-
-    if (!(Test-Path "include\mbedtls\threading_alt.h")) {
-        Apply-Patch "${CheckoutDir}\CI\windows\patches\mbedtls\mbedtls-enable-alt-threading-02.patch" "d0dde0836dc6b100edf218207feffbbf808d04b1d0065082cdc5c838f8a4a7c7"
-    }
+    Write-Step "Checkout CMake PR..."
+    Git-Checkout-Pull-Request 88
 }
 
 function Build-Product {
@@ -43,28 +39,31 @@ function Build-Product {
     Write-Step "Configure (${ARCH})..."
     cmake -G "Visual Studio 16 2019" `
         -A "${CMAKE_ARCH}" `
-        -DUSE_SHARED_MBEDTLS_LIBRARY=OFF `
-        -DUSE_STATIC_MBEDTLS_LIBRARY=ON `
-        -DENABLE_PROGRAMS=OFF `
         "${CMAKE_OPTS}" `
-        -S "mbedtls" `
-        -B "mbedtls_build\${CMAKE_BITNESS}"
+        -S "rnnoise" `
+        -B "rnnoise_build\${CMAKE_BITNESS}"
 
     Write-Step "Build (${ARCH})..."
-    cmake --build "mbedtls_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}"
+    cmake --build "rnnoise_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}"
 }
 
 function Install-Product {
     cd "${DepsBuildDir}"
 
     Write-Step "Install (${ARCH})..."
-    cmake --install "mbedtls_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}" --prefix "${DepsBuildDir}\${CMAKE_INSTALL_DIR}"
+    # need some manual copy action here because cmake support isn't there for `install`
+    #cmake --install "rnnoise_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}" --prefix "${DepsBuildDir}\${CMAKE_INSTALL_DIR}"
+
+    New-Item -Path "${CMAKE_INSTALL_DIR}\include" -ItemType Directory -Force
+    New-Item -Path "${CMAKE_INSTALL_DIR}\lib" -ItemType Directory -Force
+    Copy-Item -Path "${DepsBuildDir}\${ProductFolder}\include\rnnoise.h" -Destination "${CMAKE_INSTALL_DIR}\include\rnnoise.h"
+    Copy-Item -Path "${DepsBuildDir}\rnnoise_build\${CMAKE_BITNESS}\${BuildConfiguration}\rnnoise.lib" -Destination "${CMAKE_INSTALL_DIR}\lib\rnnoise.lib"
 }
 
-function Build-Mbedtls-Main {
+function Build-Rnnoise-Main {
     $ProductName = "${ProductName}"
     if (!${ProductName}) {
-        $ProductName = "mbedtls"
+        $ProductName = "rnnoise"
     }
 
     if (!${_RunObsDepsBuildScript}) {
@@ -74,8 +73,8 @@ function Build-Mbedtls-Main {
         Build-Checks
     }
 
-    $ProductProject = "ARMmbed"
-    $ProductRepo = "mbedtls"
+    $ProductProject = "xiph"
+    $ProductRepo = "rnnoise"
     $ProductFolder = "${ProductRepo}"
 
     if (!$Install) {
@@ -86,4 +85,4 @@ function Build-Mbedtls-Main {
     }
 }
 
-Build-Mbedtls-Main
+Build-Rnnoise-Main

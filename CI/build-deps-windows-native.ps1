@@ -48,7 +48,10 @@ $DepsBuildDir = "${CheckoutDir}/windows_build_temp"
 
 $ObsBuildDependencies = @(
     @('mbedtls', '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8'),
-    @('cmocka', '5a4b15870efa2225e6586fbb4c3af05ff0659434')
+    @('cmocka', '5a4b15870efa2225e6586fbb4c3af05ff0659434'),
+    @('freetype', '6a2b3e4007e794bfc6c91030d0ed987f925164a8'),
+    @('curl', '315ee3fe75dade912b48a21ceec9ccda0230d937'),
+    @('rnnoise', '90ec41ef659fd82cfec2103e9bb7fc235e9ea66c')
 )
 
 function Build-OBS-Deps-Main {
@@ -81,17 +84,15 @@ function Build-OBS-Deps-Main {
             $DepVersion = $Dependency[1]
         } else {
             Write-Error "ObsBuildDependencies is not array"
+            exit 1
         }
         if (Test-CommandExists Build-Product) {
-            #Write-Status "Build-Product previously defined"
             Remove-Item -Path Function:Build-Product
         }
         if (Test-CommandExists Patch-Product) {
-            #Write-Status "Patch-Product previously defined"
             Remove-Item -Path Function:Patch-Product
         }
         if (Test-CommandExists Install-Product) {
-            #Write-Status "Install-Product previously defined"
             Remove-Item -Path Function:Install-Product
         }
 
