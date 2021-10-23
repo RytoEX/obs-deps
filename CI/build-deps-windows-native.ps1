@@ -1,9 +1,9 @@
 Param(
-    [Switch]$Help,
-    [Switch]$Quiet,
-    [Switch]$Verbose,
-    [Switch]$NoChoco,
-    [Switch]$SkipDependencyChecks,
+    [Switch]$Help = $(if (Test-Path variable:Help) { $Help }),
+    [Switch]$Quiet = $(if (Test-Path variable:Quiet) { $Quiet }),
+    [Switch]$Verbose = $(if (Test-Path variable:Verbose) { $Verbose }),
+    [Switch]$NoChoco = $(if (Test-Path variable:NoChoco) { $NoChoco }),
+    [Switch]$SkipDependencyChecks = $(if (Test-Path variable:SkipDependencyChecks) { $SkipDependencyChecks }),
     [String]$BuildDirectory = "build",
     [ValidateSet("32-bit", "64-bit")]
     [String]$BuildArch = (Get-CimInstance CIM_OperatingSystem).OSArchitecture,
@@ -72,7 +72,7 @@ function Build-OBS-Deps-Main {
     $FileName = "${ProductName}-${VersionString}"
 
     if (!$SkipDependencyChecks) {
-        Install-Dependencies -NoChoco:${NoChoco}
+        Install-Dependencies -NoChoco:$NoChoco
     }
 
     Foreach ($Dependency in $ObsBuildDependencies) {

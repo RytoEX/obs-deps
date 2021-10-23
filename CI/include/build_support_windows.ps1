@@ -16,8 +16,9 @@ $CIWorkflowJobString = Get-Content ${CIWorkflow} -Raw | Select-String "(?s)(  wi
 $CIDepsVersion = Get-Content ${CIWorkflow} | Select-String "[ ]+DEPS_VERSION_WIN: '([0-9\-]+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
 
 $BuildDirectory = "$(if (Test-Path Env:BuildDirectory) { $env:BuildDirectory } else { $BuildDirectory })"
-$BuildConfiguration = "$(if (Test-Path Env:BuildConfiguration) { $env:BuildConfiguration } else { $BuildConfiguration })"
 $BuildArch = "$(if (Test-Path Env:BuildArch) { $env:BuildArch } else { $BuildArch })"
+$BuildConfiguration = "$(if (Test-Path Env:BuildConfiguration) { $env:BuildConfiguration } else { $BuildConfiguration })"
+
 $WindowsDepsVersion = "$(if (Test-Path Env:WindowsDepsVersion ) { $env:WindowsDepsVersion } else { $CIDepsVersion })"
 $CmakeSystemVersion = "$(if (Test-Path Env:CMAKE_SYSTEM_VERSION) { $Env:CMAKE_SYSTEM_VERSION } else { "10.0.18363.657" })"
 
@@ -161,9 +162,6 @@ function Install-Windows-Build-Tools {
 }
 
 function Install-Dependencies {
-    Param(
-        [switch]$NoChoco
-    )
     if (!$NoChoco) {
         Install-Windows-Build-Tools
     }
@@ -182,7 +180,6 @@ function Get-Basename {
 
 function Safe-Fetch {
     Param(
-        [switch]$NoContinue,
         [Parameter(Mandatory=$true)]
         [String] $DOWNLOAD_URL,
         [Parameter(Mandatory=$true)]
@@ -196,8 +193,10 @@ function Safe-Fetch {
     $CURLCMD = $script:CURLCMD
 
     if ($NoContinue) {
+        Write-Output "NoContinue is true"
         $CURLCMD = $CURLCMD.Replace("--continue-at -", "") + " ${DOWNLOAD_URL}"
     } else {
+        Write-Output "NoContinue is false"
         $CURLCMD = ${CURLCMD} + " ${DOWNLOAD_URL}"
     }
 
@@ -214,7 +213,6 @@ function Safe-Fetch {
 
 function Check-And-Fetch {
     Param(
-        [switch]$NoContinue,
         [Parameter(Mandatory=$true)]
         [String] $DOWNLOAD_URL,
         [Parameter(Mandatory=$true)]
@@ -224,22 +222,13 @@ function Check-And-Fetch {
         Caught-Error "Usage: Check-And-Fetch URL HASH"
     }
 
-    if ($NoContinue) {
-        $NoContinueValue = $true
-    } else {
-        $NoContinueValue = $false
-    }
-    $params = @{
-        NoContinue = $NoContinueResult
-    }
-
     $DOWNLOAD_FILE = Get-Basename "${DOWNLOAD_URL}"
 
     if (Test-Path "${DOWNLOAD_FILE}" -and "${DOWNLOAD_HASH}" -eq $(Get-FileHash ${DOWNLOAD_FILE}).Hash) {
         Write-Info "${DOWNLOAD_FILE} exists and passed hash check"
         return 0
     } else {
-        Safe-Fetch $SafeFetchArgs "${DOWNLOAD_URL}" "${DOWNLOAD_HASH}" @params
+        Safe-Fetch $SafeFetchArgs "${DOWNLOAD_URL}" "${DOWNLOAD_HASH}"
     }
 }
 
@@ -356,6 +345,7 @@ function Apply-Patch {
     if (Test-Path "./.git") {
         git apply "${PATCH_FILE}"
     } else {
+        # TODO: patch failed in my tests, hence using git apply above
         patch -g 0 -f -p1 -i "${PATCH_FILE}"
     }
 }
@@ -365,12 +355,12 @@ function Check-Archs {
 
     if ("${BuildArch}" -eq "64-bit") {
         $script:ARCH = "x86_64"
-        $script:CMAKE_ARCH = "x86_64"
+        $script:CMAKE_ARCH = "x64"
         $script:CMAKE_BITNESS = "64"
         $script:CMAKE_INSTALL_DIR = "win64"
     } elseif ("${BuildArch}" -eq "32-bit") {
         $script:ARCH = "x86"
-        $script:CMAKE_ARCH = "x86"
+        $script:CMAKE_ARCH = "Win32"
         $script:CMAKE_BITNESS = "32"
         $script:CMAKE_INSTALL_DIR = "win32"
     } else {

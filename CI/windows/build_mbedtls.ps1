@@ -1,10 +1,10 @@
 Param(
-    [Switch]$Help,
-    [Switch]$Quiet,
-    [Switch]$Verbose,
-    [Switch]$NoChoco,
-    [Switch]$SkipDependencyChecks,
-    [Switch]$Install,
+    [Switch]$Help = $(if (Test-Path variable:Help) { $Help }),
+    [Switch]$Quiet = $(if (Test-Path variable:Quiet) { $Quiet }),
+    [Switch]$Verbose = $(if (Test-Path variable:Verbose) { $Verbose }),
+    [Switch]$NoChoco = $(if (Test-Path variable:NoChoco) { $NoChoco }),
+    [Switch]$SkipDependencyChecks = $(if (Test-Path variable:SkipDependencyChecks) { $SkipDependencyChecks }),
+    [Switch]$Install = $(if (Test-Path variable:Install) { $Install }),
     [String]$BuildDirectory = "build",
     [ValidateSet("32-bit", "64-bit")]
     [String]$BuildArch = (Get-CimInstance CIM_OperatingSystem).OSArchitecture,
@@ -42,7 +42,7 @@ function Build-Product {
 
     Write-Step "Configure (${ARCH})..."
     cmake -G "Visual Studio 16 2019" `
-        -A x64 `
+        -A "${CMAKE_ARCH}" `
         -DUSE_SHARED_MBEDTLS_LIBRARY=OFF `
         -DUSE_STATIC_MBEDTLS_LIBRARY=ON `
         -DENABLE_PROGRAMS=OFF `
@@ -51,14 +51,14 @@ function Build-Product {
         -B "mbedtls_build\${CMAKE_BITNESS}"
 
     Write-Step "Build (${ARCH})..."
-    cmake --build "mbedtls_build\${CMAKE_BITNESS}" --config "RelWithDebInfo"
+    cmake --build "mbedtls_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}"
 }
 
 function Install-Product {
     cd "${DepsBuildDir}"
 
     Write-Step "Install (${ARCH})..."
-    cmake --install "mbedtls_build\${CMAKE_BITNESS}" --config "RelWithDebInfo" --prefix "${DepsBuildDir}\${CMAKE_INSTALL_DIR}"
+    cmake --install "mbedtls_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}" --prefix "${DepsBuildDir}\${CMAKE_INSTALL_DIR}"
 }
 
 function Build-Mbedtls-Main {
@@ -71,14 +71,9 @@ function Build-Mbedtls-Main {
         $CheckoutDir = "$(git rev-parse --show-toplevel)"
         . "${CheckoutDir}/CI/include/build_support_windows.ps1"
 
-        Build-Checks -NoChoco:${NoChoco}
+        Build-Checks
     }
 
-    #Write-Status "ProductName: ${ProductName}"
-    #Write-Status "CheckoutDir: ${CheckoutDir}"
-    #Write-Status "ProductProject: ${ProductProject}"
-    #Write-Status "ProductRepo: ${ProductRepo}"
-    #Write-Status "ProductHash: ${ProductHash}"
     $NOCONTINUE = $true
     $ProductProject = "ARMmbed"
     $ProductRepo = "mbedtls"
