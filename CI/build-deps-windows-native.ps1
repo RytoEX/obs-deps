@@ -3,7 +3,6 @@ Param(
     [Switch]$Quiet,
     [Switch]$Verbose,
     [Switch]$NoChoco,
-    [Switch]$Package,
     [Switch]$SkipDependencyChecks,
     [String]$BuildDirectory = "build",
     [ValidateSet("32-bit", "64-bit")]
@@ -34,7 +33,6 @@ Param(
 #   -BuildArch              : Build architecture to use (32-bit or 64-bit)
 #   -BuildConfiguration     : Build configuration to use
 #                             Default: RelWithDebInfo
-#   -Package                : Prepare folder structure for installer creation
 #
 ##############################################################################
 
@@ -107,10 +105,6 @@ function Build-OBS-Deps-Main {
         . ${CheckoutDir}/CI/windows/build_${DepName}.ps1
     }
 
-    #if ($Package) {
-    #    Package-OBS -CombinedArchs:$CombinedArchs
-    #}
-
     Write-Info "All done!"
 }
 
@@ -126,8 +120,7 @@ function Print-Usage {
         "-NoChoco                 : Skip automatic dependency installation via Chocolatey - Default: on",
         "-BuildDirectory          : Directory to use for builds - Default: build64 on 64-bit systems, build32 on 32-bit systems",
         "-BuildArch               : Build architecture to use (32-bit or 64-bit) - Default: local architecture",
-        "-BuildConfiguration      : Build configuration to use - Default: RelWithDebInfo",
-        "-Package                 : Prepare folder structure for installer creation"
+        "-BuildConfiguration      : Build configuration to use - Default: RelWithDebInfo"
     )
     $Lines | Write-Host
 }

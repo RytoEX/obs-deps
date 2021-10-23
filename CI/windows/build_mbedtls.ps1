@@ -3,7 +3,6 @@ Param(
     [Switch]$Quiet,
     [Switch]$Verbose,
     [Switch]$NoChoco,
-    [Switch]$Package,
     [Switch]$SkipDependencyChecks,
     [Switch]$Install,
     [String]$BuildDirectory = "build",
@@ -72,7 +71,6 @@ function Build-Mbedtls-Main {
         $CheckoutDir = "$(git rev-parse --show-toplevel)"
         . "${CheckoutDir}/CI/include/build_support_windows.ps1"
 
-        #_check_parameters $*
         Build-Checks -NoChoco:${NoChoco}
     }
 
