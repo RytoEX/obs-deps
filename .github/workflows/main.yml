@@ -587,7 +587,7 @@ jobs:
 
   windows-deps-build-cross-compile:
     name: '01 - Build Windows dependencies (cross-compile)'
-    runs-on: [ubuntu-18.04]
+    runs-on: [ubuntu-18.04, ubuntu-20.04]
     strategy:
       matrix:
         arch: ['x86', 'x86_64']
@@ -861,10 +861,10 @@ jobs:
 
       - name: 'Setup build environment'
         run: |
-          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/bin
-          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/include
-          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/lib
-          mkdir -p windows/obs-dependencies-${{ matrix.arch }}/share
+          mkdir -p windows_build_temp/win${{ matrix.arch }}/bin
+          mkdir -p windows_build_temp/win${{ matrix.arch }}/include
+          mkdir -p windows_build_temp/win${{ matrix.arch }}/lib
+          mkdir -p windows_build_temp/win${{ matrix.arch }}/share
 
       - name: 'Restore mbedtls from cache'
         id: mbedtls-cache
@@ -877,11 +877,11 @@ jobs:
 
       - name: 'Build dependency mbedtls'
         if: steps.mbedtls-cache.outputs.cache-hit != 'true'
-        run: CI/windows/build_mbedtls.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}
+        run: CI/windows/build_mbedtls.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
 
       - name: 'Install dependency mbedtls'
         if: steps.mbedtls-cache.outputs.cache-hit == 'true'
-        run: CI/windows/build_mbedtls.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }} -Install
+        run: CI/windows/build_mbedtls.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
       - name: 'Restore cmocka from cache'
         id: cmocka-cache
@@ -894,11 +894,11 @@ jobs:
 
       - name: 'Build dependency cmocka'
         if: steps.cmocka-cache.outputs.cache-hit != 'true'
-        run: CI/windows/build_cmocka.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}
+        run: CI/windows/build_cmocka.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
 
       - name: 'Install dependency cmocka'
         if: steps.cmocka-cache.outputs.cache-hit == 'true'
-        run: CI/windows/build_cmocka.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }} -Install
+        run: CI/windows/build_cmocka.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
       - name: 'Restore freetype from cache'
         id: freetype-cache
@@ -911,11 +911,11 @@ jobs:
 
       - name: 'Build dependency freetype'
         if: steps.freetype-cache.outputs.cache-hit != 'true'
-        run: CI/windows/build_freetype.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}
+        run: CI/windows/build_freetype.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
 
       - name: 'Install dependency freetype'
         if: steps.freetype-cache.outputs.cache-hit == 'true'
-        run: CI/windows/build_freetype.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }} -Install
+        run: CI/windows/build_freetype.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
       - name: 'Restore curl from cache'
         id: curl-cache
@@ -928,11 +928,11 @@ jobs:
 
       - name: 'Build dependency curl'
         if: steps.curl-cache.outputs.cache-hit != 'true'
-        run: CI/windows/build_curl.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}
+        run: CI/windows/build_curl.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
 
       - name: 'Install dependency curl'
         if: steps.curl-cache.outputs.cache-hit == 'true'
-        run: CI/windows/build_curl.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }} -Install
+        run: CI/windows/build_curl.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
       - name: 'Restore rnnoise from cache'
         id: rnnoise-cache
@@ -945,11 +945,11 @@ jobs:
 
       - name: 'Build dependency rnnoise'
         if: steps.rnnoise-cache.outputs.cache-hit != 'true'
-        run: CI/windows/build_rnnoise.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}
+        run: CI/windows/build_rnnoise.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
 
       - name: 'Install dependency rnnoise'
         if: steps.rnnoise-cache.outputs.cache-hit == 'true'
-        run: CI/windows/build_rnnoise.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }} -Install
+        run: CI/windows/build_rnnoise.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
       - name: 'Package dependencies'
         if: success()
