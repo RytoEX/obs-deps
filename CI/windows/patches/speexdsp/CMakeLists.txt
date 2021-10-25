@@ -1,0 +1,81 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(speexdsp)
+
+
+if(WIN32)
+	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} /Oi")
+	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /Oi")
+	set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /Oi")
+	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /Oi")
+
+	add_definitions(-DHAVE_CONFIG_H -D_LIB -DUNICODE -D_UNICODE)
+	add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+	add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
+	include_directories(BEFORE "win32" "include")
+
+	set(speexdsp_SOURCES
+		libspeexdsp/buffer.c
+		libspeexdsp/fftwrap.c
+		libspeexdsp/filterbank.c
+		libspeexdsp/jitter.c
+		libspeexdsp/kiss_fft.c
+		libspeexdsp/kiss_fftr.c
+		libspeexdsp/mdf.c
+		libspeexdsp/preprocess.c
+		libspeexdsp/resample.c
+		libspeexdsp/scal.c
+		libspeexdsp/smallft.c
+	)
+
+	set(speexdsp_HEADERS
+		include/speex/speex_buffer.h
+		include/speex/speex_echo.h
+		include/speex/speex_jitter.h
+		include/speex/speex_preprocess.h
+		include/speex/speex_resampler.h
+		include/speex/speexdsp_types.h
+		libspeexdsp/_kiss_fft_guts.h
+		libspeexdsp/arch.h
+		libspeexdsp/bfin.h
+		libspeexdsp/fftwrap.h
+		libspeexdsp/filterbank.h
+		libspeexdsp/fixed_arm4.h
+		libspeexdsp/fixed_arm5e.h
+		libspeexdsp/fixed_bfin.h
+		libspeexdsp/fixed_debug.h
+		libspeexdsp/fixed_generic.h
+		libspeexdsp/kiss_fft.h
+		libspeexdsp/kiss_fftr.h
+		libspeexdsp/math_approx.h
+		libspeexdsp/misc_bfin.h
+		libspeexdsp/os_support.h
+		libspeexdsp/pseudofloat.h
+		libspeexdsp/resample_neon.h
+		libspeexdsp/resample_sse.h
+		libspeexdsp/smallft.h
+		libspeexdsp/stack_alloc.h
+		libspeexdsp/vorbis_psy.h
+	)
+
+	add_library(speexdsp STATIC
+		${speexdsp_SOURCES}
+		${speexdsp_HEADERS}
+	)
+
+	set_target_properties(speexdsp PROPERTIES
+		COMPILE_FLAGS_RELEASE "/GL")
+	set_target_properties(speexdsp PROPERTIES
+		STATIC_LIBRARY_FLAGS_RELEASE "/LTCG")
+
+	include(CheckIPOSupported)
+	check_ipo_supported(RESULT HasIPOSupport)
+	if(HasIPOSupport)
+		set_target_properties(speexdsp PROPERTIES
+			INTERPROCEDURAL_OPTIMIZATION ON)
+	endif()
+
+	install(TARGETS speexdsp
+		ARCHIVE)
+endif()
