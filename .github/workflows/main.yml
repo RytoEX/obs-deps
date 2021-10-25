@@ -951,6 +951,23 @@ jobs:
         if: steps.rnnoise-cache.outputs.cache-hit == 'true'
         run: CI/windows/build_rnnoise.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
+      - name: 'Restore speexdsp from cache'
+        id: speexdsp-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'speexdsp-${{ matrix.arch }}-${{ env.SPEEXDSP_REVISION }}'
+        with:
+          path: ${{ github.workspace }}/windows_build_temp/speexdsp
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.SPEEXDSP_VERSION }}
+
+      - name: 'Build dependency speexdsp'
+        if: steps.speexdsp-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_speexdsp.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
+
+      - name: 'Install dependency speexdsp'
+        if: steps.speexdsp-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_speexdsp.sh -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
+
       - name: 'Package dependencies'
         if: success()
         working-directory: ${{ github.workspace }}/windows_build_temp/win${{ matrix.arch }}
