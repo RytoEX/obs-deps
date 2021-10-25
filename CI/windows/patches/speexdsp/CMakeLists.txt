@@ -69,17 +69,12 @@ if(WIN32)
 		PRIVATE_HEADER
 		"${speexdsp_PRIVATE_HEADERS}"
 	)
-	#include_directories(BEFORE "win32" "include")
 	target_include_directories(speexdsp BEFORE
 		PRIVATE
 			"libspeexdsp"
 			"win32"
 		PUBLIC
 			"include"
-	)
-	source_group("some group" FILES
-		"${speexdsp_PUBLIC_HEADERS}"
-		"${speexdsp_PRIVATE_HEADERS}"
 	)
 
 	set_target_properties(speexdsp PROPERTIES
@@ -95,11 +90,7 @@ if(WIN32)
 	endif()
 
 	install(TARGETS speexdsp
-		ARCHIVE
+		ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
 		PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/speex"
 	)
-	#install(DIRECTORY "include"
-	#	TYPE INCLUDE
-	#	PATTERN "*.h"
-	#)
 endif()
