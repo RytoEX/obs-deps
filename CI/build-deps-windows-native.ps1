@@ -117,7 +117,7 @@ function Print-Usage {
         "-Quiet                   : Suppress most build process output",
         "-Verbose                 : Enable more verbose build process output",
         "-SkipDependencyChecks    : Skip dependency checks - Default: off",
-        "-NoChoco                 : Skip automatic dependency installation via Chocolatey - Default: on",
+        "-NoChoco                 : Skip automatic dependency installation via Chocolatey - Default: off",
         "-BuildDirectory          : Directory to use for builds - Default: build64 on 64-bit systems, build32 on 32-bit systems",
         "-BuildArch               : Build architecture to use (32-bit or 64-bit) - Default: local architecture",
         "-BuildConfiguration      : Build configuration to use - Default: RelWithDebInfo"
