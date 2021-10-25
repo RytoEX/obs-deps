@@ -789,7 +789,7 @@ jobs:
         run: CI/windows/build_ffmpeg.sh -s -a ${{ matrix.arch }}
 
       - name: 'Install dependency ffmpeg'
-        if: steps.ffmpeg-deps-cache.outputs.cache-hit == 'true'
+        if: steps.ffmpeg-cache.outputs.cache-hit == 'true'
         run: CI/windows/build_ffmpeg.sh -s -a ${{ matrix.arch }} --install
 
       - name: 'Package dependencies'
