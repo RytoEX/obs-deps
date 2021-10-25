@@ -408,6 +408,8 @@ function Build-Checks {
 
     Check-Archs
     Check-Curl
+
+    $script:DepsBuildDir = "${CheckoutDir}/windows_build_temp"
 }
 
 function Build-Setup {
