@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(speexdsp)
 
+include(GNUInstallDirs)
 
 if(WIN32)
 	set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} /Oi")
@@ -12,8 +13,6 @@ if(WIN32)
 	add_definitions(-DHAVE_CONFIG_H -D_LIB -DUNICODE -D_UNICODE)
 	add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 	add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
-
-	include_directories(BEFORE "win32" "include")
 
 	set(speexdsp_SOURCES
 		libspeexdsp/buffer.c
@@ -28,14 +27,15 @@ if(WIN32)
 		libspeexdsp/scal.c
 		libspeexdsp/smallft.c
 	)
-
-	set(speexdsp_HEADERS
+	set(speexdsp_PUBLIC_HEADERS
 		include/speex/speex_buffer.h
 		include/speex/speex_echo.h
 		include/speex/speex_jitter.h
 		include/speex/speex_preprocess.h
 		include/speex/speex_resampler.h
 		include/speex/speexdsp_types.h
+	)
+	set(speexdsp_PRIVATE_HEADERS
 		libspeexdsp/_kiss_fft_guts.h
 		libspeexdsp/arch.h
 		libspeexdsp/bfin.h
@@ -59,9 +59,27 @@ if(WIN32)
 		libspeexdsp/vorbis_psy.h
 	)
 
-	add_library(speexdsp STATIC
-		${speexdsp_SOURCES}
-		${speexdsp_HEADERS}
+	add_library(speexdsp STATIC)
+	target_sources(speexdsp PRIVATE "${speexdsp_SOURCES}" "${speexdsp_PUBLIC_HEADERS}" "${speexdsp_PRIVATE_HEADERS}")
+	set_target_properties(speexdsp PROPERTIES
+		PUBLIC_HEADER
+		"${speexdsp_PUBLIC_HEADERS}"
+	)
+	set_target_properties(speexdsp PROPERTIES
+		PRIVATE_HEADER
+		"${speexdsp_PRIVATE_HEADERS}"
+	)
+	#include_directories(BEFORE "win32" "include")
+	target_include_directories(speexdsp BEFORE
+		PRIVATE
+			"libspeexdsp"
+			"win32"
+		PUBLIC
+			"include"
+	)
+	source_group("some group" FILES
+		"${speexdsp_PUBLIC_HEADERS}"
+		"${speexdsp_PRIVATE_HEADERS}"
 	)
 
 	set_target_properties(speexdsp PROPERTIES
@@ -77,5 +95,11 @@ if(WIN32)
 	endif()
 
 	install(TARGETS speexdsp
-		ARCHIVE)
+		ARCHIVE
+		PUBLIC_HEADER DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/speex"
+	)
+	#install(DIRECTORY "include"
+	#	TYPE INCLUDE
+	#	PATTERN "*.h"
+	#)
 endif()

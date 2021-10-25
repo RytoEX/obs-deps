@@ -24,7 +24,7 @@ function Patch-Product {
     cd "${ProductFolder}"
 
     Write-Step "Add CMake support..."
-    Copy-Item -Path "${CheckoutDir\windows\patches\${ProductFolder}\CMakeLists.txt" -Destination "${DepsBuildDir}\${ProductFolder}\CMakeLists.txt"
+    Copy-Item -Path "${CheckoutDir}\CI\windows\patches\${ProductFolder}\CMakeLists.txt" -Destination "${DepsBuildDir}\${ProductFolder}\CMakeLists.txt"
 }
 
 function Build-Product {
