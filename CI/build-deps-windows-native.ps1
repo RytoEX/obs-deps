@@ -53,7 +53,8 @@ $ObsBuildDependencies = @(
     @('curl', '315ee3fe75dade912b48a21ceec9ccda0230d937'),
     @('rnnoise', '90ec41ef659fd82cfec2103e9bb7fc235e9ea66c'),
     @('speexdsp', '20ed3452074664ad07e380e51321b148acebdf20'),
-    @('detours', 'e4bfd6b03e50de46b47abfbd1e46b384f0c5f833')
+    @('detours', 'e4bfd6b03e50de46b47abfbd1e46b384f0c5f833'),
+    @('luajit', '0bf80b07b0672ce874feedcc777afe1b791ccb5a')
 )
 
 function Build-OBS-Deps-Main {
