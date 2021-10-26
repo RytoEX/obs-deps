@@ -398,6 +398,35 @@ function Check-Curl {
     }
 }
 
+function Check-Visual-Studio {
+    Param(
+        [switch]$Force
+    )
+
+    Write-Step "Check Visual Studio..."
+    if ($script:VisualStudioFound -and !$Force) {
+        Write-Info "Visual Studio already found"
+        Write-Status "Visual Studio Installation Path: ${script:VisualStudioPath}"
+        return
+    }
+
+    $script:VisualStudioFound = $false
+    $VswhereDefaultLocation = "${ENV:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+    if (Test-CommandExists "Get-VSSetupInstance") {
+        $script:VisualStudioPath = (Get-VSSetupInstance).InstallationPath
+    } elseif (Test-CommandExists "${VswhereDefaultLocation}") {
+        # for VS2019 and newer: -version 16
+        $script:VisualStudioPath = & "${VswhereDefaultLocation}" -property installationPath
+    }
+
+    if ($script:VisualStudioPath -and (Test-Path "${script:VisualStudioPath}")) {
+        $script:VisualStudioFound = $true
+        $script:VcvarsFolder = "${VisualStudioPath}\VC\Auxiliary\Build"
+    }
+
+    Write-Status "Visual Studio Installation Path: ${script:VisualStudioPath}"
+}
+
 function Build-Checks {
     if(!$NoChoco) {
         Install-Windows-Build-Tools
@@ -408,6 +437,7 @@ function Build-Checks {
 
     Check-Archs
     Check-Curl
+    Check-Visual-Studio
 
     $script:DepsBuildDir = "${CheckoutDir}/windows_build_temp"
 }
