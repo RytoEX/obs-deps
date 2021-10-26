@@ -985,6 +985,23 @@ jobs:
         if: steps.detours-cache.outputs.cache-hit == 'true'
         run: CI/windows/build_detours.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
+      - name: 'Restore luajit from cache'
+        id: luajit-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'luajit-${{ matrix.arch }}-${{ env.LUAJIT_REVISION }}'
+        with:
+          path: ${{ github.workspace }}/windows_build_temp/luajit
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.LUAJIT_VERSION }}
+
+      - name: 'Build dependency luajit'
+        if: steps.luajit-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_luajit.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
+
+      - name: 'Install dependency luajit'
+        if: steps.luajit-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_luajit.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
+
       - name: 'Package dependencies'
         if: success()
         working-directory: ${{ github.workspace }}/windows_build_temp/win${{ matrix.arch }}
