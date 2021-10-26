@@ -54,8 +54,6 @@ function Install-Product {
     # need some manual copy action here because cmake support isn't there for `install`
     #cmake --install "rnnoise_build\${CMAKE_BITNESS}" --config "${BuildConfiguration}" --prefix "${DepsBuildDir}\${CMAKE_INSTALL_DIR}"
 
-    New-Item -Path "${CMAKE_INSTALL_DIR}\include" -ItemType Directory -Force
-    New-Item -Path "${CMAKE_INSTALL_DIR}\lib" -ItemType Directory -Force
     Copy-Item -Path "${DepsBuildDir}\${ProductFolder}\include\rnnoise.h" -Destination "${CMAKE_INSTALL_DIR}\include\rnnoise.h"
     Copy-Item -Path "${DepsBuildDir}\rnnoise_build\${CMAKE_BITNESS}\${BuildConfiguration}\rnnoise.lib" -Destination "${CMAKE_INSTALL_DIR}\lib\rnnoise.lib"
 }
