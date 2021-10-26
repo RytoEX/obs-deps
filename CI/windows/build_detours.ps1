@@ -30,7 +30,7 @@ function Build-Product {
     }
 
     Write-Step "Build (${ARCH})..."
-    cmd.exe /c """C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars${CMAKE_BITNESS}.bat"" & cd ""${DepsBuildDir}\${ProductFolder}\src"" & nmake"
+    cmd.exe /c """${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"" & cd ""${DepsBuildDir}\${ProductFolder}\src"" & nmake"
 }
 
 function Install-Product {
