@@ -440,6 +440,10 @@ function Build-Checks {
     Check-Visual-Studio
 
     $script:DepsBuildDir = "${CheckoutDir}/windows_build_temp"
+
+    Ensure-Directory "${script:DepsBuildDir}\${CMAKE_INSTALL_DIR}\bin"
+    Ensure-Directory "${script:DepsBuildDir}\${CMAKE_INSTALL_DIR}\include"
+    Ensure-Directory "${script:DepsBuildDir}\${CMAKE_INSTALL_DIR}\lib"
 }
 
 function Build-Setup {
