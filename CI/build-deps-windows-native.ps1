@@ -51,7 +51,9 @@ $ObsBuildDependencies = @(
     @('cmocka', '5a4b15870efa2225e6586fbb4c3af05ff0659434'),
     @('freetype', '6a2b3e4007e794bfc6c91030d0ed987f925164a8'),
     @('curl', '315ee3fe75dade912b48a21ceec9ccda0230d937'),
-    @('rnnoise', '90ec41ef659fd82cfec2103e9bb7fc235e9ea66c')
+    @('rnnoise', '90ec41ef659fd82cfec2103e9bb7fc235e9ea66c'),
+    @('speexdsp', '20ed3452074664ad07e380e51321b148acebdf20'),
+    @('detours', 'e4bfd6b03e50de46b47abfbd1e46b384f0c5f833')
 )
 
 function Build-OBS-Deps-Main {

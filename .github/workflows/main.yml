@@ -968,6 +968,23 @@ jobs:
         if: steps.speexdsp-cache.outputs.cache-hit == 'true'
         run: CI/windows/build_speexdsp.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
+      - name: 'Restore detours from cache'
+        id: detours-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'detours-${{ matrix.arch }}-${{ env.DETOURS_REVISION }}'
+        with:
+          path: ${{ github.workspace }}/windows_build_temp/detours
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.DETOURS_VERSION }}
+
+      - name: 'Build dependency detours'
+        if: steps.detours-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_detours.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
+
+      - name: 'Install dependency detours'
+        if: steps.detours-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_detours.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
+
       - name: 'Package dependencies'
         if: success()
         working-directory: ${{ github.workspace }}/windows_build_temp/win${{ matrix.arch }}
