@@ -836,7 +836,7 @@ jobs:
       DETOURS_VERSION: 'v4.0.1'
       DETOURS_HASH: 'e4bfd6b03e50de46b47abfbd1e46b384f0c5f833'
       LUAJIT_VERSION: 'v2.0.5'
-      LUAJIT_HASH: ''
+      LUAJIT_HASH: '0bf80b07b0672ce874feedcc777afe1b791ccb5a'
       PYTHON_VERSION: '3.6.2'
       PYTHON_HASH: ''
       VULKAN_VERSION: '1.2.131.2'
