@@ -130,7 +130,8 @@ function Install-Windows-Build-Tools {
         @("cmake", "cmake --install-arguments 'ADD_CMAKE_TO_PATH=System'"),
         @("curl", "curl"),
         @("git", "git"),
-        @("patch", "patch")
+        @("patch", "patch"),
+        @("pyenv", "pyenv-win")
     )
 
     if (!(Test-CommandExists "choco")) {
@@ -156,6 +157,8 @@ function Install-Windows-Build-Tools {
     }
 
     $Env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+    refreshenv
+    pyenv rehash
 }
 
 function Install-Dependencies {
