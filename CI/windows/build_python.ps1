@@ -24,7 +24,12 @@ function Build-Product {
     cd "${DepsBuildDir}"
 
     Write-Step "Download (${ARCH})..."
-    pyenv install --quiet "${ProductVersion}"
+    if ("${BuildArch}" -eq "64-bit") {
+        $PythonArch = ""
+    } elseif ("${BuildArch}" -eq "32-bit") {
+        $PythonArch = "-win32"
+    }
+    pyenv install --quiet "${ProductVersion}${PythonArch}"
 }
 
 function Install-Product {
