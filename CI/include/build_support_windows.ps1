@@ -405,6 +405,7 @@ function Check-Visual-Studio {
     Param(
         [switch]$Force
     )
+    Trap { Caught-Error "Check-Visual-Studio" }
 
     Write-Step "Check Visual Studio..."
     if ($script:VisualStudioFound -and !$Force) {
@@ -416,15 +417,25 @@ function Check-Visual-Studio {
     $script:VisualStudioFound = $false
     $VswhereDefaultLocation = "${ENV:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
     if (Test-CommandExists "Get-VSSetupInstance") {
-        $script:VisualStudioPath = (Get-VSSetupInstance).InstallationPath
+        # for VS2019 and newer: -Version '16.0'
+        $script:VisualStudioPath = (Get-VSSetupInstance | Select-VSSetupInstance -Version '[16.0,17.0)').InstallationPath
     } elseif (Test-CommandExists "${VswhereDefaultLocation}") {
         # for VS2019 and newer: -version 16
-        $script:VisualStudioPath = & "${VswhereDefaultLocation}" -property installationPath
+        $script:VisualStudioPath = & "${VswhereDefaultLocation}" -version '[16,17)' -property installationPath
     }
 
     if ($script:VisualStudioPath -and (Test-Path "${script:VisualStudioPath}")) {
         $script:VisualStudioFound = $true
         $script:VcvarsFolder = "${VisualStudioPath}\VC\Auxiliary\Build"
+    }
+
+    if (!$script:VisualStudioFound) {
+        $ErrorMessage = -join @("Visual Studio Installation Not Found`n`n"
+            "A Visual Studio 2019 installation is required for this build script to run. "
+            "Visual Studio 2019 Community is free. "
+            "You can download it from here: https://visualstudio.microsoft.com/vs/community/")
+        Write-Error "${ErrorMessage}"
+        Caught-Error "Check-Visual-Studio: NoVisualStudio"
     }
 
     Write-Status "Visual Studio Installation Path: ${script:VisualStudioPath}"
