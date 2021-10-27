@@ -346,7 +346,7 @@ function Apply-Patch {
     $PATCH_FILE = Get-Basename "${COMMIT_URL}"
 
     if ("${COMMIT_URL}".Substring(0, 5) -eq "https") {
-        Invoke-WebRequest "${COMMIT_URL}" -OutFile "${PATCH_FILE}"
+        Invoke-WebRequest "${COMMIT_URL}" -UseBasicParsing -OutFile "${PATCH_FILE}"
         if ("${COMMIT_HASH}" -eq $(Get-FileHash ${PATCH_FILE}).Hash) {
             Write-Info "${PATCH_FILE} downloaded successfully and passed hash check"
         } else {
