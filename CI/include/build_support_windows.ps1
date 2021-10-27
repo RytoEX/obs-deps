@@ -177,6 +177,8 @@ function Get-Basename {
 
 function Safe-Fetch {
     Param(
+        [Switch] $UseCurl,
+        [Switch] $CurlNoContinue,
         [Parameter(Mandatory=$true)]
         [String] $DOWNLOAD_URL,
         [Parameter(Mandatory=$true)]
@@ -188,16 +190,16 @@ function Safe-Fetch {
 
     $DOWNLOAD_FILE = Get-Basename "${DOWNLOAD_URL}"
 
-    if ($UseCurlExe) {
-        $CURLCMD = $script:CURLCMD
+    if ($UseCurl) {
+        $CurlCmd = $script:CURLCMD
 
-        if ($NoContinue) {
-            $CURLCMD = $CURLCMD.Replace(" --continue-at -", "") + " ${DOWNLOAD_URL}"
+        if ($CurlNoContinue) {
+            $CurlCmd = $CurlCmd.Replace(" --continue-at -", "") + " ${DOWNLOAD_URL}"
         } else {
-            $CURLCMD = "${CURLCMD} ${DOWNLOAD_URL}"
+            $CurlCmd = "${CurlCmd} ${DOWNLOAD_URL}"
         }
 
-        Invoke-Expression "${CURLCMD}"
+        Invoke-Expression "${CurlCmd}"
     } else {
         Invoke-WebRequest -Uri "${DOWNLOAD_URL}" -UseBasicParsing -OutFile "${DOWNLOAD_FILE}"
     }
@@ -213,6 +215,8 @@ function Safe-Fetch {
 
 function Check-And-Fetch {
     Param(
+        [Switch] $UseCurl,
+        [Switch] $CurlNoContinue,
         [Parameter(Mandatory=$true)]
         [String] $DOWNLOAD_URL,
         [Parameter(Mandatory=$true)]
@@ -228,7 +232,7 @@ function Check-And-Fetch {
         Write-Info "${DOWNLOAD_FILE} exists and passed hash check"
         return 0
     } else {
-        Safe-Fetch "${DOWNLOAD_URL}" "${DOWNLOAD_HASH}"
+        Safe-Fetch -UseCurl:$UseCurl -CurlNoContinue:$CurlNoContinue "${DOWNLOAD_URL}" "${DOWNLOAD_HASH}"
     }
 }
 
@@ -389,7 +393,9 @@ function Check-Curl {
         Invoke-Expression "choco install -y curl"
     }
 
-    $CURLCMD = "C:\ProgramData\chocolatey\bin\curl.exe"
+    # TODO: implement a way to force using/installing curl.exe from chocolatey
+    #$CURLCMD = "C:\ProgramData\chocolatey\bin\curl.exe"
+    $CURLCMD = "C:\Windows\System32\curl.exe"
 
     if ("${CI}" -or $Quiet) {
         $script:CURLCMD = "${CURLCMD} --silent --show-error --location -O"
@@ -447,6 +453,7 @@ function Build-Checks {
     $script:CI_PRODUCT_HASH = ${CIWorkflowJobString} | Select-String "[ ]+${PRODUCT_NAME_U}_HASH: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
 
     Check-Archs
+    Check-Curl
     Check-Visual-Studio
 
     $script:DepsBuildDir = "${CheckoutDir}/windows_build_temp"
@@ -457,6 +464,10 @@ function Build-Checks {
 }
 
 function Build-Setup {
+    Param(
+        [Switch] $UseCurl,
+        [Switch] $CurlNoContinue
+    )
     Trap { Caught-Error "build-${ProductName}" }
 
     Ensure-Directory "${CheckoutDir}/windows_build_temp"
@@ -466,7 +477,7 @@ function Build-Setup {
     }
 
     Write-Step "Download..."
-    Check-And-Fetch "${ProductUrl}" "${ProductHash}"
+    Check-And-Fetch -UseCurl:$UseCurl -CurlNoContinue:$CurlNoContinue "${ProductUrl}" "${ProductHash}"
 
     if (!"${SKIP_UNPACK}") {
         Write-Step "Unpack..."
