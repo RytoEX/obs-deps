@@ -128,7 +128,6 @@ function Install-Windows-Build-Tools {
     $ObsBuildDependencies = @(
         @("7z", "7zip"),
         @("cmake", "cmake --install-arguments 'ADD_CMAKE_TO_PATH=System'"),
-        @("curl", "curl"),
         @("git", "git"),
         @("patch", "patch"),
         @("pyenv", "pyenv-win")
@@ -387,7 +386,7 @@ function Check-Archs {
 }
 
 function Check-Curl {
-    if (!(Test-CommandExists "curl") -and !$NoChoco) {
+    if (!(Test-CommandExists "curl.exe") -and !$NoChoco) {
         Write-Step "Install curl from chocolatey..."
         Invoke-Expression "choco install -y curl"
     }
@@ -450,7 +449,6 @@ function Build-Checks {
     $script:CI_PRODUCT_HASH = ${CIWorkflowJobString} | Select-String "[ ]+${PRODUCT_NAME_U}_HASH: '(.+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
 
     Check-Archs
-    Check-Curl
     Check-Visual-Studio
 
     $script:DepsBuildDir = "${CheckoutDir}/windows_build_temp"
