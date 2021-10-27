@@ -226,11 +226,11 @@ function Check-And-Fetch {
 
     $DOWNLOAD_FILE = Get-Basename "${DOWNLOAD_URL}"
 
-    if (Test-Path "${DOWNLOAD_FILE}" -and "${DOWNLOAD_HASH}" -eq $(Get-FileHash ${DOWNLOAD_FILE}).Hash) {
+    if ($(Test-Path "${DOWNLOAD_FILE}") -and $("${DOWNLOAD_HASH}" -eq $(Get-FileHash ${DOWNLOAD_FILE}).Hash)) {
         Write-Info "${DOWNLOAD_FILE} exists and passed hash check"
         return 0
     } else {
-        Safe-Fetch $SafeFetchArgs "${DOWNLOAD_URL}" "${DOWNLOAD_HASH}"
+        Safe-Fetch "${DOWNLOAD_URL}" "${DOWNLOAD_HASH}"
     }
 }
 
@@ -423,7 +423,7 @@ function Check-Visual-Studio {
         $script:VisualStudioPath = & "${VswhereDefaultLocation}" -version '[16,17)' -property installationPath
     }
 
-    if ($script:VisualStudioPath -and (Test-Path "${script:VisualStudioPath}")) {
+    if ($script:VisualStudioPath -and $(Test-Path "${script:VisualStudioPath}")) {
         $script:VisualStudioFound = $true
         $script:VcvarsFolder = "${VisualStudioPath}\VC\Auxiliary\Build"
     }
