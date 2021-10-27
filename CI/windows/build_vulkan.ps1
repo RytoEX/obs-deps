@@ -23,19 +23,26 @@ Param(
 function Build-Product {
     cd "${DepsBuildDir}"
 
-    Write-Step "Download (${ARCH})..."
-    $VulkanDownloadUrl = "https://sdk.lunarg.com/sdk/download/${ProductVersion}/windows/VulkanSDK-${ProductVersion}-Installer.exe"
-    Write-Output "VulkanDownloadUrl: ${VulkanDownloadUrl}"
-    $VulkanDownloadFile = Get-Basename "${VulkanDownloadUrl}"
-    Write-Output "ProductVersion: ${ProductVersion}"
-    #Invoke-WebRequest -Uri "${VulkanDownloadUrl}" -UseBasicParsing -OutFile "${VulkanDownloadFile}"
+    Write-Step "Extract (${ARCH})..."
+    if ("${BuildArch}" -eq "64-bit") {
+        $VulkanArch = ""
+    } elseif ("${BuildArch}" -eq "32-bit") {
+        $VulkanArch = "32"
+    }
+    7z x ".\VulkanSDK-${ProductVersion}-Installer.exe" -ovulkan "include\vulkan" -r "Lib${VulkanArch}\vulkan-1.lib"
 }
 
 function Install-Product {
     cd "${DepsBuildDir}"
 
     Write-Step "Install (${ARCH})..."
-    #7z x .\VulkanSDK-1.2.131.2-Installer.exe -ovulkan "include\vulkan" -r "Lib\vulkan-1.lib"
+    if ("${BuildArch}" -eq "64-bit") {
+        $VulkanArch = ""
+    } elseif ("${BuildArch}" -eq "32-bit") {
+        $VulkanArch = "32"
+    }
+    Copy-Item -Path "vulkan\Include\vulkan" -Destination "${CMAKE_INSTALL_DIR}\include\vulkan" -Recurse
+    Copy-Item -Path "vulkan\Lib${VulkanArch}\vulkan-1.lib" -Destination "${CMAKE_INSTALL_DIR}\lib"
 }
 
 function Build-Vulkan-Main {
@@ -71,7 +78,7 @@ function Build-Vulkan-Main {
     Write-Status "ProductUrl: ${ProductUrl}"
 
     if (!$Install) {
-        Build-Setup
+        Build-Setup -UseCurl
         Build
     } else {
         Install-Product
