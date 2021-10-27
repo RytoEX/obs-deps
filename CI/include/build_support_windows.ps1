@@ -85,7 +85,7 @@ function Test-CommandExists {
 
     $CommandExists = $false
     $OldActionPref = $ErrorActionPreference
-    $ErrorActionPreference = "stop"
+    $ErrorActionPreference = "Stop"
 
     try {
         if (Get-Command $Command) {
