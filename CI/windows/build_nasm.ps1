@@ -32,7 +32,7 @@ function Install-Product {
 
     Write-Step "Install (${ARCH})..."
     New-Item -Path "${CMAKE_INSTALL_DIR}\nasm" -ItemType Directory -Force
-    Copy-Item -Path "nasm\win${CMAKE_BITNESS}\nasm-${ProductVersion}\*" -Destination "${CMAKE_INSTALL_DIR}\nasm"
+    Copy-Item -Path "nasm\win${CMAKE_BITNESS}\nasm-${ProductVersion}\*" -Destination "${CMAKE_INSTALL_DIR}\nasm" -Recurse -Force
 }
 
 function Build-Nasm-Main {
