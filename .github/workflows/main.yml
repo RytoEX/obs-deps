@@ -841,6 +841,8 @@ jobs:
       PYTHON_HASH: ''
       VULKAN_VERSION: '1.2.131.2'
       VULKAN_HASH: '7434a39620e425330e3822effbdbefa41ce6e342cd8c610a3c49dc7375f0649d'
+      NASM_VERSION: '2.15.01'
+      NASM_HASH: ''
     defaults:
       run:
         shell: pwsh
