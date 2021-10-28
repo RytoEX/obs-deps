@@ -1002,6 +1002,40 @@ jobs:
         if: steps.luajit-cache.outputs.cache-hit == 'true'
         run: CI/windows/build_luajit.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
+      - name: 'Restore python from cache'
+        id: python-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'python-${{ matrix.arch }}-${{ env.PYTHON_REVISION }}'
+        with:
+          path: ${{ github.workspace }}/windows_build_temp/python
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.PYTHON_VERSION }}
+
+      - name: 'Build dependency python'
+        if: steps.python-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_python.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
+
+      - name: 'Install dependency python'
+        if: steps.python-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_python.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
+
+      - name: 'Restore vulkan from cache'
+        id: vulkan-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'vulkan-${{ matrix.arch }}-${{ env.VULKAN_REVISION }}'
+        with:
+          path: ${{ github.workspace }}/windows_build_temp/vulkan
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.VULKAN_VERSION }}
+
+      - name: 'Build dependency vulkan'
+        if: steps.vulkan-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_vulkan.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
+
+      - name: 'Install dependency vulkan'
+        if: steps.vulkan-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_vulkan.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
+
       - name: 'Package dependencies'
         if: success()
         working-directory: ${{ github.workspace }}/windows_build_temp/win${{ matrix.arch }}
