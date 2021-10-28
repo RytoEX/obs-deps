@@ -41,7 +41,8 @@ function Install-Product {
     } elseif ("${BuildArch}" -eq "32-bit") {
         $VulkanArch = "32"
     }
-    Copy-Item -Path "vulkan\Include\vulkan" -Destination "${CMAKE_INSTALL_DIR}\include\vulkan" -Recurse
+    New-Item -Path "${CMAKE_INSTALL_DIR}\include\vulkan" -ItemType Directory -Force
+    Copy-Item -Path "vulkan\Include\vulkan\*" -Destination "${CMAKE_INSTALL_DIR}\include\vulkan"
     Copy-Item -Path "vulkan\Lib${VulkanArch}\vulkan-1.lib" -Destination "${CMAKE_INSTALL_DIR}\lib"
 }
 
@@ -58,24 +59,19 @@ function Build-Vulkan-Main {
         Build-Checks
     }
 
-    Write-Status "ProductName: ${ProductName}"
-    Write-Status "ProductVersion: ${ProductVersion}"
+    Write-Status "Build-Vulkan-Main start (post Build-Checks)"
     Write-Status "ProductHash: ${ProductHash}"
-    Write-Status "ProductUrl: ${ProductUrl}"
-
     if (!${ProductVersion}) {
         $ProductVersion = $script:CI_PRODUCT_VERSION
     }
     if (!${ProductHash}) {
         $ProductHash = $script:CI_PRODUCT_HASH
     }
+    Write-Status "ProductHash: ${ProductHash}"
+    Write-Status "script:CI_PRODUCT_HASH: ${script:CI_PRODUCT_HASH}"
+    Write-Status "Build-Vulkan-Main moving to Build-Setup"
 
     $ProductUrl = "https://sdk.lunarg.com/sdk/download/${ProductVersion}/windows/VulkanSDK-${ProductVersion}-Installer.exe"
-
-    Write-Status "ProductName: ${ProductName}"
-    Write-Status "ProductVersion: ${ProductVersion}"
-    Write-Status "ProductHash: ${ProductHash}"
-    Write-Status "ProductUrl: ${ProductUrl}"
 
     if (!$Install) {
         Build-Setup -UseCurl

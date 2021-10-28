@@ -39,8 +39,9 @@ function Install-Product {
     pyenv shell "${ProductVersion}"
     $PythonPath = pyenv which python
     $PythonFolder = Split-Path -Path "${PythonPath}"
+    New-Item -Path "${CMAKE_INSTALL_DIR}\include\python" -ItemType Directory -Force
+    Copy-Item -Path "${PythonFolder}\include\*" -Destination "${CMAKE_INSTALL_DIR}\include\python"
     Copy-Item -Path "${PythonFolder}\libs\python3*.lib" -Destination "${CMAKE_INSTALL_DIR}\lib"
-    Copy-Item -Path "${PythonFolder}\include" -Destination "${CMAKE_INSTALL_DIR}\include\python" -Recurse
 }
 
 function Build-Python-Main {
