@@ -138,7 +138,7 @@ function Print-Usage {
     $Lines | Write-Host
 }
 
-if($Help) {
+if ($Help) {
     Print-Usage
     exit 0
 }
