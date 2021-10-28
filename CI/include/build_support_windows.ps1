@@ -459,7 +459,7 @@ function Build-Checks {
     Check-Curl
     Check-Visual-Studio
 
-    $script:DepsBuildDir = "${CheckoutDir}/windows_native_build_temp"
+    $script:DepsBuildDir = "${CheckoutDir}\windows_native_build_temp"
 
     Ensure-Directory "${script:DepsBuildDir}\${CMAKE_INSTALL_DIR}\bin"
     Ensure-Directory "${script:DepsBuildDir}\${CMAKE_INSTALL_DIR}\include"

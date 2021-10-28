@@ -42,9 +42,9 @@ $_RunObsDepsBuildScript = $true
 $ProductName = "obs-deps"
 
 $CheckoutDir = git rev-parse --show-toplevel
-$DepsBuildDir = "${CheckoutDir}/windows_native_build_temp"
+$DepsBuildDir = "${CheckoutDir}\windows_native_build_temp"
 
-. ${CheckoutDir}/CI/include/build_support_windows.ps1
+. ${CheckoutDir}\CI\include\build_support_windows.ps1
 
 $ObsBuildDependencies = @(
     @('mbedtls', '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8'),
@@ -62,7 +62,7 @@ $ObsBuildDependencies = @(
 )
 
 function Build-OBS-Deps-Main {
-    Ensure-Directory ${CheckoutDir}
+    Ensure-Directory "${CheckoutDir}"
     Write-Step "Fetching version tags..."
     & git fetch origin --tags
     $GitBranch = git rev-parse --abbrev-ref HEAD
@@ -73,13 +73,10 @@ function Build-OBS-Deps-Main {
 
     Build-Checks
 
-    if (Test-Path variable:BUILD_FOR_DISTRIBUTION) {
-        $VersionString = "${GitTag}"
-    } else {
-        $VersionString = "${GitTag}-${GitHash}"
+    if (!$CurrentDate) {
+        $CurrentDate = Get-Date -UFormat "%Y-%m-%d"
     }
-
-    $FileName = "${ProductName}-${VersionString}"
+    $FileName = "${ProductName}-win-native-${CurrentDate}-${BuildArch}.tar.xz"
 
     if (!$SkipDependencyChecks) {
         Install-Dependencies -NoChoco:$NoChoco
@@ -95,7 +92,7 @@ function Build-OBS-Deps-Main {
                 $DepHash = $DepVersion
             }
         } else {
-            Write-Error "ObsBuildDependencies is not array"
+            Write-Error "ObsBuildDependencies item Dependency is not array"
             exit 1
         }
         if (Test-CommandExists Build-Product) {
@@ -114,8 +111,13 @@ function Build-OBS-Deps-Main {
         $ProductName = "${DepName}"
         $ProductVersion = "${DepVersion}"
         $ProductHash = "${DepHash}"
-        . ${CheckoutDir}/CI/windows/build_${DepName}.ps1
+        . ${CheckoutDir}\CI\windows\build_${DepName}.ps1
     }
+
+    cd "${DepsBuildDir}\${CMAKE_INSTALL_DIR}"
+
+    Write-Step "Create archive ${FileName}"
+    tar -cJf "${FileName}" *
 
     Write-Info "All done!"
 }
