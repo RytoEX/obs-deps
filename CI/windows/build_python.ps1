@@ -30,6 +30,7 @@ function Build-Product {
         $PythonArch = "-win32"
     }
     pyenv install --quiet "${ProductVersion}${PythonArch}"
+    pyenv shell "${ProductVersion}"
     $PythonPath = pyenv which python
     $PythonFolder = Split-Path -Path "${PythonPath}"
     New-Item -Path "${DepsBuildDir}\python\include" -ItemType Directory -Force
@@ -42,7 +43,6 @@ function Install-Product {
     cd "${DepsBuildDir}"
 
     Write-Step "Install (${ARCH})..."
-    pyenv shell "${ProductVersion}"
     New-Item -Path "${CMAKE_INSTALL_DIR}\include\python" -ItemType Directory -Force
     Copy-Item -Path "${DepsBuildDir}\python\include\*" -Destination "${CMAKE_INSTALL_DIR}\include\python"
     Copy-Item -Path "${DepsBuildDir}\python\lib${CMAKE_BITNESS}\python3*.lib" -Destination "${CMAKE_INSTALL_DIR}\lib"
