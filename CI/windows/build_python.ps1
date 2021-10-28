@@ -35,7 +35,6 @@ function Build-Product {
     $PythonFolder = Split-Path -Path "${PythonPath}"
     New-Item -Path "${DepsBuildDir}\python\include" -ItemType Directory -Force
     New-Item -Path "${DepsBuildDir}\python\lib${CMAKE_BITNESS}" -ItemType Directory -Force
-    Copy-Item -Path "${PythonFolder}\LICENSE.txt" -Destination "${DepsBuildDir}\python\LICENSE.txt"
     Copy-Item -Path "${PythonFolder}\include\*" -Destination "${DepsBuildDir}\python\include"
     Copy-Item -Path "${PythonFolder}\libs\python3*.lib" -Destination "${DepsBuildDir}\python\lib${CMAKE_BITNESS}"
 }
