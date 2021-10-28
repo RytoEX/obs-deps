@@ -111,7 +111,7 @@ function Build-OBS-Deps-Main {
         $ProductName = "${DepName}"
         $ProductVersion = "${DepVersion}"
         $ProductHash = "${DepHash}"
-        . ${CheckoutDir}\CI\windows\build_${DepName}.ps1
+        . "${CheckoutDir}\CI\windows\build_${DepName}.ps1"
     }
 
     Write-Step "Create archive ${FileName}"
