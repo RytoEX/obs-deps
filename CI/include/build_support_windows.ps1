@@ -204,11 +204,14 @@ function Safe-Fetch {
         Invoke-WebRequest -Uri "${DOWNLOAD_URL}" -UseBasicParsing -OutFile "${DOWNLOAD_FILE}"
     }
 
-    if ("${DOWNLOAD_HASH}" -eq $(Get-FileHash ${DOWNLOAD_FILE}).Hash) {
+    $CalculatedHash = $(Get-FileHash ${DOWNLOAD_FILE}).Hash
+    if ("${DOWNLOAD_HASH}" -eq "${CalculatedHash}") {
         Write-Info "${DOWNLOAD_FILE} downloaded successfully and passed hash check"
         return 0
     } else {
         Write-Error "${DOWNLOAD_FILE} downloaded successfully and failed hash check"
+        Write-Warning "Expected Hash:   ${DOWNLOAD_HASH}"
+        Write-Warning "Calculated Hash: ${CalculatedHash}"
         return 1
     }
 }
