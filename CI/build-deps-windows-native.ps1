@@ -42,7 +42,7 @@ $_RunObsDepsBuildScript = $true
 $ProductName = "obs-deps"
 
 $CheckoutDir = git rev-parse --show-toplevel
-$DepsBuildDir = "${CheckoutDir}/windows_build_temp"
+$DepsBuildDir = "${CheckoutDir}/windows_native_build_temp"
 
 . ${CheckoutDir}/CI/include/build_support_windows.ps1
 

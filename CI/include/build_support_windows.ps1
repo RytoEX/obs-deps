@@ -459,7 +459,7 @@ function Build-Checks {
     Check-Curl
     Check-Visual-Studio
 
-    $script:DepsBuildDir = "${CheckoutDir}/windows_build_temp"
+    $script:DepsBuildDir = "${CheckoutDir}/windows_native_build_temp"
 
     Ensure-Directory "${script:DepsBuildDir}\${CMAKE_INSTALL_DIR}\bin"
     Ensure-Directory "${script:DepsBuildDir}\${CMAKE_INSTALL_DIR}\include"
@@ -473,7 +473,7 @@ function Build-Setup {
     )
     Trap { Caught-Error "build-${ProductName}" }
 
-    Ensure-Directory "${CheckoutDir}/windows_build_temp"
+    Ensure-Directory "${CheckoutDir}/windows_native_build_temp"
 
     if (!$ProductHash) {
         $ProductHash = $CI_PRODUCT_HASH
@@ -493,7 +493,7 @@ function Build-Setup {
 function Build-Setup-GitHub {
     Trap { Caught-Error "build-${ProductName}" }
 
-    Ensure-Directory "${CheckoutDir}/windows_build_temp"
+    Ensure-Directory "${CheckoutDir}/windows_native_build_temp"
 
     if (!$ProductHash) {
         $ProductHash = $CI_PRODUCT_HASH
@@ -507,7 +507,7 @@ function Build-Setup-GitHub {
 function Build-Setup-GitLab {
     Trap { Caught-Error "build-${ProductName}" }
 
-    Ensure-Directory "${CheckoutDir}/windows_build_temp"
+    Ensure-Directory "${CheckoutDir}/windows_native_build_temp"
 
     if (!$ProductHash) {
         $ProductHash = $CI_PRODUCT_HASH
@@ -526,17 +526,17 @@ function Build {
     Write-Status "Build ${ProductName} ${ProductVersion}"
 
     if (Test-CommandExists 'Patch-Product') {
-        Ensure-Directory "${CheckoutDir}/windows_build_temp"
+        Ensure-Directory "${CheckoutDir}/windows_native_build_temp"
         Patch-Product
     }
 
     if (Test-CommandExists 'Build-Product') {
-        Ensure-Directory "${CheckoutDir}/windows_build_temp"
+        Ensure-Directory "${CheckoutDir}/windows_native_build_temp"
         Build-Product
     }
 
     if (Test-CommandExists 'Install-Product') {
-        Ensure-Directory "${CheckoutDir}/windows_build_temp"
+        Ensure-Directory "${CheckoutDir}/windows_native_build_temp"
         Install-Product
     }
 }

@@ -865,10 +865,10 @@ jobs:
 
       - name: 'Setup build environment'
         run: |
-          mkdir -p windows_build_temp/win${{ matrix.arch }}/bin
-          mkdir -p windows_build_temp/win${{ matrix.arch }}/include
-          mkdir -p windows_build_temp/win${{ matrix.arch }}/lib
-          mkdir -p windows_build_temp/win${{ matrix.arch }}/share
+          mkdir -p windows_native_build_temp/win${{ matrix.arch }}/bin
+          mkdir -p windows_native_build_temp/win${{ matrix.arch }}/include
+          mkdir -p windows_native_build_temp/win${{ matrix.arch }}/lib
+          mkdir -p windows_native_build_temp/win${{ matrix.arch }}/share
 
       - name: 'Restore mbedtls from cache'
         id: mbedtls-cache
@@ -876,7 +876,7 @@ jobs:
         env:
           CACHE_NAME: 'mbedtls-${{ matrix.arch }}-${{ env.MBEDTLS_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/mbedtls
+          path: ${{ github.workspace }}/windows_native_build_temp/mbedtls
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.MBEDTLS_VERSION }}
 
       - name: 'Build dependency mbedtls'
@@ -893,7 +893,7 @@ jobs:
         env:
           CACHE_NAME: 'cmocka-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/cmocka
+          path: ${{ github.workspace }}/windows_native_build_temp/cmocka
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.CMOCKA_VERSION }}
 
       - name: 'Build dependency cmocka'
@@ -910,7 +910,7 @@ jobs:
         env:
           CACHE_NAME: 'freetype-${{ matrix.arch }}-${{ env.FREETYPE_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/freetype
+          path: ${{ github.workspace }}/windows_native_build_temp/freetype
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.FREETYPE_VERSION }}
 
       - name: 'Build dependency freetype'
@@ -927,7 +927,7 @@ jobs:
         env:
           CACHE_NAME: 'curl-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/curl
+          path: ${{ github.workspace }}/windows_native_build_temp/curl
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.CURL_VERSION }}
 
       - name: 'Build dependency curl'
@@ -944,7 +944,7 @@ jobs:
         env:
           CACHE_NAME: 'rnnoise-${{ matrix.arch }}-${{ env.RNNOISE_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/rnnoise
+          path: ${{ github.workspace }}/windows_native_build_temp/rnnoise
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.RNNOISE_VERSION }}
 
       - name: 'Build dependency rnnoise'
@@ -961,7 +961,7 @@ jobs:
         env:
           CACHE_NAME: 'speexdsp-${{ matrix.arch }}-${{ env.SPEEXDSP_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/speexdsp
+          path: ${{ github.workspace }}/windows_native_build_temp/speexdsp
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.SPEEXDSP_VERSION }}
 
       - name: 'Build dependency speexdsp'
@@ -978,7 +978,7 @@ jobs:
         env:
           CACHE_NAME: 'detours-${{ matrix.arch }}-${{ env.DETOURS_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/detours
+          path: ${{ github.workspace }}/windows_native_build_temp/detours
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.DETOURS_VERSION }}
 
       - name: 'Build dependency detours'
@@ -995,7 +995,7 @@ jobs:
         env:
           CACHE_NAME: 'luajit-${{ matrix.arch }}-${{ env.LUAJIT_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/luajit
+          path: ${{ github.workspace }}/windows_native_build_temp/luajit
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.LUAJIT_VERSION }}
 
       - name: 'Build dependency luajit'
@@ -1012,7 +1012,7 @@ jobs:
         env:
           CACHE_NAME: 'python-${{ matrix.arch }}-${{ env.PYTHON_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/python
+          path: ${{ github.workspace }}/windows_native_build_temp/python
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.PYTHON_VERSION }}
 
       - name: 'Build dependency python'
@@ -1029,7 +1029,7 @@ jobs:
         env:
           CACHE_NAME: 'vulkan-${{ matrix.arch }}-${{ env.VULKAN_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/vulkan
+          path: ${{ github.workspace }}/windows_native_build_temp/vulkan
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.VULKAN_VERSION }}
 
       - name: 'Build dependency vulkan'
@@ -1046,7 +1046,7 @@ jobs:
         env:
           CACHE_NAME: 'nasm-${{ matrix.arch }}-${{ env.NASM_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/nasm
+          path: ${{ github.workspace }}/windows_native_build_temp/nasm
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.NASM_VERSION }}
 
       - name: 'Build dependency nasm'
@@ -1059,7 +1059,7 @@ jobs:
 
       - name: 'Package dependencies'
         if: success()
-        working-directory: ${{ github.workspace }}/windows_build_temp/win${{ matrix.arch }}
+        working-directory: ${{ github.workspace }}/windows_native_build_temp/win${{ matrix.arch }}
         run: |
           CURRENT_DATE=$(date +"%Y-%m-%d")
           FILE_NAME="windows-native-deps-${CURRENT_DATE}-${{ matrix.arch }}.tar.xz"
