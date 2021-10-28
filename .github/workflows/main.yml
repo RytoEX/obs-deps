@@ -1038,6 +1038,23 @@ jobs:
         if: steps.vulkan-cache.outputs.cache-hit == 'true'
         run: CI/windows/build_vulkan.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
+      - name: 'Restore nasm from cache'
+        id: nasm-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'nasm-${{ matrix.arch }}-${{ env.NASM_REVISION }}'
+        with:
+          path: ${{ github.workspace }}/windows_build_temp/nasm
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.NASM_VERSION }}
+
+      - name: 'Build dependency nasm'
+        if: steps.nasm-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_nasm.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
+
+      - name: 'Install dependency nasm'
+        if: steps.nasm-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_nasm.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
+
       - name: 'Package dependencies'
         if: success()
         working-directory: ${{ github.workspace }}/windows_build_temp/win${{ matrix.arch }}
