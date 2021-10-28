@@ -30,6 +30,12 @@ function Build-Product {
         $PythonArch = "-win32"
     }
     pyenv install --quiet "${ProductVersion}${PythonArch}"
+    $PythonPath = pyenv which python
+    $PythonFolder = Split-Path -Path "${PythonPath}"
+    New-Item -Path "${DepsBuildDir}\python\include" -ItemType Directory -Force
+    New-Item -Path "${DepsBuildDir}\python\lib${CMAKE_BITNESS}" -ItemType Directory -Force
+    Copy-Item -Path "${PythonFolder}\include\*" -Destination "${DepsBuildDir}\python\include"
+    Copy-Item -Path "${PythonFolder}\libs\python3*.lib" -Destination "${DepsBuildDir}\python\lib${CMAKE_BITNESS}"
 }
 
 function Install-Product {
@@ -37,11 +43,9 @@ function Install-Product {
 
     Write-Step "Install (${ARCH})..."
     pyenv shell "${ProductVersion}"
-    $PythonPath = pyenv which python
-    $PythonFolder = Split-Path -Path "${PythonPath}"
     New-Item -Path "${CMAKE_INSTALL_DIR}\include\python" -ItemType Directory -Force
-    Copy-Item -Path "${PythonFolder}\include\*" -Destination "${CMAKE_INSTALL_DIR}\include\python"
-    Copy-Item -Path "${PythonFolder}\libs\python3*.lib" -Destination "${CMAKE_INSTALL_DIR}\lib"
+    Copy-Item -Path "${DepsBuildDir}\python\include\*" -Destination "${CMAKE_INSTALL_DIR}\include\python"
+    Copy-Item -Path "${DepsBuildDir}\python\lib${CMAKE_BITNESS}\python3*.lib" -Destination "${CMAKE_INSTALL_DIR}\lib"
 }
 
 function Build-Python-Main {
@@ -57,12 +61,9 @@ function Build-Python-Main {
         Build-Checks
     }
 
-    #$ProductProject = "python"
-    #$ProductRepo = "python"
-    #$ProductFolder = "${ProductRepo}"
+    $ProductFolder = "python"
 
     if (!$Install) {
-        #Build-Setup
         Build
     } else {
         Install-Product
