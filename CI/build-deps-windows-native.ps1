@@ -12,7 +12,7 @@ Param(
 )
 
 ##############################################################################
-# Windows OBS build script
+# Windows OBS deps native build script
 ##############################################################################
 #
 # This script contains all steps necessary to:
