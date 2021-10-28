@@ -39,6 +39,7 @@ function Build-Product {
     Write-Step "Configure (${ARCH})..."
     cmake -G "Visual Studio 16 2019" `
         -A "${CMAKE_ARCH}" `
+        -DRNNOISE_COMPILE_OPUS=ON `
         "${CMAKE_OPTS}" `
         -S "rnnoise" `
         -B "rnnoise_build\${CMAKE_BITNESS}"
