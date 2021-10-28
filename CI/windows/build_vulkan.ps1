@@ -59,17 +59,12 @@ function Build-Vulkan-Main {
         Build-Checks
     }
 
-    Write-Status "Build-Vulkan-Main start (post Build-Checks)"
-    Write-Status "ProductHash: ${ProductHash}"
     if (!${ProductVersion}) {
         $ProductVersion = $script:CI_PRODUCT_VERSION
     }
     if (!${ProductHash}) {
         $ProductHash = $script:CI_PRODUCT_HASH
     }
-    Write-Status "ProductHash: ${ProductHash}"
-    Write-Status "script:CI_PRODUCT_HASH: ${script:CI_PRODUCT_HASH}"
-    Write-Status "Build-Vulkan-Main moving to Build-Setup"
 
     $ProductUrl = "https://sdk.lunarg.com/sdk/download/${ProductVersion}/windows/VulkanSDK-${ProductVersion}-Installer.exe"
 
