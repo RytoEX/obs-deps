@@ -57,7 +57,8 @@ $ObsBuildDependencies = @(
     @('luajit', '0bf80b07b0672ce874feedcc777afe1b791ccb5a'),
     @('python', '3.6.2'),
     @('vulkan', '1.2.131.2', '7434a39620e425330e3822effbdbefa41ce6e342cd8c610a3c49dc7375f0649d'),
-    @('nasm', '2.15.01')
+    @('nasm', '2.15.01'),
+    @('swig', '3.0.12', '21ce6cbe297a56b697ef6e7e92a83e75ca41dedc87e48282ab444591986c35f5')
 )
 
 function Build-OBS-Deps-Main {
