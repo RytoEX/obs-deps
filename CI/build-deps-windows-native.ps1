@@ -76,7 +76,7 @@ function Build-OBS-Deps-Main {
     if (!$CurrentDate) {
         $CurrentDate = Get-Date -UFormat "%Y-%m-%d"
     }
-    $FileName = "${ProductName}-win-native-${CurrentDate}-${BuildArch}.tar.xz"
+    $FileName = "${ProductName}-win-native-${CurrentDate}-${BuildArch}.tar.gz"
 
     if (!$SkipDependencyChecks) {
         Install-Dependencies -NoChoco:$NoChoco
@@ -117,7 +117,7 @@ function Build-OBS-Deps-Main {
     cd "${DepsBuildDir}\${CMAKE_INSTALL_DIR}"
 
     Write-Step "Create archive ${FileName}"
-    tar -cJf "${FileName}" *
+    tar -czf "${FileName}" *
 
     Write-Info "All done!"
 }
