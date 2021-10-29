@@ -854,6 +854,7 @@ jobs:
 
       - name: 'Check for Github Labels'
         if: github.event_name == 'pull_request'
+        shell: bash
         run: |
           if test -n "$(curl -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" -s "${{ github.event.pull_request.url }}" | jq -e '.labels[] | select(.name == "Seeking Testers")')"; then
             echo "SEEKING_TESTERS=1" >> $GITHUB_ENV
@@ -864,11 +865,11 @@ jobs:
           echo "CACHE_DATE=$(date +"%Y-%m-%d")" >> $GITHUB_ENV
 
       - name: 'Setup build environment'
+        shell: bash
         run: |
           mkdir -p windows_native_build_temp/win${{ matrix.arch }}/bin
           mkdir -p windows_native_build_temp/win${{ matrix.arch }}/include
           mkdir -p windows_native_build_temp/win${{ matrix.arch }}/lib
-          mkdir -p windows_native_build_temp/win${{ matrix.arch }}/share
 
       - name: 'Restore mbedtls from cache'
         id: mbedtls-cache
