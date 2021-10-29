@@ -25,6 +25,7 @@ _build_product() {
     cd "${PRODUCT_FOLDER}"
 
     step "Configure (${ARCH})..."
+    git clean -dxf
     LDFLAGS="-static-libgcc" ./configure --enable-shared \
         --disable-avs \
         --disable-ffms \

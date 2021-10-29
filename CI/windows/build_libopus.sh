@@ -15,6 +15,7 @@ _build_product() {
     cd "${PRODUCT_FOLDER}"
 
     step "Configure ("${ARCH}")..."
+    git clean -dxf
     ./autogen.sh
     PKG_CONFIG_PATH="${BUILD_DIR}/lib/pkgconfig" \
         LDFLAGS="-L${BUILD_DIR}/lib -static-libgcc" \
