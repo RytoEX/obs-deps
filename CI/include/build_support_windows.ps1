@@ -8,7 +8,7 @@
 
 $CIWorkflow = "${CheckoutDir}/.github/workflows/main.yml"
 
-$CIWorkflowJobString = Get-Content ${CIWorkflow} -Raw | Select-String "(?s)(  windows-deps-build-native.+)\n  \w" | ForEach-Object{$_.Matches.Groups[1].Value}
+$CIWorkflowJobString = Get-Content ${CIWorkflow} -Raw | Select-String "(?s)(  windows-deps-build-native.+?)\n  \w" | ForEach-Object{$_.Matches.Groups[1].Value}
 
 $CIDepsVersion = Get-Content ${CIWorkflow} | Select-String "[ ]+DEPS_VERSION_WIN: '([0-9\-]+)'" | ForEach-Object{$_.Matches.Groups[1].Value}
 
