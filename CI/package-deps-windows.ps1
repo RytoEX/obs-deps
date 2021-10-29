@@ -119,6 +119,8 @@ function Package-OBS-Deps-Main {
         New-Item -Path "${FinalDir}\include\cmocka" -ItemType Directory
         Move-Item -Path "${FinalDir}\include\cmocka*.h" -Destination "${FinalDir}\include\cmocka"
         Rename-Item -Path "${FinalDir}\bin\libcurl_imp.lib" -NewName "libcurl.lib"
+        Remove-Item -Path "${FinalDir}\bin\luajit.lib"
+        Rename-Item -Path "${FinalDir}\bin\lua51.lib" -NewName "luajit.lib"
 
         # Remove unneeded items
         Remove-Item -Path "${FinalDir}\bin\curl-config"
