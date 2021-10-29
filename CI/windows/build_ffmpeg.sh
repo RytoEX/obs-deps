@@ -51,6 +51,7 @@ _build_product() {
     ensure_dir "${PRODUCT_FOLDER}"
 
     step "Configure (${ARCH})..."
+    make clean
 
     PKG_CONFIG_PATH="${BUILD_DIR}/lib/pkgconfig" \
         LDFLAGS="-L${BUILD_DIR}/lib -static-libgcc" \
