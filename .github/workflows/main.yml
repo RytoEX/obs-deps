@@ -1058,6 +1058,23 @@ jobs:
         if: steps.nasm-cache.outputs.cache-hit == 'true'
         run: CI/windows/build_nasm.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
 
+      - name: 'Restore swig from cache'
+        id: swig-cache
+        uses: actions/cache@v2.1.6
+        env:
+          CACHE_NAME: 'swig-${{ matrix.arch }}-${{ env.SWIG_REVISION }}'
+        with:
+          path: ${{ github.workspace }}/windows_native_build_temp/swig
+          key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.SWIG_VERSION }}
+
+      - name: 'Build dependency swig'
+        if: steps.swig-cache.outputs.cache-hit != 'true'
+        run: CI/windows/build_swig.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit
+
+      - name: 'Install dependency swig'
+        if: steps.swig-cache.outputs.cache-hit == 'true'
+        run: CI/windows/build_swig.ps1 -SkipDependencyChecks -BuildArch ${{ matrix.arch }}-bit -Install
+
       - name: 'Package dependencies'
         if: success()
         working-directory: ${{ github.workspace }}/windows_native_build_temp/win${{ matrix.arch }}
