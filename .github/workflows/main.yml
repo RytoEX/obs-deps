@@ -1078,9 +1078,10 @@ jobs:
       - name: 'Package dependencies'
         if: success()
         working-directory: ${{ github.workspace }}/windows_native_build_temp/win${{ matrix.arch }}
+        shell: bash
         run: |
           CURRENT_DATE=$(date +"%Y-%m-%d")
-          FILE_NAME="windows-native-deps-${CURRENT_DATE}-${{ matrix.arch }}.tar.xz"
+          FILE_NAME="windows-native-deps-${CURRENT_DATE}-win${{ matrix.arch }}.tar.xz"
           echo "FILE_NAME=${FILE_NAME}" >> $GITHUB_ENV
 
           cp -R ${{ github.workspace }}/licenses .
