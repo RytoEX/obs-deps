@@ -117,7 +117,7 @@ _check_parameters() {
 }
 
 _build_checks() {
-    CI_WORKFLOW_JOBSTRING=$(grep -oPz '(?s)\K(  windows-deps-build-cross-compile.+?)\n  \w' "${CI_WORKFLOW}")
+    CI_WORKFLOW_JOBSTRING=$(grep -oPz '(?s)\K(  windows-deps-build-cross-compile.+?)\n    steps:' "${CI_WORKFLOW}")
     PRODUCT_NAME_U="$(echo ${PRODUCT_NAME} | tr [a-z] [A-Z])"
     CI_PRODUCT_VERSION=$(echo "${CI_WORKFLOW_JOBSTRING}" | /bin/sed -En "s/[ ]+${PRODUCT_NAME_U}_VERSION: '(.+)'/\1/p")
     CI_PRODUCT_HASH=$(echo "${CI_WORKFLOW_JOBSTRING}" | /bin/sed -En "s/[ ]+${PRODUCT_NAME_U}_HASH: '([0-9a-f]+)'/\1/p")
