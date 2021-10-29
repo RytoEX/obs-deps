@@ -587,7 +587,7 @@ jobs:
 
   windows-deps-build-cross-compile:
     name: '01 - Build Windows dependencies (cross-compile)'
-    runs-on: [ubuntu-18.04, ubuntu-20.04]
+    runs-on: [ubuntu-20.04]
     strategy:
       matrix:
         arch: ['x86', 'x86_64']
