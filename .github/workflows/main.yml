@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - build-windows-deps-v02
     tags:
       - '20[2-9][0-9]-[0-9][0-9]-[0-9][0-9]'
   pull_request:
