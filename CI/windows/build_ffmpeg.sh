@@ -75,8 +75,7 @@ _build_product() {
         --target-os=mingw32 \
         --pkg-config=pkg-config \
         --prefix="${BUILD_DIR}" \
-        --disable-postproc \
-        --enable-schannel
+        --disable-postproc
 
     step "Build (${ARCH})..."
     make -j$PARALLELISM
