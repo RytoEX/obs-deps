@@ -64,9 +64,6 @@ function Package-OBS-Deps-Main {
         }
     }
 
-    #rm -rf "${CHECKOUT_DIR}/macos/obs-dependencies-universal"
-    #cp -cpR "${CHECKOUT_DIR}/macos/obs-dependencies-arm64" "${CHECKOUT_DIR}/macos/obs-dependencies-universal"
-    #cd "${CHECKOUT_DIR}/macos/obs-dependencies-universal"
     Remove-Item -Path "${DepsBuildDir}" -Recurse -Force
     Ensure-Directory "${DepsBuildDir}\win32"
     Ensure-Directory "${DepsBuildDir}\win64"
