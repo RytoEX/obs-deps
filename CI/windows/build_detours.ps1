@@ -29,9 +29,25 @@ function Build-Product {
     # works locally, but fails on CI with:
     # The input line is too long.
     # The syntax of the command is incorrect.
-    cmd.exe /c "echo path: %PATH% & echo include: %INCLUDE% & echo lib: %LIB% & echo libpath: %LIBPATH%"
+    Write-Output "CI: $CI"
+    if ($CI) {
+        Write-Output '$CI is $true (or truthy)'
+    }
+    if ("${CI}") {
+        Write-Output '"${CI}" is $true (or truthy)'
+    }
+    $OriginalPath = $Env:Path
+    $CleanPath = Get-UniquePath
+    Write-Output "Old PATH vars"
+    Write-Output "Env:Path: $Env:Path"
+    cmd.exe /c "echo path: %PATH%"
+    $Env:Path = $CleanPath
+    Write-Output "New PATH vars"
+    Write-Output "Env:Path: $Env:Path"
+    cmd.exe /c "echo path: %PATH%"
     cmd.exe /c "set VSCMD_DEBUG=2 & ""${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"" & cd ""${DepsBuildDir}\${ProductFolder}\src"" & nmake"
     #cmd.exe /c """${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"""
+    $Env:Path = $OriginalPath
 }
 
 function Install-Product {
