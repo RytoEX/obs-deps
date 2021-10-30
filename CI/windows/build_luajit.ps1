@@ -23,14 +23,14 @@ Param(
 function Build-Product {
     cd "${DepsBuildDir}"
 
-    if ($Quiet) {
-        $CMAKE_OPTS = "-Wno-deprecated -Wno-dev --log-level=ERROR"
-    } else {
-        $CMAKE_OPTS = ""
-    }
-
     Write-Step "Build (${ARCH})..."
-    cmd.exe /c """${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"" & cd ""${DepsBuildDir}\${ProductFolder}\src"" & msvcbuild.bat"
+    $VcvarsFile = "${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"
+    $LuajitSource = "${DepsBuildDir}\${ProductFolder}\src"
+    $OriginalPath = $Env:Path
+    $CleanPath = Get-UniquePath
+    $Env:Path = $CleanPath
+    cmd.exe /c """${VcvarsFile}"" & cd ""${LuajitSource}"" & nmake"
+    $Env:Path = $OriginalPath
 }
 
 function Install-Product {
