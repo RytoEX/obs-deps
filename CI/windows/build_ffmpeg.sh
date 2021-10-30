@@ -51,9 +51,9 @@ _build_product() {
     ensure_dir "${PRODUCT_FOLDER}"
 
     step "Configure (${ARCH})..."
-    if [ -f "Makefile" ]; then
-        make clean
-    fi
+    set +eE
+    make clean
+    set -eE
 
     PKG_CONFIG_PATH="${BUILD_DIR}/lib/pkgconfig" \
         LDFLAGS="-L${BUILD_DIR}/lib -static-libgcc" \
