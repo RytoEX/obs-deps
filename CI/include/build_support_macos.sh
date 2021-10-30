@@ -214,6 +214,9 @@ _build_setup() {
     ensure_dir "${CHECKOUT_DIR}/macos_build_temp"
 
     step "Download..."
+    info "PRODUCT_URL: ${PRODUCT_URL}"
+    info "PRODUCT_HASH: ${PRODUCT_HASH}"
+    info "CI_PRODUCT_HASH: ${CI_PRODUCT_HASH}"
     check_and_fetch "${PRODUCT_URL}" "${PRODUCT_HASH:-${CI_PRODUCT_HASH}}"
 
     if [ -z "${SKIP_UNPACK}" ]; then

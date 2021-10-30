@@ -145,6 +145,11 @@ safe_fetch() {
     DOWNLOAD_FILE="$(basename ${DOWNLOAD_URL})"
     CURLCMD=${CURLCMD:-curl}
 
+    info "DOWNLOAD_URL: ${DOWNLOAD_URL}"
+    info "DOWNLOAD_HASH: ${DOWNLOAD_HASH}"
+    info "DOWNLOAD_FILE: ${DOWNLOAD_FILE}"
+    info "CURLCMD: ${CURLCMD}"
+
     if [ "${NOCONTINUE}" ]; then
         ${CURLCMD/--continue-at -/} "${DOWNLOAD_URL}"
     else
