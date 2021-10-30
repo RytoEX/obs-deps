@@ -32,10 +32,10 @@ _build_product() {
     ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
 
     step "Configure (${ARCH})..."
-    set +eE
-    make clean
-    set -eE
-    PKG_CONFIG_PATH="$${BUILD_DIR}/lib/pkgconfig" \
+    if [ -f "Makefile" ]; then
+        make clean
+    fi
+    PKG_CONFIG_PATH="${BUILD_DIR}/lib/pkgconfig" \
         CROSS=$WIN_CROSS_TOOL_PREFIX-w64-mingw32- \
         LDFLAGS="-static-libgcc" \
         ../configure \
