@@ -867,9 +867,9 @@ jobs:
         id: mbedtls-cache
         uses: actions/cache@v2.1.6
         env:
-          CACHE_NAME: 'mbedtls-${{ matrix.arch }}-${{ env.MBEDTLS_REVISION }}'
+          CACHE_NAME: 'mbedtls-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_native_build_temp/mbedtls
+          path: ${{ github.workspace }}/windows_native_build_temp/mbedtls*
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.MBEDTLS_VERSION }}
 
       - name: 'Build dependency mbedtls'
@@ -901,7 +901,7 @@ jobs:
         id: freetype-cache
         uses: actions/cache@v2.1.6
         env:
-          CACHE_NAME: 'freetype-${{ matrix.arch }}-${{ env.FREETYPE_REVISION }}'
+          CACHE_NAME: 'freetype-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
           path: ${{ github.workspace }}/windows_native_build_temp/freetype
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.FREETYPE_VERSION }}
@@ -935,7 +935,7 @@ jobs:
         id: rnnoise-cache
         uses: actions/cache@v2.1.6
         env:
-          CACHE_NAME: 'rnnoise-${{ matrix.arch }}-${{ env.RNNOISE_REVISION }}'
+          CACHE_NAME: 'rnnoise-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
           path: ${{ github.workspace }}/windows_native_build_temp/rnnoise
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.RNNOISE_VERSION }}
@@ -952,7 +952,7 @@ jobs:
         id: speexdsp-cache
         uses: actions/cache@v2.1.6
         env:
-          CACHE_NAME: 'speexdsp-${{ matrix.arch }}-${{ env.SPEEXDSP_REVISION }}'
+          CACHE_NAME: 'speexdsp-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
           path: ${{ github.workspace }}/windows_native_build_temp/speexdsp
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.SPEEXDSP_VERSION }}
@@ -969,7 +969,7 @@ jobs:
         id: detours-cache
         uses: actions/cache@v2.1.6
         env:
-          CACHE_NAME: 'detours-${{ matrix.arch }}-${{ env.DETOURS_REVISION }}'
+          CACHE_NAME: 'detours-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
           path: ${{ github.workspace }}/windows_native_build_temp/detours
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.DETOURS_VERSION }}
@@ -986,7 +986,7 @@ jobs:
         id: luajit-cache
         uses: actions/cache@v2.1.6
         env:
-          CACHE_NAME: 'luajit-${{ matrix.arch }}-${{ env.LUAJIT_REVISION }}'
+          CACHE_NAME: 'luajit-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
           path: ${{ github.workspace }}/windows_native_build_temp/luajit
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.LUAJIT_VERSION }}
@@ -1003,7 +1003,7 @@ jobs:
         id: python-cache
         uses: actions/cache@v2.1.6
         env:
-          CACHE_NAME: 'python-${{ matrix.arch }}-${{ env.PYTHON_REVISION }}'
+          CACHE_NAME: 'python-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
           path: ${{ github.workspace }}/windows_native_build_temp/python
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.PYTHON_VERSION }}
@@ -1020,7 +1020,7 @@ jobs:
         id: vulkan-cache
         uses: actions/cache@v2.1.6
         env:
-          CACHE_NAME: 'vulkan-${{ matrix.arch }}-${{ env.VULKAN_REVISION }}'
+          CACHE_NAME: 'vulkan-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
           path: ${{ github.workspace }}/windows_native_build_temp/vulkan
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.VULKAN_VERSION }}
@@ -1037,7 +1037,7 @@ jobs:
         id: nasm-cache
         uses: actions/cache@v2.1.6
         env:
-          CACHE_NAME: 'nasm-${{ matrix.arch }}-${{ env.NASM_REVISION }}'
+          CACHE_NAME: 'nasm-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
           path: ${{ github.workspace }}/windows_native_build_temp/nasm
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.NASM_VERSION }}
@@ -1054,7 +1054,7 @@ jobs:
         id: swig-cache
         uses: actions/cache@v2.1.6
         env:
-          CACHE_NAME: 'swig-${{ matrix.arch }}-${{ env.SWIG_REVISION }}'
+          CACHE_NAME: 'swig-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
           path: ${{ github.workspace }}/windows_native_build_temp/swig
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.SWIG_VERSION }}
