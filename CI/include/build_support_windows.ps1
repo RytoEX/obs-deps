@@ -175,6 +175,25 @@ function Get-Basename {
     return ${Path}.Substring(${Path}.LastIndexOfAny($SepArray) + 1)
 }
 
+function Get-UniquePath {
+    $OriginalPathString = $Env:Path
+    $OriginalPath = $OriginalPathString -split ';'
+    # Sort-Object -Unique is case-insensitive
+    # Select-Object -Unique is case-sensitive
+    # See https://github.com/PowerShell/PowerShell/issues/12059
+    $UniquePath = $OriginalPath | Sort-Object -Unique
+    $NewPathArray = @()
+    $OriginalPath | ForEach-Object {
+        if (($_ -in $UniquePath) -and ($_ -notin $NewPathArray)) {
+            $NewPathArray += $_
+        }
+    }
+
+    $NewPath = $NewPathArray -join ';'
+
+    return $NewPath
+}
+
 function Safe-Fetch {
     Param(
         [Switch] $UseCurl,
