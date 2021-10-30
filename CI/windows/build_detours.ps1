@@ -30,7 +30,13 @@ function Build-Product {
     }
 
     Write-Step "Build (${ARCH})..."
-    cmd.exe /c """${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"" & cd ""${DepsBuildDir}\${ProductFolder}\src"" & nmake"
+    $VcvarsFile = "${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"
+    $DetoursSource = "${DepsBuildDir}\${ProductFolder}\src"
+    # works locally, but fails on CI with:
+    # The input line is too long.
+    # The syntax of the command is incorrect.
+    #cmd.exe /c """${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"" & cd ""${DepsBuildDir}\${ProductFolder}\src"" & nmake"
+    cmd.exe /c """${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"""
 }
 
 function Install-Product {
