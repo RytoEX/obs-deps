@@ -29,7 +29,8 @@ function Build-Product {
     # works locally, but fails on CI with:
     # The input line is too long.
     # The syntax of the command is incorrect.
-    cmd.exe /c "set VSCMD_DEBUG=1 & ""${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"" & cd ""${DepsBuildDir}\${ProductFolder}\src"" & nmake"
+    cmd.exe /c "echo path: %PATH% & echo include: %INCLUDE% & echo lib: %LIB% & echo libpath: %LIBPATH%"
+    cmd.exe /c "set VSCMD_DEBUG=2 & ""${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"" & cd ""${DepsBuildDir}\${ProductFolder}\src"" & nmake"
     #cmd.exe /c """${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"""
 }
 
