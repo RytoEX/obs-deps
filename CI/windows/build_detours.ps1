@@ -26,9 +26,6 @@ function Build-Product {
     Write-Step "Build (${ARCH})..."
     $VcvarsFile = "${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"
     $DetoursSource = "${DepsBuildDir}\${ProductFolder}\src"
-    # works locally, but fails on CI with:
-    # The input line is too long.
-    # The syntax of the command is incorrect.
     Write-Output "CI: $CI"
     if ($CI) {
         Write-Output '$CI is $true (or truthy)'
@@ -36,17 +33,17 @@ function Build-Product {
     if ("${CI}") {
         Write-Output '"${CI}" is $true (or truthy)'
     }
+    Write-Output "CI: $($Env:CI)"
+    if ($Env:CI) {
+        Write-Output '$Env:CI is $true (or truthy)'
+    }
+    if ("$($Env:CI)") {
+        Write-Output '$($Env:CI) is $true (or truthy)'
+    }
     $OriginalPath = $Env:Path
     $CleanPath = Get-UniquePath
-    Write-Output "Old PATH vars"
-    Write-Output "Env:Path: $Env:Path"
-    cmd.exe /c "echo path: %PATH%"
     $Env:Path = $CleanPath
-    Write-Output "New PATH vars"
-    Write-Output "Env:Path: $Env:Path"
-    cmd.exe /c "echo path: %PATH%"
-    cmd.exe /c "set VSCMD_DEBUG=2 & ""${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"" & cd ""${DepsBuildDir}\${ProductFolder}\src"" & nmake"
-    #cmd.exe /c """${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"""
+    cmd.exe /c """${VcvarsFile}"" & cd ""${DetoursSource}"" & nmake"
     $Env:Path = $OriginalPath
 }
 
