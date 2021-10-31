@@ -61,14 +61,6 @@ build-libpng-main() {
     PRODUCT_FILENAME="$(basename "${PRODUCT_URL}")"
     PRODUCT_FOLDER="${PRODUCT_FILENAME%.*.*}"
 
-    info "PRODUCT_URL: ${PRODUCT_URL}"
-    info "PRODUCT_VERSION: ${PRODUCT_VERSION}"
-    info "PRODUCT_HASH: ${PRODUCT_HASH}"
-    info "CI_PRODUCT_VERSION: ${CI_PRODUCT_VERSION}"
-    info "CI_PRODUCT_HASH: ${CI_PRODUCT_HASH}"
-    info "PRODUCT_FILENAME: ${PRODUCT_FILENAME}"
-    info "PRODUCT_FOLDER: ${PRODUCT_FOLDER}"
-
     if [ -z "${INSTALL}" ]; then
         _build_setup
         _build
