@@ -57,7 +57,7 @@ _build_product() {
 }
 
 _install_product() {
-    cd "${PRODUCT_FOLDER}/build_${ARCH}"
+    ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
 
     step "Install (${ARCH})..."
     #cmake --install build_${ARCH} --config "Release"
