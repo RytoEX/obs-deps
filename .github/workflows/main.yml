@@ -1073,7 +1073,7 @@ jobs:
         shell: bash
         run: |
           CURRENT_DATE=$(date +"%Y-%m-%d")
-          FILE_NAME="windows-native-deps-${CURRENT_DATE}-win${{ matrix.arch }}.tar.xz"
+          FILE_NAME="windows-native-deps-${CURRENT_DATE}-win${{ matrix.arch }}.tar.gz"
           echo "FILE_NAME=${FILE_NAME}" >> $GITHUB_ENV
 
           cp -R ../../licenses .
