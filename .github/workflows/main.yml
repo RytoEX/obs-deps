@@ -1076,9 +1076,9 @@ jobs:
           FILE_NAME="windows-native-deps-${CURRENT_DATE}-win${{ matrix.arch }}.tar.xz"
           echo "FILE_NAME=${FILE_NAME}" >> $GITHUB_ENV
 
-          cp -R ${{ github.workspace }}/licenses .
+          cp -R ../../licenses .
 
-          XZ_OPT=-T0 tar -cJf "${FILE_NAME}" *
+          tar -czf "${FILE_NAME}" *
 
           mv ${FILE_NAME} ..
 
