@@ -30,7 +30,7 @@ function Build-Product {
         $PythonArch = "-win32"
     }
     pyenv install --quiet "${ProductVersion}${PythonArch}"
-    pyenv shell "${ProductVersion}"
+    pyenv shell "${ProductVersion}${PythonArch}"
     $PythonPath = pyenv which python
     $PythonFolder = Split-Path -Path "${PythonPath}"
     New-Item -Path "${DepsBuildDir}\python\include" -ItemType Directory -Force
