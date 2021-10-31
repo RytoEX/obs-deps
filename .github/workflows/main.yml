@@ -789,7 +789,7 @@ jobs:
         working-directory: ${{ github.workspace }}/windows/obs-dependencies-${{ matrix.arch }}
         run: |
           CURRENT_DATE=$(date +"%Y-%m-%d")
-          FILE_NAME="windows-deps-${CURRENT_DATE}-${{ matrix.arch }}.tar.xz"
+          FILE_NAME="windows-cross-deps-${CURRENT_DATE}-${{ matrix.arch }}.tar.xz"
           echo "FILE_NAME=${FILE_NAME}" >> $GITHUB_ENV
 
           cp -R ${{ github.workspace }}/licenses .
