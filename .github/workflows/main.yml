@@ -1075,11 +1075,8 @@ jobs:
           CURRENT_DATE=$(date +"%Y-%m-%d")
           FILE_NAME="windows-native-deps-${CURRENT_DATE}-win${{ matrix.arch }}.tar.gz"
           echo "FILE_NAME=${FILE_NAME}" >> $GITHUB_ENV
-
           cp -R ../../licenses .
-
           tar -czf "${FILE_NAME}" *
-
           mv ${FILE_NAME} ..
 
       - name: 'Publish Build Artifacts'
@@ -1087,7 +1084,7 @@ jobs:
         uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{ env.FILE_NAME }}
-          path: ${{ github.workspace }}/windows/${{ env.FILE_NAME }}
+          path: ${{ github.workspace }}/windows_native_build_temp/${{ env.FILE_NAME }}
 
 
   make-release:
