@@ -29,7 +29,7 @@ function Build-Product {
     $OriginalPath = $Env:Path
     $CleanPath = Get-UniquePath
     $Env:Path = $CleanPath
-    cmd.exe /c """${VcvarsFile}"" & cd ""${LuajitSource}"" & nmake"
+    cmd.exe /c """${VcvarsFile}"" & cd ""${LuajitSource}"" & msvcbuild.bat"
     $Env:Path = $OriginalPath
 }
 
