@@ -26,19 +26,27 @@ function Build-Product {
     Write-Step "Build (${ARCH})..."
     $VcvarsFile = "${script:VcvarsFolder}\vcvars${CMAKE_BITNESS}.bat"
     $DetoursSource = "${DepsBuildDir}\${ProductFolder}\src"
-    Write-Output "CI: $CI"
-    if ($CI) {
-        Write-Output '$CI is $true (or truthy)'
-    }
-    if ("${CI}") {
-        Write-Output '"${CI}" is $true (or truthy)'
-    }
     Write-Output "CI: $($Env:CI)"
     if ($Env:CI) {
         Write-Output '$Env:CI is $true (or truthy)'
     }
     if ("$($Env:CI)") {
         Write-Output '$($Env:CI) is $true (or truthy)'
+    }
+    if ($Env:CI -eq $true) {
+        Write-Output '$Env:CI is $true'
+    } else {
+        Write-Output '$Env:CI is not $true'
+    }
+    if ($Env:CI -is "bool") {
+        Write-Output '$Env:CI is a bool'
+    } else {
+        Write-Output '$Env:CI is not a bool'
+    }
+    if ($Env:CI -is "string") {
+        Write-Output '$Env:CI is a string'
+    } else {
+        Write-Output '$Env:CI is not a string'
     }
     $OriginalPath = $Env:Path
     $CleanPath = Get-UniquePath
