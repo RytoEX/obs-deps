@@ -656,7 +656,7 @@ jobs:
 
           ./win-install-tools.sh
 
-          FFMPEG_DEP_HASH="$(echo "${{ env.LIBPNG_VERSION }}-${{ env.LIBOGG_VERSION }}-${{ env.LIBVORBIS_VERSION }}-${{ env.LIBVPX_VERSION }}-${{ env.LIBOPUS_VERSION }}-${{ env.LIBX264_VERSION }}-${{ env.LIBSRT_VERSION }}-${{ env.LIBMBEDTLS_VERSION }}" | sha256sum | cut -d " " -f 1)"
+          FFMPEG_DEP_HASH="$(echo "${{ env.MBEDTLS_VERSION }}-${{ env.PTHREAD-WIN32_VERSION }}-${{ env.LIBSRT_VERSION }}-${{ env.LIBX264_VERSION }}-${{ env.LIBOPUS_VERSION }}-${{ env.ZLIB_VERSION }}-${{ env.LIBPNG_VERSION }}-${{ env.LIBOGG_VERSION }}-${{ env.LIBVORBIS_VERSION }}-${{ env.LIBVPX_VERSION }}-${{ env.NV-CODEC-HEADERS_VERSION }}-${{ env.AMF_VERSION }}" | sha256sum | cut -d " " -f 1)"
           echo "FFMPEG_DEP_HASH=$FFMPEG_DEP_HASH" >> $GITHUB_ENV
 
       - name: 'Restore ffmpeg dependencies from cache'
