@@ -34,9 +34,14 @@ function Build-Product {
         Write-Output '$($Env:CI) is $true (or truthy)'
     }
     if ($Env:CI -eq $true) {
-        Write-Output '$Env:CI is $true'
+        Write-Output '($Env:CI -eq $true) is true'
     } else {
-        Write-Output '$Env:CI is not $true'
+        Write-Output '($Env:CI -eq $true) is false'
+    }
+    if ($Env:CI -eq "true") {
+        Write-Output '($Env:CI -eq "true") is true'
+    } else {
+        Write-Output '($Env:CI -eq "true") is false'
     }
     if ($Env:CI -is "bool") {
         Write-Output '$Env:CI is a bool'
