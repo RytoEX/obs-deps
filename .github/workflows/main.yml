@@ -671,6 +671,9 @@ jobs:
             ${{ github.workspace }}/windows_build_temp
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.FFMPEG_DEP_HASH }}
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: 'Build dependency mbedtls'
         if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
         run: CI/windows/build_mbedtls.sh -s -a ${{ matrix.arch }}
