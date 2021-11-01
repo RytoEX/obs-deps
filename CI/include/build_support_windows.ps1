@@ -419,7 +419,7 @@ function Check-Curl {
     #$CURLCMD = "C:\ProgramData\chocolatey\bin\curl.exe"
     $CURLCMD = "C:\Windows\System32\curl.exe"
 
-    if ("${CI}" -or $Quiet) {
+    if ($Env:CI -or $Quiet) {
         $script:CURLCMD = "${CURLCMD} --silent --show-error --location -O"
     } else {
         $script:CURLCMD = "${CURLCMD} --progress-bar --location --continue-at - -O"
