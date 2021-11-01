@@ -39,7 +39,6 @@ _build_product() {
         ${QUIET:+-Wno-deprecated -Wno-dev --log-level=ERROR}
 
     step "Build (${ARCH})..."
-    #cmake --build build_${ARCH} --config "Release"
     make -j$PARALLELISM
     $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z mbedtls.orig.def --export-all-symbols library/libmbedtls.dll
     $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z mbedcrypto.orig.def --export-all-symbols library/libmbedcrypto.dll
@@ -60,7 +59,6 @@ _install_product() {
     ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
 
     step "Install (${ARCH})..."
-    #cmake --install build_${ARCH} --config "Release"
     make install
     mv "${BUILD_DIR}"/lib/*.dll "${BUILD_DIR}"/bin
     _install_pkgconfig
