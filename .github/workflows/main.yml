@@ -593,7 +593,7 @@ jobs:
       matrix:
         arch: ['x86', 'x86_64']
     env:
-      CACHE_REVISION: '05'
+      CACHE_REVISION: '06'
       MBEDTLS_VERSION: '2.24.0'
       MBEDTLS_HASH: '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8'
       PTHREAD-WIN32_VERSION: '2.10.0.0'
@@ -670,9 +670,6 @@ jobs:
             !${{ github.workspace }}/windows_build_temp/win64
             ${{ github.workspace }}/windows_build_temp
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.FFMPEG_DEP_HASH }}
-
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
 
       - name: 'Build dependency mbedtls'
         if: steps.ffmpeg-deps-cache.outputs.cache-hit != 'true'
