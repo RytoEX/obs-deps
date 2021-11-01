@@ -138,11 +138,6 @@ _build_checks() {
     fi
 
     BUILD_DIR="${CHECKOUT_DIR}/windows/obs-dependencies-${ARCH}"
-    ensure_dir "${BUILD_DIR}"
-    ensure_dir "${BUILD_DIR}/bin"
-    ensure_dir "${BUILD_DIR}/include"
-    ensure_dir "${BUILD_DIR}/lib"
-    ensure_dir "${BUILD_DIR}/share"
 }
 
 _build_setup() {
