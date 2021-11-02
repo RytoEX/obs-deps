@@ -100,6 +100,23 @@ function Test-CommandExists {
     return $CommandExists
 }
 
+function Remove-ItemIfExists {
+    Param(
+        [Parameter(Mandatory)]
+        [String[]] $Path
+    )
+
+    Foreach ($Item in $Path) {
+        $RecurseValue = $false
+        if (Test-Path "${Item}" -PathType "Container") {
+            $RecurseValue = $true
+        }
+        if (Test-Path "${Item}") {
+            Remove-Item -Path "${Item}" -Force -Recurse:$RecurseValue
+        }
+    }
+}
+
 function Ensure-Directory {
     Param(
         [Parameter(Mandatory=$true)]
