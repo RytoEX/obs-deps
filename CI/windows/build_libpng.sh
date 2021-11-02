@@ -11,6 +11,16 @@
 # Halt on errors
 set -eE
 
+_fixup_installed_files() {
+    rm -f "${BUILD_DIR}"/bin/libpng-config
+    rm -f "${BUILD_DIR}"/include/png.h
+    rm -f "${BUILD_DIR}"/include/pngconf.h
+    rm -f "${BUILD_DIR}"/include/pnglibconf.h
+    rm -f "${BUILD_DIR}"/lib/libpng.a
+    rm -f "${BUILD_DIR}"/lib/libpng.dll.a
+    rm -f "${BUILD_DIR}"/lib/libpng.la
+}
+
 _build_product() {
     cd ${PRODUCT_FOLDER}
 
@@ -35,6 +45,8 @@ _install_product() {
 
     step "Install ("${ARCH}").."
     make install
+
+    _fixup_installed_files
 }
 
 build-libpng-main() {
