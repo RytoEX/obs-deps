@@ -41,23 +41,23 @@ function Package-OBS-Deps-Main {
         $CurrentDate = Get-Date -UFormat "%Y-%m-%d"
     }
     $FileName = "${ProductName}-${CurrentDate}.tar.gz"
-    $CrossDir = "${CheckoutDir}\windows\obs-cross-deps"
-    $NativeDir = ""
+    $CrossDirBase = "${CheckoutDir}\windows\obs-cross-deps"
+    $NativeDirBase = ""
 
     if (Test-Path "${CheckoutDir}\windows\obs-native-deps" -PathType "Container") {
-        $NativeDir = "${CheckoutDir}\windows\obs-native-deps"
+        $NativeDirBase = "${CheckoutDir}\windows\obs-native-deps"
     } elseif (Test-Path "${CheckoutDir}\windows_native_build_temp" -PathType "Container") {
-        $NativeDir = "${CheckoutDir}\windows_native_build_temp"
+        $NativeDirBase = "${CheckoutDir}\windows_native_build_temp"
     }
 
-    if (!(Test-Path "${CrossDir}\x86" -PathType "Container")) {
-        Caught-Error "Missing cross-compiled build in ${CrossDir}\x86"
-    } elseif (!(Test-Path "${CrossDir}\x86_64" -PathType "Container")) {
-        Caught-Error "Missing cross-compiled build in ${CrossDir}\x86_64"
-    } elseif (!(Test-Path "${NativeDir}\win32" -PathType "Container")) {
-        Caught-Error "Missing native build in ${NativeDir}\win32"
-    } elseif (!(Test-Path "${NativeDir}\win64" -PathType "Container")) {
-        Caught-Error "Missing native build in ${NativeDir}\win64"
+    if (!(Test-Path "${CrossDirBase}\x86" -PathType "Container")) {
+        Caught-Error "Missing cross-compiled build in ${CrossDirBase}\x86"
+    } elseif (!(Test-Path "${CrossDirBase}\x86_64" -PathType "Container")) {
+        Caught-Error "Missing cross-compiled build in ${CrossDirBase}\x86_64"
+    } elseif (!(Test-Path "${NativeDirBase}\win32" -PathType "Container")) {
+        Caught-Error "Missing native build in ${NativeDirBase}\win32"
+    } elseif (!(Test-Path "${NativeDirBase}\win64" -PathType "Container")) {
+        Caught-Error "Missing native build in ${NativeDirBase}\win64"
     }
 
     Write-Output "DepsBuildDir: ${DepsBuildDir}"
@@ -72,12 +72,12 @@ function Package-OBS-Deps-Main {
     )
     Foreach ($Package in $Packages) {
         if ($Package.Arch -eq "x86") {
-            $CrossDir = "${CheckoutDir}\windows\obs-cross-deps\x86"
-            $NativeDir = "${NativeDir}\win32"
+            $CrossDir = "${CrossDirBase}\x86"
+            $NativeDir = "${NativeDirBase}\win32"
             $FinalDir = "${DepsBuildDir}\win32"
         } elseif ($Package.Arch -eq "x86_64") {
-            $CrossDir = "${CheckoutDir}\windows\obs-cross-deps\x86_64"
-            $NativeDir = "${NativeDir}\win64"
+            $CrossDir = "${CrossDirBase}\x86_64"
+            $NativeDir = "${NativeDirBase}\win64"
             $FinalDir = "${DepsBuildDir}\win64"
         }
         # Copy cross-compiled deps first
