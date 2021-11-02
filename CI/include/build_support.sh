@@ -231,7 +231,7 @@ github_fetch() {
     else
         if [ "${CI}" ] && [ "$(git_has_sparse_checkout)" ] && [ "${GIT_OPT_SPARSE}" ]; then
             git clone --filter=blob:none --no-checkout "https://github.com/${GH_USER}/${GH_REPO}.git" "$(pwd)"
-            git sparse-checkout set "${GIT_OPT_SPARSE}"
+            git sparse-checkout ${GIT_OPT_SPARSE}
         else
             git clone "https://github.com/${GH_USER}/${GH_REPO}.git" "$(pwd)"
         fi
