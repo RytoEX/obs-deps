@@ -67,7 +67,9 @@ function Package-OBS-Deps-Main {
         $NativeDir = "${CheckoutDir}\windows_native_build_temp"
     }
 
-    Remove-Item -Path "${DepsBuildDir}" -Recurse -Force
+    if (Test-Path "${DepsBuildDir}") {
+        Remove-Item -Path "${DepsBuildDir}" -Recurse -Force
+    }
     Ensure-Directory "${DepsBuildDir}\win32"
     Ensure-Directory "${DepsBuildDir}\win64"
     cd ..
