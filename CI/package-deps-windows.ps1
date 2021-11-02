@@ -41,35 +41,27 @@ function Package-OBS-Deps-Main {
         $CurrentDate = Get-Date -UFormat "%Y-%m-%d"
     }
     $FileName = "${ProductName}-${CurrentDate}.tar.gz"
+    $CrossDir = "${CheckoutDir}\windows\obs-cross-deps"
     $NativeDir = ""
 
-    if ($Env:CI) {
-        if (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps\x86" -PathType "Container")) {
-            Caught-Error "Missing cross-compiled build in windows\obs-cross-deps\x86_64"
-        } elseif (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps\x86_64" -PathType "Container")) {
-            Caught-Error "Missing cross-compiled build in windows\obs-cross-deps\x86_64"
-        } elseif (!(Test-Path "${CheckoutDir}\windows\obs-native-deps\win32" -PathType "Container")) {
-            Caught-Error "Missing native build in ${CheckoutDir}\windows\obs-native-deps\win32"
-        } elseif (!(Test-Path "${CheckoutDir}\windows\obs-native-deps\win64" -PathType "Container")) {
-            Caught-Error "Missing native build in ${CheckoutDir}\windows\obs-native-deps\win64"
-        }
+    if (Test-Path "${CheckoutDir}\windows\obs-native-deps" -PathType "Container") {
         $NativeDir = "${CheckoutDir}\windows\obs-native-deps"
-    } else {
-        if (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps\x86" -PathType "Container")) {
-            Caught-Error "Missing cross-compiled build in windows\obs-cross-deps\x86"
-        } elseif (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps\x86_64" -PathType "Container")) {
-            Caught-Error "Missing cross-compiled build in windows\obs-cross-deps\x86_64"
-        } elseif (!(Test-Path "${CheckoutDir}\windows_native_build_temp\win32" -PathType "Container")) {
-            Caught-Error "Missing native build in ${CheckoutDir}\windows_native_build_temp\obs-native-deps\win32"
-        } elseif (!(Test-Path "${CheckoutDir}\windows_native_build_temp\win64" -PathType "Container")) {
-            Caught-Error "Missing native build in ${CheckoutDir}\windows_native_build_temp\obs-native-deps\win64"
-        }
+    } elseif (Test-Path "${CheckoutDir}\windows_native_build_temp" -PathType "Container") {
         $NativeDir = "${CheckoutDir}\windows_native_build_temp"
     }
 
-    if (Test-Path "${DepsBuildDir}") {
-        Remove-Item -Path "${DepsBuildDir}" -Recurse -Force
+    if (!(Test-Path "${CrossDir}\x86" -PathType "Container")) {
+        Caught-Error "Missing cross-compiled build in ${CrossDir}\x86"
+    } elseif (!(Test-Path "${CrossDir}\x86_64" -PathType "Container")) {
+        Caught-Error "Missing cross-compiled build in ${CrossDir}\x86_64"
+    } elseif (!(Test-Path "${NativeDir}\win32" -PathType "Container")) {
+        Caught-Error "Missing native build in ${NativeDir}\win32"
+    } elseif (!(Test-Path "${NativeDir}\win64" -PathType "Container")) {
+        Caught-Error "Missing native build in ${NativeDir}\win64"
     }
+
+    Write-Output "DepsBuildDir: ${DepsBuildDir}"
+    Remove-ItemIfExists "${DepsBuildDir}"
     Ensure-Directory "${DepsBuildDir}\win32"
     Ensure-Directory "${DepsBuildDir}\win64"
     cd ..
@@ -95,22 +87,16 @@ function Package-OBS-Deps-Main {
 
         # Remove unneeded files before copying native-compiled deps
         # Make sure symlinks still exist before trying to remove them
-        if (Test-Path "${FinalDir}\bin\libpng16-config") {
-            Remove-Item -Path "${FinalDir}\bin\libpng16-config" -Force
-        }
-        if (Test-Path "${FinalDir}\bin\libpng-config") {
-            Remove-Item -Path "${FinalDir}\bin\libpng-config" -Force
-        }
-        if (Test-Path "${FinalDir}\bin\srt-ffplay") {
-            Remove-Item -Path "${FinalDir}\bin\srt-ffplay" -Force
-        }
         Remove-Item -Path "${FinalDir}\bin\libmbedtls.dll" -Force
         Remove-Item -Path "${FinalDir}\bin\libmbedx509.dll" -Force
+        Remove-ItemIfExists "${FinalDir}\bin\libpng16-config"
+        Remove-ItemIfExists "${FinalDir}\bin\libpng-config"
         Remove-Item -Path "${FinalDir}\bin\mbedcrypto.lib" -Force
         Remove-Item -Path "${FinalDir}\bin\mbedtls.lib" -Force
         Remove-Item -Path "${FinalDir}\bin\mbedx509.lib" -Force
         Remove-Item -Path "${FinalDir}\bin\pngfix.exe" -Force
         Remove-Item -Path "${FinalDir}\bin\png-fix-itxt.exe" -Force
+        Remove-ItemIfExists "${FinalDir}\bin\srt-ffplay"
         Remove-Item -Path "${FinalDir}\bin\x264.def" -Force
         Remove-Item -Path "${FinalDir}\bin\x264.exe" -Force
         Remove-Item -Path "${FinalDir}\bin\zlib.def" -Force
