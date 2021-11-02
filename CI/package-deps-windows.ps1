@@ -94,8 +94,16 @@ function Package-OBS-Deps-Main {
         Copy-Item -Path "${CrossDir}\licenses" -Destination "${FinalDir}" -Recurse
 
         # Remove unneeded files before copying native-compiled deps
-        Remove-Item -Path "${FinalDir}\bin\libpng16-config" -Force
-        Remove-Item -Path "${FinalDir}\bin\libpng-config" -Force
+        # Make sure symlinks still exist before trying to remove them
+        if (Test-Path "${FinalDir}\bin\libpng16-config") {
+            Remove-Item -Path "${FinalDir}\bin\libpng16-config" -Force
+        }
+        if (Test-Path "${FinalDir}\bin\libpng-config") {
+            Remove-Item -Path "${FinalDir}\bin\libpng-config" -Force
+        }
+        if (Test-Path "${FinalDir}\bin\srt-ffplay") {
+            Remove-Item -Path "${FinalDir}\bin\srt-ffplay" -Force
+        }
         Remove-Item -Path "${FinalDir}\bin\libmbedtls.dll" -Force
         Remove-Item -Path "${FinalDir}\bin\libmbedx509.dll" -Force
         Remove-Item -Path "${FinalDir}\bin\mbedcrypto.lib" -Force
@@ -103,7 +111,6 @@ function Package-OBS-Deps-Main {
         Remove-Item -Path "${FinalDir}\bin\mbedx509.lib" -Force
         Remove-Item -Path "${FinalDir}\bin\pngfix.exe" -Force
         Remove-Item -Path "${FinalDir}\bin\png-fix-itxt.exe" -Force
-        Remove-Item -Path "${FinalDir}\bin\srt-ffplay" -Force
         Remove-Item -Path "${FinalDir}\bin\x264.def" -Force
         Remove-Item -Path "${FinalDir}\bin\x264.exe" -Force
         Remove-Item -Path "${FinalDir}\bin\zlib.def" -Force
