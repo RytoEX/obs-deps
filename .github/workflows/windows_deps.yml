@@ -21,7 +21,7 @@ jobs:
       matrix:
         arch: ['x86', 'x86_64']
     env:
-      CACHE_REVISION: '10'
+      CACHE_REVISION: '11'
       MBEDTLS_VERSION: '2.24.0'
       MBEDTLS_HASH: '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8'
       PTHREAD-WIN32_VERSION: '2.10.0.0'
@@ -96,6 +96,7 @@ jobs:
           path: |
             !${{ github.workspace }}/windows_cross_build_temp/win32
             !${{ github.workspace }}/windows_cross_build_temp/win64
+            !${{ github.workspace }}/windows_cross_build_temp/ffmpeg
             ${{ github.workspace }}/windows_cross_build_temp
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.FFMPEG_DEP_HASH }}
 
