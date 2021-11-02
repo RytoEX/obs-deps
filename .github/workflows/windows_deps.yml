@@ -240,11 +240,11 @@ jobs:
       matrix:
         arch: ['32', '64']
     env:
-      CACHE_REVISION: '01'
+      CACHE_REVISION: '02'
       MBEDTLS_VERSION: '2.24.0'
       MBEDTLS_HASH: '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8'
       CMOCKA_VERSION: '1.1.5-git'
-      CMOCKA_HASH: '5a4b15870efa2225e6586fbb4c3af05ff0659434'
+      CMOCKA_HASH: '9c114ac31a33217cf003bbb674c1aff7bb048917'
       FREETYPE_VERSION: '2.10.4'
       FREETYPE_HASH: '6a2b3e4007e794bfc6c91030d0ed987f925164a8'
       CURL_VERSION: '7.73.0'
