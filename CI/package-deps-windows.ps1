@@ -44,20 +44,20 @@ function Package-OBS-Deps-Main {
     $NativeDir = ""
 
     if ($Env:CI) {
-        if (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps-x86" -PathType "Container")) {
-            Caught-Error "Missing cross-compiled build of obs-dependencies-x86"
-        } elseif (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps-x86_64" -PathType "Container")) {
-            Caught-Error "Missing cross-compiled build of obs-dependencies-x86_64"
-        } elseif (!(Test-Path "${CheckoutDir}\windows\obs-native-deps-win32" -PathType "Container")) {
-            Caught-Error "Missing native build of obs-dependencies-x86"
+        if (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps\x86" -PathType "Container")) {
+            Caught-Error "Missing cross-compiled build of obs-dependencies\x86"
+        } elseif (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps\x86_64" -PathType "Container")) {
+            Caught-Error "Missing cross-compiled build of obs-dependencies\x86_64"
+        } elseif (!(Test-Path "${CheckoutDir}\windows\obs-native-deps\win32" -PathType "Container")) {
+            Caught-Error "Missing native build of obs-dependencies\x86"
         } elseif (!(Test-Path "${CheckoutDir}\windows\obs-native-deps-win64" -PathType "Container")) {
-            Caught-Error "Missing native build of obs-dependencies-x86_64"
+            Caught-Error "Missing native build of obs-dependencies\x86_64"
         }
-        $NativeDir = "${CheckoutDir}\windows"
+        $NativeDir = "${CheckoutDir}\windows\obs-native-deps"
     } else {
-        if (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps-x86" -PathType "Container")) {
+        if (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps\x86" -PathType "Container")) {
             Caught-Error "Missing cross-compiled build of obs-dependencies-x86"
-        } elseif (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps-x86_64" -PathType "Container")) {
+        } elseif (!(Test-Path "${CheckoutDir}\windows\obs-cross-deps\x86_64" -PathType "Container")) {
             Caught-Error "Missing cross-compiled build of obs-dependencies-x86_64"
         } elseif (!(Test-Path "${CheckoutDir}\windows_native_build_temp\win32" -PathType "Container")) {
             Caught-Error "Missing native build of obs-dependencies-x86"
@@ -80,11 +80,11 @@ function Package-OBS-Deps-Main {
     )
     Foreach ($Package in $Packages) {
         if ($Package.Arch -eq "x86") {
-            $CrossDir = "${CheckoutDir}\windows\obs-cross-deps-x86"
+            $CrossDir = "${CheckoutDir}\windows\obs-cross-deps\x86"
             $NativeDir = "${NativeDir}\win32"
             $FinalDir = "${DepsBuildDir}\win32"
         } elseif ($Package.Arch -eq "x86_64") {
-            $CrossDir = "${CheckoutDir}\windows\obs-cross-deps-x86_64"
+            $CrossDir = "${CheckoutDir}\windows\obs-cross-deps\x86_64"
             $NativeDir = "${NativeDir}\win64"
             $FinalDir = "${DepsBuildDir}\win64"
         }

@@ -581,15 +581,15 @@ jobs:
           ARTIFACT_WIN32_NATIVE=$(find . -name "windows-native-deps-${CURRENT_DATE}-win32.tar.gz" | head -1)
           ARTIFACT_WIN64_NATIVE=$(find . -name "windows-native-deps-${CURRENT_DATE}-win64.tar.gz" | head -1)
 
-          mkdir -p obs-cross-deps-x86
-          mkdir -p obs-cross-deps-x86_64
-          mkdir -p obs-native-deps-win32
-          mkdir -p obs-native-deps-win64
+          mkdir -p obs-cross-deps/x86
+          mkdir -p obs-cross-deps/x86_64
+          mkdir -p obs-native-deps/win32
+          mkdir -p obs-native-deps/win64
 
-          tar -xf $(basename ${ARTIFACT_WIN32_CROSS}) --directory obs-cross-deps-x86
-          tar -xf $(basename ${ARTIFACT_WIN64_CROSS}) --directory obs-cross-deps-x86_64
-          tar -xf $(basename ${ARTIFACT_WIN32_NATIVE}) --directory obs-native-deps-win32
-          tar -xf $(basename ${ARTIFACT_WIN64_NATIVE}) --directory obs-native-deps-win64
+          tar -xf $(basename ${ARTIFACT_WIN32_CROSS}) --directory obs-cross-deps/x86
+          tar -xf $(basename ${ARTIFACT_WIN64_CROSS}) --directory obs-cross-deps/x86_64
+          tar -xf $(basename ${ARTIFACT_WIN32_NATIVE}) --directory obs-native-deps/win32
+          tar -xf $(basename ${ARTIFACT_WIN64_NATIVE}) --directory obs-native-deps/win64
 
       - name: 'Create Windows deps package'
         if: ${{ github.event_name != 'pull_request' || env.SEEKING_TESTERS == '1' }}
