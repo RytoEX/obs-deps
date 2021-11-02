@@ -21,7 +21,7 @@ jobs:
       matrix:
         arch: ['x86', 'x86_64']
     env:
-      CACHE_REVISION: '09'
+      CACHE_REVISION: '10'
       MBEDTLS_VERSION: '2.24.0'
       MBEDTLS_HASH: '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8'
       PTHREAD-WIN32_VERSION: '2.10.0.0'
@@ -94,9 +94,9 @@ jobs:
           CACHE_NAME: 'ffmpeg-deps-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
           path: |
-            !${{ github.workspace }}/windows_build_temp/win32
-            !${{ github.workspace }}/windows_build_temp/win64
-            ${{ github.workspace }}/windows_build_temp
+            !${{ github.workspace }}/windows_cross_build_temp/win32
+            !${{ github.workspace }}/windows_cross_build_temp/win64
+            ${{ github.workspace }}/windows_cross_build_temp
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.FFMPEG_DEP_HASH }}
 
       - name: 'Build dependency mbedtls'
@@ -201,7 +201,7 @@ jobs:
         env:
           CACHE_NAME: 'ffmpeg-${{ matrix.arch }}-${{ env.CACHE_REVISION }}'
         with:
-          path: ${{ github.workspace }}/windows_build_temp/ffmpeg
+          path: ${{ github.workspace }}/windows_cross_build_temp/ffmpeg
           key: ${{ runner.os }}-${{ env.CACHE_NAME }}-${{ env.FFMPEG_VERSION }}-${{ env.FFMPEG_DEP_HASH }}
 
       - name: 'Build dependency ffmpeg'
