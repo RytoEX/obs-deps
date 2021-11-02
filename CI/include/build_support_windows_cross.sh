@@ -11,6 +11,7 @@
 # Setup build environment
 
 PARALLELISM="$(nproc)"
+CI_WORKFLOW="${CHECKOUT_DIR}/.github/workflows/windows_deps.yml"
 
 if [ "${TERM-}" -a -z "${CI}" ]; then
     COLOR_RED=$(/usr/bin/tput setaf 1)

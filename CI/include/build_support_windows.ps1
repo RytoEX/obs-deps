@@ -6,7 +6,7 @@
 #
 ##############################################################################
 
-$CIWorkflow = "${CheckoutDir}/.github/workflows/main.yml"
+$CIWorkflow = "${CheckoutDir}/.github/workflows/windows_deps.yml"
 
 $CIWorkflowJobString = Get-Content ${CIWorkflow} -Raw | Select-String "(?s)(  windows-deps-build-native.+?)\n    steps:" | ForEach-Object{$_.Matches.Groups[1].Value}
 
