@@ -134,7 +134,7 @@ _build_checks() {
             install_tools
         fi
     else
-        ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
+        ensure_dir "${CHECKOUT_DIR}/windows_cross_build_temp"
     fi
 
     BUILD_DIR="${CHECKOUT_DIR}/windows/obs-dependencies-${ARCH}"
@@ -143,7 +143,7 @@ _build_checks() {
 _build_setup() {
     trap "caught_error 'build-${PRODUCT_NAME}'" ERR
 
-    ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
+    ensure_dir "${CHECKOUT_DIR}/windows_cross_build_temp"
 
     step "Download..."
     check_and_fetch "${PRODUCT_URL}" "${PRODUCT_HASH:-${CI_PRODUCT_HASH}}"
@@ -159,7 +159,7 @@ _build_setup() {
 _build_setup_git() {
     trap "caught_error 'build-${PRODUCT_NAME}'" ERR
 
-    ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
+    ensure_dir "${CHECKOUT_DIR}/windows_cross_build_temp"
 
     step "Git checkout..."
     mkdir -p "${PRODUCT_REPO}"
@@ -171,17 +171,17 @@ _build() {
     status "Build ${PRODUCT_NAME} v${PRODUCT_VERSION:-${CI_PRODUCT_VERSION}}"
 
     if declare -f _patch_product $1 > /dev/null; then
-        ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
+        ensure_dir "${CHECKOUT_DIR}/windows_cross_build_temp"
         _patch_product
     fi
 
     if declare -f _build_product $1 > /dev/null; then
-        ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
+        ensure_dir "${CHECKOUT_DIR}/windows_cross_build_temp"
         _build_product
     fi
 
     if declare -f _install_product $1 > /dev/null; then
-        ensure_dir "${CHECKOUT_DIR}/windows_build_temp"
+        ensure_dir "${CHECKOUT_DIR}/windows_cross_build_temp"
         _install_product
     fi
 }

@@ -32,11 +32,11 @@ _build_product() {
         -DENABLE_APPS=OFF \
         -DENABLE_STATIC=OFF \
         -DENABLE_SHARED=ON \
-        -DCMAKE_C_FLAGS="-I${CHECKOUT_DIR}/windows_build_temp/pthread-win32" \
-        -DCMAKE_CXX_FLAGS="-I${CHECKOUT_DIR}/windows_build_temp/pthread-win32" \
+        -DCMAKE_C_FLAGS="-I${CHECKOUT_DIR}/windows_cross_build_temp/pthread-win32" \
+        -DCMAKE_CXX_FLAGS="-I${CHECKOUT_DIR}/windows_cross_build_temp/pthread-win32" \
         -DCMAKE_SHARED_LINKER_FLAGS="-static-libgcc -Wl,--strip-debug" \
         -DPTHREAD_LIBRARY="${BUILD_DIR}/lib/libpthreadGC2.a" \
-        -DPTHREAD_INCLUDE_DIR="${CHECKOUT_DIR}/windows_build_temp/pthread-win32" \
+        -DPTHREAD_INCLUDE_DIR="${CHECKOUT_DIR}/windows_cross_build_temp/pthread-win32" \
         -DUSE_OPENSSL_PC=OFF \
         -DCMAKE_BUILD_TYPE=MinSizeRel \
         ${QUIET:+-Wno-deprecated -Wno-dev --log-level=ERROR}

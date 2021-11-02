@@ -55,8 +55,8 @@ _build_product() {
 
     PKG_CONFIG_PATH="${BUILD_DIR}/lib/pkgconfig" \
         LDFLAGS="-L${BUILD_DIR}/lib -static-libgcc" \
-        CFLAGS="-I${BUILD_DIR}/include -I${CHECKOUT_DIR}/windows_build_temp/pthread-win32" \
-        CPPFLAGS="-I${BUILD_DIR}/include -I${CHECKOUT_DIR}/windows_build_temp/pthread-win32" \
+        CFLAGS="-I${BUILD_DIR}/include -I${CHECKOUT_DIR}/windows_cross_build_temp/pthread-win32" \
+        CPPFLAGS="-I${BUILD_DIR}/include -I${CHECKOUT_DIR}/windows_cross_build_temp/pthread-win32" \
         ./configure \
         --enable-gpl \
         --disable-programs \
