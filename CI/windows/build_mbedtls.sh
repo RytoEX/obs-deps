@@ -40,6 +40,12 @@ _build_product() {
 
     step "Build (${ARCH})..."
     make -j$PARALLELISM
+}
+
+_install_product() {
+    ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
+
+    step "Install (${ARCH})..."
     $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z mbedtls.orig.def --export-all-symbols library/libmbedtls.dll
     $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z mbedcrypto.orig.def --export-all-symbols library/libmbedcrypto.dll
     $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -z mbedx509.orig.def --export-all-symbols library/libmbedx509.dll
@@ -53,12 +59,6 @@ _build_product() {
     $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedcrypto.def -l ${BUILD_DIR}/bin/mbedcrypto.lib -D library/libmbedcrypto.dll
     $WIN_CROSS_TOOL_PREFIX-w64-mingw32-dlltool -m $WIN_CROSS_MVAL -d mbedx509.def -l ${BUILD_DIR}/bin/mbedx509.lib -D library/libmbedx509.dll
 
-}
-
-_install_product() {
-    ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
-
-    step "Install (${ARCH})..."
     make install
     mv "${BUILD_DIR}"/lib/*.dll "${BUILD_DIR}"/bin
     _install_pkgconfig
