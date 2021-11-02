@@ -164,7 +164,7 @@ _build_setup_git() {
     step "Git checkout..."
     mkdir -p "${PRODUCT_REPO}"
     cd "${PRODUCT_REPO}"
-    github_fetch ${PRODUCT_PROJECT} ${PRODUCT_REPO} ${PRODUCT_HASH:-${CI_PRODUCT_HASH}}
+    github_fetch ${PRODUCT_PROJECT} ${PRODUCT_REPO} ${PRODUCT_HASH:-${CI_PRODUCT_HASH}} "$1"
 }
 
 _build() {
