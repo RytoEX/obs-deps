@@ -29,7 +29,7 @@ function Build-Product {
     } elseif ("${BuildArch}" -eq "32-bit") {
         $VulkanArch = "32"
     }
-    7z x ".\VulkanSDK-${ProductVersion}-Installer.exe" -y -ovulkan "include\vulkan" -r "Lib${VulkanArch}\vulkan-1.lib"
+    7z x ".\VulkanSDK-${ProductVersion}-Installer-Components.7z" -y -ovulkan "include\vulkan" -r "Lib${VulkanArch}\vulkan-1.lib"
 }
 
 function Install-Product {
