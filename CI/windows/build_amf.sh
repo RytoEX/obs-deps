@@ -36,6 +36,9 @@ build-amf-main() {
     PRODUCT_FOLDER="${PRODUCT_REPO}"
 
     if [ -z "${INSTALL}" ]; then
+        set +eE
+        check_git
+        set -eE
         _build_setup_git "set amf/public/include"
         _build
     else
