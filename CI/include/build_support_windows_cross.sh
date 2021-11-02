@@ -139,6 +139,10 @@ _build_checks() {
     fi
 
     BUILD_DIR="${CHECKOUT_DIR}/windows/obs-dependencies-${ARCH}"
+    mkdir -p "${BUILD_DIR}/bin"
+    mkdir -p "${BUILD_DIR}/include"
+    mkdir -p "${BUILD_DIR}/lib"
+    mkdir -p "${BUILD_DIR}/share"
 }
 
 _build_setup() {
