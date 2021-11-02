@@ -66,7 +66,8 @@ function Build-Vulkan-Main {
         $ProductHash = $script:CI_PRODUCT_HASH
     }
 
-    $ProductUrl = "https://sdk.lunarg.com/sdk/download/${ProductVersion}/windows/VulkanSDK-${ProductVersion}-Installer.exe"
+    #$ProductUrl = "https://sdk.lunarg.com/sdk/download/${ProductVersion}/windows/VulkanSDK-${ProductVersion}-Installer.exe"
+    $ProductUrl = "https://cdn-fastly.obsproject.com/downloads/VulkanSDK-${ProductVersion}-Installer-Components.7z"
 
     if (!$Install) {
         Build-Setup -UseCurl
