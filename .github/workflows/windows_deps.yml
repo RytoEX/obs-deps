@@ -602,5 +602,5 @@ jobs:
         with:
           name: ${{ env.FILE_NAME }}
           path: |
-            ${{ github.workspace }}\windows\win32
-            ${{ github.workspace }}\windows\win64
+            ${{ github.workspace }}\windows\obs-win-deps\win32
+            ${{ github.workspace }}\windows\obs-win-deps\win64
