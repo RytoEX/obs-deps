@@ -48,7 +48,7 @@ $DepsBuildDir = "${CheckoutDir}\windows_native_build_temp"
 
 $ObsBuildDependencies = @(
     @('mbedtls', '523f0554b6cdc7ace5d360885c3f5bbcc73ec0e8'),
-    @('cmocka', '5a4b15870efa2225e6586fbb4c3af05ff0659434'),
+    @('cmocka', '9c114ac31a33217cf003bbb674c1aff7bb048917'),
     @('freetype', '6a2b3e4007e794bfc6c91030d0ed987f925164a8'),
     @('curl', '315ee3fe75dade912b48a21ceec9ccda0230d937'),
     @('rnnoise', '90ec41ef659fd82cfec2103e9bb7fc235e9ea66c'),
