@@ -323,8 +323,9 @@ function Git-Fetch {
             git fetch origin
         }
 
-        git checkout -f "${GH_REF}" --
-        git reset --hard "${GH_REF}" --
+        Write-Info "Checking out commit ${GIT_REF}..."
+        git checkout -f "${GIT_REF}" --
+        git reset --hard "${GIT_REF}" --
         if (Test-Path "./.gitmodules") {
             git submodule foreach --recursive git submodule sync
             git submodule update --init --recursive
@@ -332,8 +333,8 @@ function Git-Fetch {
     } else {
         git clone "${GIT_HOST}/${GIT_USER}/${GIT_REPO}.git" "$(pwd)"
         git config advice.detachedHead false
-        Write-Info "Checking out commit ${GH_REF}..."
-        git checkout -f "${GH_REF}" --
+        Write-Info "Checking out commit ${GIT_REF}..."
+        git checkout -f "${GIT_REF}" --
 
         if (Test-Path "./.gitmodules") {
             git submodule foreach --recursive git submodule sync
