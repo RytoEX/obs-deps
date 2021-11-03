@@ -601,4 +601,6 @@ jobs:
         uses: actions/upload-artifact@v2.2.4
         with:
           name: ${{ env.FILE_NAME }}
-          path: ${{ github.workspace }}/windows/${{ env.FILE_NAME }}
+          path: |
+            ${{ github.workspace }}\windows\win32
+            ${{ github.workspace }}\windows\win64

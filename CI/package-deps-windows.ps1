@@ -28,7 +28,7 @@ $ErrorActionPreference = "Stop"
 
 function Package-OBS-Deps-Main {
     $CheckoutDir = git rev-parse --show-toplevel
-    $ProductName = "windows-obs-deps"
+    $ProductName = "windows-deps"
     $DepsBuildDir = "${CheckoutDir}\windows\obs-win-deps"
 
     . "${CheckoutDir}\CI\include\build_support_windows.ps1"
@@ -60,7 +60,6 @@ function Package-OBS-Deps-Main {
         Caught-Error "Missing native build in ${NativeDirBase}\win64"
     }
 
-    Write-Output "DepsBuildDir: ${DepsBuildDir}"
     Remove-ItemIfExists "${DepsBuildDir}"
     Ensure-Directory "${DepsBuildDir}\win32"
     Ensure-Directory "${DepsBuildDir}\win64"
@@ -80,11 +79,16 @@ function Package-OBS-Deps-Main {
             $NativeDir = "${NativeDirBase}\win64"
             $FinalDir = "${DepsBuildDir}\win64"
         }
+
+        Write-Step "Copy $($Package.WinArch)/$($Package.Arch) files..."
+
         # Copy cross-compiled deps first
+        Write-Step "Copy cross-compiled $($Package.WinArch)/$($Package.Arch) files..."
         Copy-Item -Path "${CrossDir}\bin" -Destination "${FinalDir}" -Recurse
         Copy-Item -Path "${CrossDir}\include" -Destination "${FinalDir}" -Recurse
         Copy-Item -Path "${CrossDir}\licenses" -Destination "${FinalDir}" -Recurse
 
+        Write-Step "Clean up cross-compiled $($Package.WinArch)/$($Package.Arch) files..."
         # Remove unneeded files before copying native-compiled deps
         # Make sure symlinks still exist before trying to remove them
         Remove-Item -Path "${FinalDir}\bin\libmbedtls.dll" -Force
@@ -102,6 +106,7 @@ function Package-OBS-Deps-Main {
         Remove-Item -Path "${FinalDir}\bin\zlib.def" -Force
 
         # Copy native-compiled deps
+        Write-Step "Copy native-compiled $($Package.WinArch)/$($Package.Arch) files..."
         Copy-Item -Path "${NativeDir}\bin\*" "${FinalDir}\bin" -Recurse -Force
         Copy-Item -Path "${NativeDir}\include\*" "${FinalDir}\include" -Recurse -Force
         #Copy-Item -Path "${NativeDir}\licenses\*" "${FinalDir}\licenses" -Recurse -Force
@@ -111,6 +116,7 @@ function Package-OBS-Deps-Main {
         Copy-Item -Path "${NativeDir}\swig" "${FinalDir}\swig" -Recurse
 
         # Move and rename items
+        Write-Step "Clean up native-compiled $($Package.WinArch)/$($Package.Arch) files..."
         New-Item -Path "${FinalDir}\include\cmocka" -ItemType Directory
         Move-Item -Path "${FinalDir}\include\cmocka*.h" -Destination "${FinalDir}\include\cmocka"
         Rename-Item -Path "${FinalDir}\bin\libcurl_imp.lib" -NewName "libcurl.lib"
@@ -122,6 +128,11 @@ function Package-OBS-Deps-Main {
         Remove-Item -Path "${FinalDir}\cmake\CURL" -Recurse -Force
         Remove-Item -Path "${FinalDir}\cmake\freetype" -Recurse -Force
     }
+
+    # Create dependencies archive
+    Write-Step "Create pre-built dependency arhive ${FileName}..."
+    cd "${DepsBuildDir}\.."
+    tar -czf "${FileName}" -C "${DepsBuildDir}" *
 
     Write-Info "All done!"
 }
