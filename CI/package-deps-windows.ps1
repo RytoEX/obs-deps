@@ -130,7 +130,7 @@ function Package-OBS-Deps-Main {
     }
 
     # Create dependencies archive
-    Write-Step "Create pre-built dependency arhive ${FileName}..."
+    Write-Step "Create pre-built dependency archive ${FileName}..."
     cd "${DepsBuildDir}\.."
     tar -czf "${FileName}" -C "${DepsBuildDir}" *
 
