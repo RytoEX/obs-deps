@@ -19,12 +19,12 @@ _build_product() {
     ./autogen.sh
     PKG_CONFIG_PATH="${BUILD_DIR}/lib/pkgconfig" \
         LDFLAGS="-L${BUILD_DIR}/lib -static-libgcc" \
-        CPPFLAGS="-I${BUILD_DIR}/include" \
+        CPPFLAGS="-I${BUILD_DIR}/include -D_FORTIFY_SOURCE=0" \
         ./configure \
         --host=$WIN_CROSS_TOOL_PREFIX-w64-mingw32 \
         --prefix="${BUILD_DIR}" \
         --enable-shared \
-        --enable-stack-protector=yes
+        --disable-stack-protector
 
     step "Build ("${ARCH}")..."
     make -j$PARALLELISM
