@@ -22,10 +22,13 @@ _build_product() {
     ensure_dir "${PRODUCT_FOLDER}/build_${ARCH}"
 
     step "Configure (${ARCH})..."
+    if [ -f "Makefile" ]; then
+        make clean
+    fi
     cmake .. ${CMAKE_CCACHE_OPTIONS} \
         -DCMAKE_SYSTEM_NAME=Windows \
         -DCMAKE_C_COMPILER=$WIN_CROSS_TOOL_PREFIX-w64-mingw32-gcc \
-        -DCMAKE_CXX_COMPILER=$WIN_CROSS_TOOL_PREFIX-w64-mingw32-g++ \
+        -DCMAKE_CXX_COMPILER=$WIN_CROSS_TOOL_PREFIX-w64-mingw32-c++ \
         -DCMAKE_INSTALL_PREFIX="${BUILD_DIR}" \
         -DCMAKE_RC_COMPILER=$WIN_CROSS_TOOL_PREFIX-w64-mingw32-windres \
         -DUSE_ENCLIB="mbedtls" \
@@ -34,7 +37,7 @@ _build_product() {
         -DENABLE_SHARED=ON \
         -DCMAKE_C_FLAGS="-I${CHECKOUT_DIR}/windows_cross_build_temp/pthread-win32" \
         -DCMAKE_CXX_FLAGS="-I${CHECKOUT_DIR}/windows_cross_build_temp/pthread-win32" \
-        -DCMAKE_SHARED_LINKER_FLAGS="-static-libgcc -Wl,--strip-debug" \
+        -DCMAKE_SHARED_LINKER_FLAGS="-static-libgcc -static-libstdc++ -Wl,--strip-debug" \
         -DPTHREAD_LIBRARY="${BUILD_DIR}/lib/libpthreadGC2.a" \
         -DPTHREAD_INCLUDE_DIR="${CHECKOUT_DIR}/windows_cross_build_temp/pthread-win32" \
         -DUSE_OPENSSL_PC=OFF \
