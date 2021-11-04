@@ -19,6 +19,7 @@ _fixup_installed_files() {
     rm -f "${BUILD_DIR}"/lib/libpng.a
     rm -f "${BUILD_DIR}"/lib/libpng.dll.a
     rm -f "${BUILD_DIR}"/lib/libpng.la
+    rm -f "${BUILD_DIR}"/lib/pkgconfig/libpng.pc
 }
 
 _build_product() {
