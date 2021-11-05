@@ -319,7 +319,7 @@ function Git-Fetch {
         git config remote.origin.fetch "+refs/heads/master:refs/remotes/origin/master"
         git config remote.origin.tapOpt --no-tags
 
-        if (!(git rev-parse -q --verify "${GH_COMMIT}^{commit}")) {
+        if (!(git rev-parse -q --verify "${GIT_REF}^{commit}")) {
             git fetch origin
         }
 
