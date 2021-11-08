@@ -604,3 +604,44 @@ jobs:
           path: |
             ${{ github.workspace }}\windows\obs-win-deps\win32
             ${{ github.workspace }}\windows\obs-win-deps\win64
+
+  make-release:
+    name: 'Create and upload release'
+    runs-on: [ubuntu-latest]
+    if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
+    needs: [windows-deps-package]
+    steps:
+      - name: Get Current Date
+        shell: bash
+        id: get_date
+        run: echo "CURRENT_DATE=$(date +"%Y-%m-%d")" >> $GITHUB_ENV
+
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+
+      - name: 'Create Release'
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.get_version.outputs.VERSION }}
+          release_name: OBS Deps build ${{ steps.get_version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+
+      - name: 'Download Windows deps artifact'
+        uses: actions/download-artifact@v2
+        with:
+          name: windows-deps-${{ env.CURRENT_DATE }}
+
+      - name: 'Upload Windows deps package to release'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/windows-deps-${{ env.CURRENT_DATE }}
+          asset_name: windows-deps-${{ steps.get_version.outputs.VERSION }}.zip
+          asset_content_type: application/octet-stream
