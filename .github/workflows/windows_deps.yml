@@ -618,7 +618,7 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\/win-/}
 
       - name: 'Create Release'
         id: create_release
@@ -636,12 +636,15 @@ jobs:
         with:
           name: windows-deps-${{ env.CURRENT_DATE }}
 
+      - name: 'Zip Windows deps artifact'
+        run: 7z a windows-deps-${{ env.CURRENT_DATE }}.zip win32\ win64\ -mx9
+
       - name: 'Upload Windows deps package to release'
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ${{ github.workspace }}/windows-deps-${{ env.CURRENT_DATE }}
+          asset_path: ${{ github.workspace }}/windows-deps-${{ env.CURRENT_DATE }}.zip
           asset_name: windows-deps-${{ steps.get_version.outputs.VERSION }}.zip
           asset_content_type: application/octet-stream
