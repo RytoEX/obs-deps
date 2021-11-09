@@ -637,6 +637,9 @@ jobs:
         with:
           name: windows-deps-${{ env.CURRENT_DATE }}
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: 'Zip Windows deps artifact'
         run: 7z a windows-deps-${{ env.CURRENT_DATE }}.zip win32\ win64\ -mx9
 
