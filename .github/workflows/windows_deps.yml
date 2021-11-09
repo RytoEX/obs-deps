@@ -641,7 +641,7 @@ jobs:
         uses: mxschmitt/action-tmate@v3
 
       - name: 'Zip Windows deps artifact'
-        run: 7z a windows-deps-${{ env.CURRENT_DATE }}.zip win32\ win64\ -mx9
+        run: 7z a windows-deps-${{ env.CURRENT_DATE }}.zip win32 win64 -mx9
 
       - name: 'Upload Windows deps package to release'
         uses: actions/upload-release-asset@v1
