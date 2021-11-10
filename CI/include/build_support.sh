@@ -129,17 +129,6 @@ check_git() {
     fi
 }
 
-_add_ccache_to_path() {
-    if [ "${CMAKE_CCACHE_OPTIONS}" ]; then
-        PATH="/usr/local/opt/ccache/libexec:${PATH}"
-        status "Compiler Info:"
-        local IFS=$'\n'
-        for COMPILER_INFO in $(type cc c++ gcc g++ clang clang++ || true); do
-            info "${COMPILER_INFO}"
-        done
-    fi
-}
-
 safe_fetch() {
     if [ $# -lt 2 ]; then
         error "Usage: safe_fetch URL HASH"
