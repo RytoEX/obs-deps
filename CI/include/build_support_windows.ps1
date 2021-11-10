@@ -434,7 +434,7 @@ function Check-Curl {
     }
 
     # TODO: implement a way to force using/installing curl.exe from chocolatey
-    #$CURLCMD = "C:\ProgramData\chocolatey\bin\curl.exe"
+    #       "C:\ProgramData\chocolatey\bin\curl.exe"
     $CURLCMD = "C:\Windows\System32\curl.exe"
 
     if ($Env:CI -or $Quiet) {
