@@ -123,7 +123,6 @@ _build_checks() {
     CI_PRODUCT_VERSION=$(/bin/cat "${CI_WORKFLOW}" | /bin/sed '/windows-deps-build-cross-compile/,/defaults:/!d' | /bin/sed -En "s/[ ]+${PRODUCT_NAME_U}_VERSION: '(.+)'/\1/p")
     CI_PRODUCT_HASH=$(/bin/cat "${CI_WORKFLOW}" | /bin/sed '/windows-deps-build-cross-compile/,/defaults:/!d' | /bin/sed -En "s/[ ]+${PRODUCT_NAME_U}_HASH: '([0-9a-f]+)'/\1/p")
 
-
     check_archs
 
     if [ -z "${INSTALL}" ]; then
