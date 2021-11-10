@@ -71,10 +71,7 @@ obs-deps-build-main() {
 
     cd "${CHECKOUT_DIR}/windows/obs-dependencies-${ARCH}"
 
-    step "Cleanup unnecessary files..."
-    #find . \( -type f -or -type l \) \( -name "*.la" -or -name "*.a" \) | xargs rm
-    #rm -rf ./lib
-    #rm -rf ./share
+    step "Copy license files..."
     cp -R "${CHECKOUT_DIR}/licenses" .
 
     step "Create archive ${FILE_NAME}"
