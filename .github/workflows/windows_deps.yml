@@ -520,7 +520,7 @@ jobs:
     needs: [windows-deps-build-cross-compile, windows-deps-build-native]
     defaults:
       run:
-        shell: pwsh
+        shell: bash
     steps:
       - name: Get Current Date
         shell: bash
@@ -571,7 +571,6 @@ jobs:
       - name: 'Extract artifacts'
         if: ${{ github.event_name != 'pull_request' || env.SEEKING_TESTERS == '1' }}
         working-directory: ${{ github.workspace }}/windows
-        shell: bash
         run: |
           CURRENT_DATE=$(date +"%Y-%m-%d")
           FILE_NAME="windows-deps-${CURRENT_DATE}"
@@ -592,6 +591,7 @@ jobs:
           tar -xf $(basename ${ARTIFACT_WIN64_NATIVE}) --directory obs-native-deps/win64
 
       - name: 'Create Windows deps package'
+        shell: pwsh
         if: ${{ github.event_name != 'pull_request' || env.SEEKING_TESTERS == '1' }}
         run: CI/package-deps-windows.ps1
 
