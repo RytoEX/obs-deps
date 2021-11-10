@@ -38,6 +38,7 @@ Param(
 
 $ErrorActionPreference = "Stop"
 
+$_ScriptName = "$($MyInvocation.MyCommand.Name)"
 $_RunObsDepsBuildScript = $true
 $ProductName = "obs-deps"
 
@@ -125,7 +126,7 @@ function Build-OBS-Deps-Main {
 function Print-Usage {
     Write-Host "build-deps-windows-native.ps1 - Build script for ${ProductName}"
     $Lines = @(
-        "Usage: ${MyInvocation.MyCommand.Name}",
+        "Usage: ${_ScriptName}",
         "-Help                    : Print this help",
         "-Quiet                   : Suppress most build process output",
         "-Verbose                 : Enable more verbose build process output",

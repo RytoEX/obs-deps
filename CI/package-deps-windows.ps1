@@ -26,6 +26,8 @@ Param(
 
 $ErrorActionPreference = "Stop"
 
+$_ScriptName = "$($MyInvocation.MyCommand.Name)"
+
 function Package-OBS-Deps-Main {
     $CheckoutDir = git rev-parse --show-toplevel
     $ProductName = "windows-deps"
@@ -141,7 +143,7 @@ function Package-OBS-Deps-Main {
 function Print-Usage {
     Write-Host "package-deps-windows.ps1 - Package script for ${ProductName}"
     $Lines = @(
-        "Usage: ${MyInvocation.MyCommand.Name}",
+        "Usage: ${_ScriptName}",
         "-Help                    : Print this help",
         "-Quiet                   : Suppress most build process output",
         "-Verbose                 : Enable more verbose build process output",
