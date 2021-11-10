@@ -31,7 +31,8 @@ fi
 install_tools() {
     sudo apt ${QUIET:+--quiet} -y install automake cmake curl git libtool mingw-w64 mingw-w64-tools pkg-config wget
 
-    curl -L -O https://www.nasm.us/pub/nasm/releasebuilds/2.15.01/nasm-2.15.01.tar.xz
+    check_and_fetch 'https://www.nasm.us/pub/nasm/releasebuilds/2.15.01/nasm-2.15.01.tar.xz' '28a50f80d2f4023e444b113e9ddc57fcec2b2f295a07ce158cf3f18740375831'
+
     tar -xf nasm-2.15.01.tar.xz
     cd ./nasm-2.15.01
     ./configure
