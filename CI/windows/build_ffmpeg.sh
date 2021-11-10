@@ -23,6 +23,30 @@ _patch_product() {
     git add .
     git commit -m "Fix decoding of certain malformed FLV files"
 
+    # cherry pick commits for SRT fixes
+    # 1f7b527194a2 avformat/libsrt: check av_strdup() return value and fix memleak
+    # f9d6addd60b3 avformat/libsrt: fix for the memory leak if passphrase has been configured by option
+    # 79d907774d59 avformat/libsrt: change tlpktdrop, nakreport, messageapi options to boolean type
+    # 8d823e6005fe lavf/libsrt: add linger parameter to libsrt
+    # 952fd0c76874 lavf/libsrt: enable other encryption parameters
+    # d7e2a2bb35e3 lavf/libsrt: add version guard for srt encryption control
+    # 3def315c5c3b lavf/libsrt: Fix typo
+    # f8990c5f414d avformat/libsrt: fix enabling nonblocking mode
+    # fee4cafbf52f avformat/libsrt: add missing SRT_VERSION_VALUE check
+    # b96bc946f219 avformat/libsrt: fix timeout unit confusion between milisec and microsec
+    # 006744bdbd83 avformat/libsrt: fix name of timeout option
+    # aab9133d919b avformat/libsrt: fix checking connection result in non-blocking mode
+    # c112fae6603f avformat/libsrt: poll for error conditions as well
+    # 86a7b77b6048 avformat/libsrt: small fixes in libsrt_neterrno()
+    # 7cc7680a802c avformat/libsrt: send non-blocking mode on both the listen and the connect socket
+    # 449e984192d9 avformat/libsrt: use listen_timeout for listening
+    # 290a35aefed2 avformat/libsrt: make avformat connect timeout 0 by default
+    # 6e95ce8cc9ae avformat/libsrt: clarify option description for timeout and latency unit of measurement
+    # e9b35a249d22 avformat/libsrt: change open_timeout to int64_t to avoid integer overflow
+    # 7c59e1b0f285 lavf/srt: fix build fail when used the libsrt 1.4.1
+    # 86f5fd471d35 avformat/libsrt: close listen fd in listener mode
+    # fb0304fcc9f7 avformat/libsrt: fix cleanups on failed libsrt_open() and libsrt_setup()
+
     git cherry-pick 1f7b527194a2a10c334b0ff66ec0a72f4fe65e08 \
         f9d6addd60b3f9ac87388fe4ae0dc217235af81d \
         79d907774d59119dcfd1c04dae97b52890aec3ec \
