@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+      - debug-hashfiles
+      - improve-qt-cache
+      - '**'
     tags:
       - '20[2-9][0-9]-[0-9][0-9]-[0-9][0-9]'
   pull_request:
@@ -442,6 +445,15 @@ jobs:
           path: ${{ github.workspace }}/macos/obs-dependencies-qt-${{ matrix.arch }}
           key: ${{ runner.os }}-deps-${{ env.CACHE_NAME }}-${{ env.QT_VERSION }}-${{ hashFiles('CI/patches/QTBUG-[0-9]+.patch', 'CI/macos/patches/QTBUG-[0-9]+.patch') }}
           restore-keys: ${{ runner.os }}-deps-${{ env.CACHE_NAME }}-${{ env.QT_VERSION }}-
+        run: |
+          echo "${{ runner.os }}-deps-${{ env.CACHE_NAME }}-${{ env.QT_VERSION }}-${{ hashFiles('CI/patches/QTBUG-[0-9]+.patch') }}-${{ hashFiles('CI/macos/patches/QTBUG-[0-9]+.patch') }}"
+          echo "${{ runner.os }}-deps-${{ env.CACHE_NAME }}-${{ env.QT_VERSION }}-${{ hashFiles('${{ github.workspace }}/CI/patches/QTBUG-[0-9]+.patch') }}-${{ hashFiles('${{ github.workspace }}/CI/macos/patches/QTBUG-[0-9]+.patch') }}"
+
+      - name: 'Check hashFiles'
+        id: check-hashfiles
+        run: |
+          echo "${{ runner.os }}-deps-${{ env.CACHE_NAME }}-${{ env.QT_VERSION }}-${{ hashFiles('CI/patches/QTBUG-[0-9]+.patch') }}-${{ hashFiles('CI/macos/patches/QTBUG-[0-9]+.patch') }}"
+          echo "${{ runner.os }}-deps-${{ env.CACHE_NAME }}-${{ env.QT_VERSION }}-${{ hashFiles('${{ github.workspace }}/CI/patches/QTBUG-[0-9]+.patch') }}-${{ hashFiles('${{ github.workspace }}/CI/macos/patches/QTBUG-[0-9]+.patch') }}"
 
       - name: 'Build Qt'
         if: steps.qt-cache.outputs.cache-hit != 'true'
