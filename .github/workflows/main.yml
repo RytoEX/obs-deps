@@ -449,15 +449,16 @@ jobs:
       - name: 'Check hashFiles'
         id: check-hashfiles
         run: |
-          echo "runner.os: ${{ runner.os }}"
-          echo "env.CACHE_NAME: ${{ env.CACHE_NAME }}"
-          echo "env.QT_VERSION: ${{ env.QT_VERSION }}"
           echo "pwd: $PWD"
-          echo "pwd: $(pwd)"
           echo "hashFiles 01: ${{ hashFiles('CI/patches/QTBUG-[0-9]+.patch') }}"
           echo "hashFiles 02: ${{ hashFiles('CI/macos/patches/QTBUG-[0-9]+.patch') }}"
           echo "hashFiles 03 (github.workspace): ${{ hashFiles('${{ github.workspace }}/CI/patches/QTBUG-[0-9]+.patch') }}"
           echo "hashFiles 04 (github.workspace): ${{ hashFiles('${{ github.workspace }}/CI/macos/patches/QTBUG-[0-9]+.patch') }}"
+          echo "hashFiles 05 (folder): ${{ hashFiles('CI/macos/patches') }}"
+          echo "hashFiles 06 (QTBUG-*.patch): ${{ hashFiles('CI/macos/patches/QTBUG-*.patch') }}"
+          echo "hashFiles 07 (QTBUG-90370.patch): ${{ hashFiles('CI/macos/patches/QTBUG-90370.patch') }}"
+          echo "hashFiles 08 (QTBUG-[0-9][0-9][0-9][0-9][0-9].patch): ${{ hashFiles('CI/macos/patches/QTBUG-[0-9][0-9][0-9][0-9][0-9].patch') }}"
+          echo "hashFiles 09 (QTBUG-[0-9]*.patch): ${{ hashFiles('CI/macos/patches/QTBUG-[0-9]*.patch') }}"
 
       - name: 'Build Qt'
         if: steps.qt-cache.outputs.cache-hit != 'true'
