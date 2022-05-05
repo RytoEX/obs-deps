@@ -459,21 +459,6 @@ jobs:
           echo "hashFiles 03 (github.workspace): ${{ hashFiles('${{ github.workspace }}/CI/patches/QTBUG-[0-9]+.patch') }}"
           echo "hashFiles 04 (github.workspace): ${{ hashFiles('${{ github.workspace }}/CI/macos/patches/QTBUG-[0-9]+.patch') }}"
 
-      - name: 'Check hashFiles with path'
-        id: check-hashfiles-with-path
-        with:
-          path: ${{ github.workspace }}/macos/obs-dependencies-qt-${{ matrix.arch }}
-        run: |
-          echo "runner.os: ${{ runner.os }}"
-          echo "env.CACHE_NAME: ${{ env.CACHE_NAME }}"
-          echo "env.QT_VERSION: ${{ env.QT_VERSION }}"
-          echo "pwd: $PWD"
-          echo "pwd: $(pwd)"
-          echo "hashFiles 01: ${{ hashFiles('CI/patches/QTBUG-[0-9]+.patch') }}"
-          echo "hashFiles 02: ${{ hashFiles('CI/macos/patches/QTBUG-[0-9]+.patch') }}"
-          echo "hashFiles 03 (github.workspace): ${{ hashFiles('${{ github.workspace }}/CI/patches/QTBUG-[0-9]+.patch') }}"
-          echo "hashFiles 04 (github.workspace): ${{ hashFiles('${{ github.workspace }}/CI/macos/patches/QTBUG-[0-9]+.patch') }}"
-
       - name: 'Build Qt'
         if: steps.qt-cache.outputs.cache-hit != 'true'
         run: CI/macos/build_qt.sh -a ${{ matrix.arch }}
