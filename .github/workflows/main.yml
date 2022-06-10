@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - add-qt-windows-builds*
     tags:
       - '20[2-9][0-9]-[0-9][0-9]-[0-9][0-9]'
   pull_request:
@@ -428,11 +429,69 @@ jobs:
           name: ${{ steps.setup.outputs.artifactName }}
           path: ${{ github.workspace }}\windows\${{ steps.setup.outputs.artifactFileName }}
 
+  windows-qt-build:
+    name: 'Build Windows Qt'
+    runs-on: windows-2019
+    strategy:
+      fail-fast: true
+      matrix:
+        target: [x64, x86]
+        qtVersion: [5, 6]
+        config: ['RelWithDebInfo', 'Debug']
+    env:
+      CACHE_REVISION: '01'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Environment
+        id: setup
+        run: |
+          $ArtifactName="qt${{ matrix.qtVersion }}-windows-${{ matrix.target }}-${{ matrix.config }}-${{ github.sha }}"
+          $FileName="windows-deps-qt${{ matrix.qtVersion }}-$(Get-Date -Format 'yyyy-MM-dd')-${{ matrix.target }}-${{ matrix.config }}.zip"
+
+          Write-Output "::set-output name=artifactName::${ArtifactName}"
+          Write-Output "::set-output name=artifactFileName::${FileName}"
+
+      - name: 'Check for GitHub Labels'
+        id: seekingTesters
+        if: ${{ github.event_name == 'pull_request' }}
+        run: |
+          $LabelFound = try {
+            $Params = @{
+              Authentication = 'Bearer'
+              Token = (ConvertTo-SecureString '${{ secrets.GITHUB_TOKEN }}' -AsPlainText)
+              Uri = '${{ github.event.pull_request.url }}'
+              UseBasicParsing = $true
+            }
+
+            (Invoke-RestMethod @Params).labels.name.contains("Seeking Testers")
+          } catch {
+            $false
+          }
+
+          Write-Output "::set-output name=found::$(([string]${LabelFound}).ToLower())"
+
+      - name: 'Build Windows Qt'
+        uses: ./.github/actions/build-windows-qt
+        with:
+          target: ${{ matrix.target }}
+          config: ${{ matrix.config }}
+          qtVersion: ${{ matrix.qtVersion }}
+          cacheRevision: ${{ env.CACHE_REVISION }}
+
+      - name: 'Publish Build Artifacts'
+        if: ${{ success() && (github.event_name != 'pull_request' || steps.seekingTesters.outputs.found == 'true') }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.setup.outputs.artifactName }}
+          path: ${{ github.workspace }}/windows/${{ steps.setup.outputs.artifactFileName }}
+
   make-release:
     name: 'Create and upload release'
     runs-on: ubuntu-20.04
     if: github.event_name == 'push' && contains(github.ref, 'refs/tags/')
-    needs: [ffmpeg-package-universal, macos-package-universal, macos-qt-package-universal, windows-build]
+    needs: [ffmpeg-package-universal, macos-package-universal, macos-qt-package-universal, windows-build, windows-qt-build]
     defaults:
       run:
         shell: bash
@@ -467,6 +526,9 @@ jobs:
 
             popd > /dev/null
           done
+
+          mv ${{ github.workspace }}/qt5-windows-*/*.zip ${{ github.workspace }}
+          mv ${{ github.workspace }}/qt6-windows-*/*.zip ${{ github.workspace }}
 
       - name: 'Package Linux dependencies'
         run: |
@@ -532,8 +594,8 @@ jobs:
           name: "OBS Deps Build ${{ steps.metadata.outputs.version }}"
           body_path: ${{ github.workspace }}/CHECKSUMS.txt
           files: |
-            ${{ github.workspace }}/windows-*-x64.zip
-            ${{ github.workspace }}/windows-*-x86.zip
+            ${{ github.workspace }}/windows-*-x64*.zip
+            ${{ github.workspace }}/windows-*-x86*.zip
             ${{ github.workspace }}/macos-*-arm64.tar.xz
             ${{ github.workspace }}/macos-*-x86_64.tar.xz
             ${{ github.workspace }}/macos-*-universal.tar.xz
