@@ -99,7 +99,7 @@ function Fixup {
     $Items = @(
         @{
             Path = "$($ConfigData.OutputPath)/lib/ajantv2_vs[0-9]*_M[DT]$(if ( $Configuration -eq 'Debug' ) { 'd' }).lib"
-            Destination = "$($ConfigData.OutputPath)/lib"
+            Destination = "$($ConfigData.OutputPath)/lib/ajantv2$(if ( $Configuration -eq 'Debug' ) { 'd' }).lib"
             Force = $true
         }
     )
