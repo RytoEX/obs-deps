@@ -2,9 +2,9 @@ autoload -Uz log_debug log_error log_info log_status log_output
 
 ## Dependency Information
 local name='FFmpeg'
-local version='7.1.1'
+local version='8.0.1'
 local url='https://github.com/FFmpeg/FFmpeg.git'
-local hash='db69d06eeeab4f46da15030a80d539efb4503ca8'
+local hash='894da5ca7d742e4429ffb2af534fcda0103ef593'
 local -a patches=(
   "* ${0:a:h}/patches/FFmpeg/0001-flvdec-handle-unknown.patch \
     5a5185f54cbcf4672763cce687d1b6ddb662549b69637da826279ce4797f57ef"
