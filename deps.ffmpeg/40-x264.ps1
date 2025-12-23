@@ -1,8 +1,8 @@
 param(
     [string] $Name = 'x264',
-    [string] $Version = 'r3106',
-    [string] $Uri = 'https://github.com/mirror/x264.git',
-    [string] $Hash = 'eaa68fad9e5d201d42fde51665f2d137ae96baf0',
+    [string] $Version = 'r3222',
+    [string] $Uri = 'https://code.videolan.org/videolan/x264.git',
+    [string] $Hash = 'b35605ace3ddf7c1a5d67a2eb553f034aef41d55',
     [array] $Targets = @('x64', 'arm64'),
     [switch] $ForceShared = $true
 )
