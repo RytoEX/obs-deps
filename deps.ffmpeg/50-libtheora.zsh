@@ -3,18 +3,18 @@ autoload -Uz log_debug log_error log_info log_status log_output
 ## Dependency Information
 local name='libtheora'
 local -A versions=(
-  macos 1.1.1
-  linux 1.1.1
-  windows 1.1.1
+  macos 1.2.0
+  linux 1.2.0
+  windows 1.2.0
 )
 local -A urls=(
-  macos https://ftp.osuosl.org/pub/xiph/releases/theora/libtheora-1.1.1.tar.xz
-  linux https://ftp.osuosl.org/pub/xiph/releases/theora/libtheora-1.1.1.tar.xz
+  macos https://ftp.osuosl.org/pub/xiph/releases/theora/libtheora-1.2.0.tar.xz
+  linux https://ftp.osuosl.org/pub/xiph/releases/theora/libtheora-1.2.0.tar.xz
   windows https://github.com/xiph/theora.git
 )
 local -A hashes=(
-  macos "${0:a:h}/checksums/libtheora-1.1.1.tar.xz.sha256"
-  linux "${0:a:h}/checksums/libtheora-1.1.1.tar.xz.sha256"
+  macos "${0:a:h}/checksums/libtheora-1.2.0.tar.xz.sha256"
+  linux "${0:a:h}/checksums/libtheora-1.2.0.tar.xz.sha256"
   windows 7180717276af1ebc7da15c83162d6c5d6203aabf
 )
 local -a patches=(
