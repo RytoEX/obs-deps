@@ -1,8 +1,8 @@
 param(
     [string] $Name = 'mbedtls',
-    [string] $Version = '3.6.4',
+    [string] $Version = '3.6.5',
     [string] $Uri = 'https://github.com/Mbed-TLS/mbedtls.git',
-    [string] $Hash = 'c765c831e5c2a0971410692f92f7a81d6ec65ec2',
+    [string] $Hash = 'e185d7fd85499c8ce5ca2a54f5cf8fe7dbe3f8df',
     [array] $Targets = @('x64', 'arm64'),
     [array] $Patches = @(
         @{
