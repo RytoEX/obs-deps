@@ -1,8 +1,8 @@
 param(
     [string] $Name = 'wil',
-    [string] $Version = 'v1.0.240803.1',
+    [string] $Version = 'v1.0.260126.7',
     [string] $Uri = 'https://github.com/microsoft/wil.git',
-    [string] $Hash = 'f0c6a81c0c9a4b23b6801f40554b8bec425a83b4',
+    [string] $Hash = 'cbf677fb0a942557d08fd129f4c106a76247b2ec',
     [array] $Targets = @('x64', 'arm64'),
     [switch] $ForceStatic = $true
 )
