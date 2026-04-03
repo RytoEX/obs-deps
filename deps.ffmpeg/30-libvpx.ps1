@@ -1,8 +1,8 @@
 param(
     [string] $Name = 'libvpx',
-    [string] $Version = '1.15.2',
-    [string] $Uri = 'https://github.com/webmproject/libvpx/archive/refs/tags/v1.15.2.zip',
-    [string] $Hash = "${PSScriptRoot}/checksums/v1.15.2.zip.sha256",
+    [string] $Version = '1.16.0',
+    [string] $Uri = 'https://github.com/webmproject/libvpx/archive/refs/tags/v1.16.0.zip',
+    [string] $Hash = "${PSScriptRoot}/checksums/v1.16.0.zip.sha256",
     [array] $Targets = @('x64', 'arm64')
 )
 
