@@ -7,8 +7,8 @@
     <ToString>Microsoft.PowerShell.Commands.FileHashInfo</ToString>
     <Props>
       <S N="Algorithm">SHA256</S>
-      <S N="Hash">279327339903B544C28A92AEADA7D0DCFD0397B59C2F368CC698AC56F515906E</S>
-      <S N="Path">libtheora-1.2.0.tar.gz</S>
+      <S N="Hash">F644FEF154F7A80E7258C8BAEC5C510F594D720835855CDDCE322B924934BA36</S>
+      <S N="Path">libtheora-1.1.1.zip</S>
     </Props>
   </Obj>
 </Objs>
