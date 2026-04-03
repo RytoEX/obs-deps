@@ -2,12 +2,12 @@ autoload -Uz log_debug log_error log_info log_status log_output
 
 ## Dependency Information
 local name='opus'
-local version='1.6'
+local version='1.6.1'
 local url='https://github.com/xiph/opus.git'
 local -A hashes=(
-  macos a8b13e40d751c7b40833b94fc9437c5c3439da89
-  linux a8b13e40d751c7b40833b94fc9437c5c3439da89
-  windows a8b13e40d751c7b40833b94fc9437c5c3439da89
+  macos 22244de5a79bd1d6d623c32e72bf1954b56235be
+  linux 22244de5a79bd1d6d623c32e72bf1954b56235be
+  windows 22244de5a79bd1d6d623c32e72bf1954b56235be
 )
 
 ## Build Steps
