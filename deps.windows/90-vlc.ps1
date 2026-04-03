@@ -1,8 +1,8 @@
 param(
     [string] $Name = 'vlc',
-    [string] $Version = '3.0.21',
-    [string] $Uri = 'https://cdn-fastly.obsproject.com/downloads/vlc-3.0.21.zip',
-    [string] $Hash = "${PSScriptRoot}/checksums/vlc-3.0.21.zip.sha256",
+    [string] $Version = '3.0.23',
+    [string] $Uri = 'https://cdn-fastly.obsproject.com/downloads/vlc-3.0.23.zip',
+    [string] $Hash = "${PSScriptRoot}/checksums/vlc-3.0.23.zip.sha256",
     [array] $Targets = @('x64', 'arm64')
 )
 
