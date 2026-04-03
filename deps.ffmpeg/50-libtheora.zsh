@@ -17,6 +17,10 @@ local -A hashes=(
   linux "${0:a:h}/checksums/libtheora-1.2.0.tar.xz.sha256"
   windows 7180717276af1ebc7da15c83162d6c5d6203aabf
 )
+local -a patches=(
+  "macos ${0:a:h}/patches/libtheora/0001-fix-flat-namespace-on-big-sur.patch \
+    83af02f2aa2b746bb7225872cab29a253264be49db0ecebb12f841562d9a2923"
+)
 
 ## Dependency Overrides
 local targets=('macos-*' 'linux-*')
