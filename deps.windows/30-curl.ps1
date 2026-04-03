@@ -1,8 +1,8 @@
 param(
     [string] $Name = 'curl',
-    [string] $Version = '8.12.1',
+    [string] $Version = '8.19.0',
     [string] $Uri = 'https://github.com/curl/curl.git',
-    [string] $Hash = '57495c64871d18905a0941db9196ef90bafe9a29',
+    [string] $Hash = '8c908d2d0a6d32abdedda2c52e90bd56ec76c24d',
     [array] $Targets = @('x64', 'arm64')
 )
 
