@@ -5,8 +5,8 @@ param(
     [string] $Hash = '3201b6c2bf1e4d4791f66fc8634e80f3ff2731c6',
     [array] $Targets = @('x64', 'arm64'),
     [hashtable] $PythonVersion = @{
-        x64 = '3.8.10'
-        arm64 = '3.11.6-arm'
+        x64 = '3.12.10'
+        arm64 = '3.12.10-arm'
     }
 )
 
