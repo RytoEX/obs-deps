@@ -7,8 +7,8 @@
     <ToString>Microsoft.PowerShell.Commands.FileHashInfo</ToString>
     <Props>
       <S N="Algorithm">SHA256</S>
-      <S N="Hash">084115C62FE023E3D88CD78764A4D8E89763985EE4B4A085825F7A00D85EAFBB</S>
-      <S N="Path">libpng-1.6.47.tar.gz</S>
+      <S N="Hash">883340209FCCD5353E406A79E22A2D226FC61666B83E700AB1E367BC1A679101</S>
+      <S N="Path">lpng1647.zip</S>
     </Props>
   </Obj>
 </Objs>

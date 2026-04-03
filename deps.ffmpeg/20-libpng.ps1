@@ -1,8 +1,8 @@
 param(
     [string] $Name = 'libpng',
     [string] $Version = '1.6.47',
-    [string] $Uri = 'https://sourceforge.net/projects/libpng/files/libpng16/1.6.47/libpng-1.6.47.tar.gz',
-    [string] $Hash = "${PSScriptRoot}/checksums/libpng-1.6.47.tar.gz.sha256",
+    [string] $Uri = 'https://sourceforge.net/projects/libpng/files/libpng16/1.6.47/lpng1647.zip',
+    [string] $Hash = "${PSScriptRoot}/checksums/lpng1647.zip.sha256",
     [array] $Targets = @('x64', 'arm64'),
     [array] $Patches = @(
         @{
