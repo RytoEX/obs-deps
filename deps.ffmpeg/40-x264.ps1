@@ -16,11 +16,6 @@ function Setup {
         }
         Invoke-External pacman.exe -S --noconfirm --needed --noprogressbar make
     }
-
-    if ( $Target -eq 'arm64' ) {
-        Remove-Item -Path "${Path}/tools/gas-preprocessor.pl" -ErrorAction SilentlyContinue
-        Copy-Item -Path "$($script:WorkRoot)/gas-preprocessor/gas-preprocessor.pl" -Destination "${Path}/tools/"
-    }
 }
 
 function Clean {
