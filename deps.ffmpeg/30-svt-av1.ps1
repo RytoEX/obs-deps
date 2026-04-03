@@ -1,8 +1,8 @@
 param(
     [string] $Name = 'svt-av1',
-    [string] $Version = '3.1.2',
+    [string] $Version = '4.1.0',
     [string] $Uri = 'https://gitlab.com/AOMediaCodec/SVT-AV1.git',
-    [string] $Hash = 'b33dcc56cc64fcb3b3569094af8ab1d0d81ab4c1',
+    [string] $Hash = 'c04f951541ad600e0d9c10836f2ab7b9bc69816d',
     [array] $Targets = @('x64')
 )
 
