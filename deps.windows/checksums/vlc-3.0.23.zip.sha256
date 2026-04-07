@@ -7,8 +7,8 @@
     <ToString>Microsoft.PowerShell.Commands.FileHashInfo</ToString>
     <Props>
       <S N="Algorithm">SHA256</S>
-      <S N="Hash">9045B92C03BADDBD8FF438A8E0B93425DF04DDB50400788BDAE414723B866232</S>
-      <S N="Path">windows_32-bit_build_temp\vlc-3.0.21.zip</S>
+      <S N="Hash">C21315EE77C7B55C192DE762CDF680271D0E23D78B916268EE6E034060C94427</S>
+      <S N="Path">windows_32-bit_build_temp\vlc-3.0.23.zip</S>
     </Props>
   </Obj>
 </Objs>
