@@ -2,7 +2,7 @@ param(
     [string] $Name = 'python',
     [string] $Version = '3.1.1',
     [string] $Uri = 'https://github.com/pyenv-win/pyenv-win.git',
-    [string] $Hash = '3201b6c2bf1e4d4791f66fc8634e80f3ff2731c6',
+    [string] $Hash = '856ed5a8c107879d53374f782a4b40cc794f19e0',
     [array] $Targets = @('x64', 'arm64'),
     [hashtable] $PythonVersion = @{
         x64 = '3.12.10'
