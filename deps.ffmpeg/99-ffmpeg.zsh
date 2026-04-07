@@ -211,7 +211,6 @@ config() {
     --disable-indev=jack
     --disable-sdl2
     --disable-doc
-    --disable-postproc
     --disable-stripping
   )
 

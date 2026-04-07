@@ -92,7 +92,6 @@ function Configure {
         '--disable-indev=jack'
         '--disable-sdl2'
         '--disable-doc'
-        '--disable-postproc'
         $(if ( ! $script:Shared ) { ('--pkg-config-flags=' + "'--static'") })
         $(if ( $Configuration -eq 'Debug' ) { '--enable-debug' } else { '--disable-debug' })
         $(if ( $Configuration -eq 'RelWithDebInfo' ) { '--disable-stripping' })
